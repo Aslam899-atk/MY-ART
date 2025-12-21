@@ -30,154 +30,164 @@ const Contact = () => {
 
     return (
         <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
-            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                    <h1 style={{ fontSize: '3rem' }}>Message <span style={{ color: 'var(--primary)' }}>Hub</span></h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Choose the type of message you'd like to send.</p>
-                </header>
+            <div className="row justify-content-center">
+                <div className="col-12 col-lg-10">
+                    <header className="text-center mb-5">
+                        <h1 className="display-3 fw-bold">Message <span style={{ color: 'var(--primary)' }}>Hub</span></h1>
+                        <p className="lead text-muted">Choose the type of message you'd like to send.</p>
+                    </header>
 
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', justifyContent: 'center' }}>
-                    <button
-                        onClick={() => setMsgType('inquiry')}
-                        className={`glass ${msgType === 'inquiry' ? 'btn-primary' : ''}`}
-                        style={{ padding: '1rem 2rem', borderRadius: '12px', border: msgType === 'inquiry' ? 'none' : '1px solid var(--glass-border)', color: 'white' }}
-                    >
-                        General Inquiry
-                    </button>
-                    <button
-                        onClick={() => setMsgType('service')}
-                        className={`glass ${msgType === 'service' ? 'btn-primary' : ''}`}
-                        style={{ padding: '1rem 2rem', borderRadius: '12px', border: msgType === 'service' ? 'none' : '1px solid var(--glass-border)', color: 'white' }}
-                    >
-                        Order / Service Request
-                    </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem' }}>
-                    <div className="glass" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        <div>
-                            <h3 style={{ marginBottom: '1rem' }}>{msgType === 'inquiry' ? 'Contact Info' : 'Request Info'}</h3>
-                            <p style={{ color: 'var(--text-muted)' }}>
-                                {msgType === 'inquiry'
-                                    ? 'We usually respond to general inquiries within 24 hours.'
-                                    : 'Please provide details for your custom order or service request.'}
-                            </p>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ color: 'var(--primary)' }}><Mail size={24} /></div>
-                            <div>
-                                <div style={{ fontWeight: 'bold' }}>Email</div>
-                                <div style={{ color: 'var(--text-muted)' }}>studio@artvoid.com</div>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ color: 'var(--primary)' }}><MessageCircle size={24} /></div>
-                            <div>
-                                <div style={{ fontWeight: 'bold' }}>Socials</div>
-                                <div style={{ color: 'var(--text-muted)' }}>@artvoid_studio</div>
-                            </div>
-                        </div>
+                    <div className="d-flex gap-3 mb-5 justify-content-center flex-wrap">
+                        <button
+                            onClick={() => setMsgType('inquiry')}
+                            className={`btn rounded-4 px-4 py-3 border-0 transition-all ${msgType === 'inquiry' ? 'btn-primary' : 'glass text-white'}`}
+                        >
+                            General Inquiry
+                        </button>
+                        <button
+                            onClick={() => setMsgType('service')}
+                            className={`btn rounded-4 px-4 py-3 border-0 transition-all ${msgType === 'service' ? 'btn-primary' : 'glass text-white'}`}
+                        >
+                            Order / Service Request
+                        </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Name</label>
-                            <div style={{ position: 'relative' }}>
-                                <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                <input
-                                    required
-                                    placeholder="Your Name"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
-                                />
+                    <div className="row g-5">
+                        <div className="col-12 col-md-5">
+                            <div className="glass p-4 p-md-5 h-100 d-flex flex-column gap-4 border-0">
+                                <div>
+                                    <h3 className="fw-bold mb-3">{msgType === 'inquiry' ? 'Contact Info' : 'Request Info'}</h3>
+                                    <p className="text-muted mb-0">
+                                        {msgType === 'inquiry'
+                                            ? 'We usually respond to general inquiries within 24 hours.'
+                                            : 'Please provide details for your custom order or service request.'}
+                                    </p>
+                                </div>
+
+                                <div className="d-flex align-items-center gap-3">
+                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Mail size={24} /></div>
+                                    <div>
+                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Email</div>
+                                        <div className="text-white">studio@artvoid.com</div>
+                                    </div>
+                                </div>
+
+                                <div className="d-flex align-items-center gap-3">
+                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><MessageCircle size={24} /></div>
+                                    <div>
+                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Socials</div>
+                                        <div className="text-white">@artvoid_studio</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {msgType === 'service' && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Phone No</label>
-                                    <input
-                                        required
-                                        placeholder="+1 234 567 890"
-                                        value={formData.phone}
-                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                        style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
-                                    />
+                        <div className="col-12 col-md-7">
+                            <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
+                                <div className="d-flex flex-column gap-2">
+                                    <label className="small fw-bold text-muted text-uppercase">Name</label>
+                                    <div className="position-relative">
+                                        <User size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                        <input
+                                            required
+                                            placeholder="Your Name"
+                                            className="form-control bg-dark border-0 text-white ps-5 py-3 rounded-3"
+                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Address</label>
-                                    <input
-                                        required
-                                        placeholder="Full Delivery Address"
-                                        value={formData.address}
-                                        onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                        style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
-                                    />
-                                </div>
-                            </>
-                        )}
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{msgType === 'service' ? 'Gmail' : 'Email'}</label>
-                            <div style={{ position: 'relative' }}>
-                                <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                <input
-                                    required
-                                    type="email"
-                                    placeholder="your@email.com"
-                                    value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{msgType === 'service' ? 'Comment' : 'Message'}</label>
-                            <textarea
-                                required
-                                rows="5"
-                                placeholder={msgType === 'service' ? "Describe your order or project details..." : "What's on your mind?"}
-                                value={formData.message}
-                                onChange={e => setFormData({ ...formData, message: e.target.value })}
-                                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white', resize: 'none' }}
-                            />
-                        </div>
-
-                        {msgType === 'service' && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Choose Image (Showcase)</label>
-                                <label className="glass" style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', border: '1px dashed var(--glass-border)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                    <Upload size={18} /> {formData.image ? 'Image Chosen' : 'Choose Image'}
-                                    <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
-                                </label>
-                                {formData.image && (
-                                    <div style={{ position: 'relative', marginTop: '0.5rem' }}>
-                                        <img src={formData.image} alt="Preview" style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
-                                        <button type="button" onClick={() => setFormData({ ...formData, image: '' })} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.2rem', borderRadius: '50%' }}><X size={14} /></button>
+                                {msgType === 'service' && (
+                                    <div className="row g-3">
+                                        <div className="col-12 col-sm-6 d-flex flex-column gap-2">
+                                            <label className="small fw-bold text-muted text-uppercase">Phone No</label>
+                                            <input
+                                                required
+                                                placeholder="+1 234 567 890"
+                                                className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                                value={formData.phone}
+                                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="col-12 col-sm-6 d-flex flex-column gap-2">
+                                            <label className="small fw-bold text-muted text-uppercase">Address</label>
+                                            <input
+                                                required
+                                                placeholder="Shipping Address"
+                                                className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                                value={formData.address}
+                                                onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
                                 )}
-                            </div>
-                        )}
 
-                        <button type="submit" className="btn-primary" style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                            <Send size={18} /> {msgType === 'service' ? 'Submit Request' : 'Send Message'}
-                        </button>
+                                <div className="d-flex flex-column gap-2">
+                                    <label className="small fw-bold text-muted text-uppercase">{msgType === 'service' ? 'Gmail Address' : 'Email'}</label>
+                                    <div className="position-relative">
+                                        <Mail size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                        <input
+                                            required
+                                            type="email"
+                                            placeholder="your@email.com"
+                                            className="form-control bg-dark border-0 text-white ps-5 py-3 rounded-3"
+                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                            value={formData.email}
+                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
 
-                        {submitted && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{ textAlign: 'center', color: '#10b981', fontWeight: '600' }}
-                            >
-                                {msgType === 'service' ? 'Request submitted successfully!' : 'Message sent successfully!'}
-                            </motion.div>
-                        )}
-                    </form>
+                                <div className="d-flex flex-column gap-2">
+                                    <label className="small fw-bold text-muted text-uppercase">{msgType === 'service' ? 'Comment / Notes' : 'Message'}</label>
+                                    <textarea
+                                        required
+                                        rows="4"
+                                        placeholder={msgType === 'service' ? "Describe your order or project details..." : "What's on your mind?"}
+                                        className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                                        style={{ background: 'rgba(0,0,0,0.2) !important', resize: 'none' }}
+                                        value={formData.message}
+                                        onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                    />
+                                </div>
+
+                                {msgType === 'service' && (
+                                    <div className="d-flex flex-column gap-2">
+                                        <label className="small fw-bold text-muted text-uppercase">Reference Image (Optional)</label>
+                                        <label className="btn glass border-0 text-white py-3 rounded-3 d-flex align-items-center justify-content-center gap-2" style={{ border: '1px dashed var(--glass-border) !important' }}>
+                                            <Upload size={18} /> {formData.image ? 'Image Selected' : 'Select Artwork'}
+                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="d-none" />
+                                        </label>
+                                        {formData.image && (
+                                            <div className="position-relative mt-2">
+                                                <img src={formData.image} alt="Preview" className="w-100 rounded-3" style={{ height: '120px', objectFit: 'cover' }} />
+                                                <button type="button" onClick={() => setFormData({ ...formData, image: '' })} className="btn btn-sm position-absolute top-0 end-0 m-2 rounded-circle" style={{ background: 'rgba(0,0,0,0.5)', color: 'white' }}><X size={14} /></button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                <button type="submit" className="btn btn-primary py-3 rounded-3 d-flex align-items-center justify-content-center gap-2 border-0 fw-bold mt-2">
+                                    <Send size={18} /> {msgType === 'service' ? 'Submit Request' : 'Send Message'}
+                                </button>
+
+                                {submitted && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="text-center text-success fw-bold p-3 rounded-3"
+                                        style={{ background: 'rgba(16, 185, 129, 0.1)' }}
+                                    >
+                                        {msgType === 'service' ? 'Request submitted successfully!' : 'Message sent successfully!'}
+                                    </motion.div>
+                                )}
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

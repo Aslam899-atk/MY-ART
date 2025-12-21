@@ -1,6 +1,6 @@
 {
   "name": "art-web",
-  "homepage": "https://Aslam899-atk.github.io/MY-ART",
+  "homepage": "https://art-web-5987a.web.app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,10 +9,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "firebase deploy"
   },
   "dependencies": {
+    "firebase": "^12.7.0",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

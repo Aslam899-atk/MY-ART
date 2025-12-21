@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle } from 'lucide-react';
+import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
@@ -8,6 +8,13 @@ const Shop = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [orderForm, setOrderForm] = useState({ name: '', phone: '', email: '', address: '' });
     const [isSuccess, setIsSuccess] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredProducts = products.filter(product => {
+        if (!searchQuery) return true;
+        return product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
 
     const handleOrderSubmit = (e) => {
         e.preventDefault();
@@ -29,44 +36,69 @@ const Shop = () => {
 
     return (
         <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
-            <header style={{ marginBottom: '3rem' }}>
-                <h1 style={{ fontSize: '3rem' }}>The <span style={{ color: 'var(--primary)' }}>Gallery</span></h1>
-                <p style={{ color: 'var(--text-muted)' }}>Browse our exclusive collection of premium artworks.</p>
+            <header className="mb-5">
+                <h1 className="display-3 fw-bold">The <span style={{ color: 'var(--primary)' }}>Gallery</span></h1>
+                <p className="lead text-muted">Browse our exclusive collection of premium artworks.</p>
+
+                {/* Search Bar */}
+                <div className="glass p-3 rounded-4 mt-4 d-flex align-items-center gap-3">
+                    <input
+                        type="text"
+                        placeholder="Search artworks..."
+                        className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                        style={{ background: 'rgba(0,0,0,0.3) !important' }}
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                    <div className="text-muted small text-nowrap">
+                        {filteredProducts.length} results
+                    </div>
+                </div>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-                {products.map(product => (
-                    <div key={product.id} className="glass animate-fade-in" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ position: 'relative', height: '240px', background: `url(${product.image}) center/cover`, borderBottom: '1px solid var(--glass-border)' }}>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); toggleLike(product.id); }}
-                                style={{
-                                    position: 'absolute', top: '1rem', right: '1rem',
-                                    background: likedIds && likedIds.includes(product.id) ? 'rgba(239, 68, 68, 0.8)' : 'rgba(15, 23, 42, 0.6)',
-                                    backdropFilter: 'blur(4px)', color: 'white', padding: '0.5rem 0.8rem',
-                                    borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.4rem',
-                                    border: '1px solid var(--glass-border)',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                <span style={{ color: 'white', fontSize: '1.2rem' }}>&hearts;</span> {product.likes || 0}
-                            </button>
-                        </div>
-                        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{product.category || 'Artwork'}</span>
-                                    <h3 style={{ fontSize: '1.25rem', marginTop: '0.25rem' }}>{product.name}</h3>
-                                </div>
-                                <span style={{ fontSize: '1.25rem', fontWeight: '800' }}>${product.price}</span>
+            <div className="row g-4">
+                {filteredProducts.map(product => (
+                    <div key={product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                        <div className="glass animate-fade-in h-100 overflow-hidden d-flex flex-column border-0">
+                            <div className="position-relative overflow-hidden" style={{ height: '260px' }}>
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="img-fluid w-100 h-100 transition-all hover-zoom"
+                                    style={{ objectFit: 'cover' }}
+                                />
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); toggleLike(product.id); }}
+                                    className="btn border-0 position-absolute m-3 end-0 top-0 d-flex align-items-center gap-2 px-3 py-2 rounded-4"
+                                    style={{
+                                        background: likedIds && likedIds.includes(product.id) ? 'rgba(239, 68, 68, 0.8)' : 'rgba(15, 23, 42, 0.6)',
+                                        backdropFilter: 'blur(8px)', color: 'white', zIndex: 2
+                                    }}
+                                >
+                                    <Heart size={18} fill={likedIds && likedIds.includes(product.id) ? "white" : "none"} />
+                                    <span>{product.likes || 0}</span>
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setSelectedProduct(product)}
-                                className="btn-primary"
-                                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                            >
-                                <ShoppingBag size={18} /> Order Now
-                            </button>
+                            <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
+                                <div className="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <small className="text-primary fw-bold text-uppercase tracking-wider" style={{ fontSize: '0.7rem' }}>{product.category || 'Artwork'}</small>
+                                        <h3 className="h5 mt-1 mb-0">{product.name}</h3>
+                                        <div className="d-flex gap-2">
+                                            {product.orientation && <span className="badge bg-secondary bg-opacity-25 text-muted small fw-normal">{product.orientation}</span>}
+                                        </div>
+                                    </div>
+                                    <span className={`h5 fw-bold mb-0 ${product.price > 0 ? '' : 'text-muted small'}`}>
+                                        {product.price > 0 ? `$${product.price}` : 'Display Only'}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedProduct(product)}
+                                    className="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-3 border-0 mt-auto"
+                                >
+                                    {product.price > 0 ? <><ShoppingBag size={18} /> Order Now</> : <><Mail size={18} /> Inquire</>}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -74,61 +106,75 @@ const Shop = () => {
 
             <AnimatePresence>
                 {selectedProduct && (
-                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass"
-                            style={{ width: '100%', maxWidth: '500px', padding: '2rem', position: 'relative' }}
+                            className="glass p-4 p-md-5 position-relative w-100"
+                            style={{ maxWidth: '500px' }}
                         >
                             {!isSuccess ? (
                                 <>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                        <h2>Complete Your <span style={{ color: 'var(--primary)' }}>Order</span></h2>
-                                        <button onClick={() => setSelectedProduct(null)} style={{ background: 'transparent', color: 'var(--text-muted)' }}><X size={24} /></button>
+                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                        <h2 className="h3 fw-bold mb-0">Complete Your <span style={{ color: 'var(--primary)' }}>Order</span></h2>
+                                        <button onClick={() => setSelectedProduct(null)} className="btn text-muted p-0 border-0"><X size={24} /></button>
                                     </div>
 
-                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '2rem' }}>
-                                        <div style={{ width: '60px', height: '60px', background: `url(${selectedProduct.image}) center/cover`, borderRadius: '8px' }}></div>
+                                    <div className="d-flex gap-3 align-items-center p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                        <div className="flex-shrink-0">
+                                            <img
+                                                src={selectedProduct.image}
+                                                alt={selectedProduct.name}
+                                                className="rounded-3"
+                                                style={{ width: '70px', height: '70px', objectFit: 'cover' }}
+                                            />
+                                        </div>
                                         <div>
-                                            <div style={{ fontWeight: 'bold' }}>{selectedProduct.name}</div>
-                                            <div style={{ color: 'var(--primary)', fontWeight: 'bold' }}>${selectedProduct.price}</div>
+                                            <div className="fw-bold">{selectedProduct.name}</div>
+                                            <div className="text-primary fw-bold h5 mb-0">
+                                                {selectedProduct.price > 0 ? `$${selectedProduct.price}` : 'Inquire for Price'}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleOrderSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                        <div style={{ position: 'relative' }}>
-                                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                            <input required placeholder="Full Name" value={orderForm.name} onChange={e => setOrderForm({ ...orderForm, name: e.target.value })} style={{ width: '100%', padding: '0.8rem 1rem 0.8rem 2.8rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white' }} />
+                                    <form onSubmit={handleOrderSubmit} className="d-flex flex-column gap-3">
+                                        <div className="alert alert-info border-0 bg-primary bg-opacity-10 text-primary small mb-0">
+                                            {selectedProduct.price > 0
+                                                ? "Fill out your details to place an order. We'll contact you for payment."
+                                                : "Interested in this piece? Send us an inquiry and we'll get back to you with pricing and availability."}
                                         </div>
-                                        <div style={{ position: 'relative' }}>
-                                            <Phone size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                            <input required placeholder="Phone Number" value={orderForm.phone} onChange={e => setOrderForm({ ...orderForm, phone: e.target.value })} style={{ width: '100%', padding: '0.8rem 1rem 0.8rem 2.8rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white' }} />
+                                        <div className="position-relative">
+                                            <User size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required placeholder="Full Name" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={orderForm.name} onChange={e => setOrderForm({ ...orderForm, name: e.target.value })} />
                                         </div>
-                                        <div style={{ position: 'relative' }}>
-                                            <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                            <input required type="email" placeholder="Gmail Address" value={orderForm.email} onChange={e => setOrderForm({ ...orderForm, email: e.target.value })} style={{ width: '100%', padding: '0.8rem 1rem 0.8rem 2.8rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white' }} />
+                                        <div className="position-relative">
+                                            <Phone size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required placeholder="Phone Number" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={orderForm.phone} onChange={e => setOrderForm({ ...orderForm, phone: e.target.value })} />
                                         </div>
-                                        <div style={{ position: 'relative' }}>
-                                            <MapPin size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
-                                            <textarea required rows="3" placeholder="Shipping Address" value={orderForm.address} onChange={e => setOrderForm({ ...orderForm, address: e.target.value })} style={{ width: '100%', padding: '0.8rem 1rem 0.8rem 2.8rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', resize: 'none' }} />
+                                        <div className="position-relative">
+                                            <Mail size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required type="email" placeholder="Gmail Address" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={orderForm.email} onChange={e => setOrderForm({ ...orderForm, email: e.target.value })} />
                                         </div>
-                                        <button type="submit" className="btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontWeight: 'bold' }}>Place Order</button>
+                                        <div className="position-relative">
+                                            <MapPin size={18} className="position-absolute text-muted" style={{ left: '1rem', top: '1.2rem' }} />
+                                            <textarea required rows="3" placeholder={selectedProduct.price > 0 ? "Shipping Address" : "Message / Query"} className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important', resize: 'none' }} value={orderForm.address} onChange={e => setOrderForm({ ...orderForm, address: e.target.value })} />
+                                        </div>
+                                        <button type="submit" className="btn btn-primary py-3 fw-bold border-0 rounded-3 mt-2">{selectedProduct.price > 0 ? 'Place Order' : 'Send Inquiry'}</button>
                                     </form>
                                 </>
                             ) : (
-                                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                    <div style={{ color: '#10b981', marginBottom: '1.5rem' }}><CheckCircle size={64} /></div>
-                                    <h2 style={{ marginBottom: '1rem' }}>Order Received!</h2>
-                                    <p style={{ color: 'var(--text-muted)' }}>We have received your order for <strong>{selectedProduct.name}</strong>. We will contact you soon!</p>
+                                <div className="text-center py-4">
+                                    <div className="text-success mb-4"><CheckCircle size={80} /></div>
+                                    <h2 className="h2 fw-bold mb-3">Order Received!</h2>
+                                    <p className="lead text-muted">We have received your order for <strong className="text-white">{selectedProduct.name}</strong>. We will contact you soon!</p>
                                 </div>
                             )}
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 

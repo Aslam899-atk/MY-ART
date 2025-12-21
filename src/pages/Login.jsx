@@ -19,29 +19,44 @@ const Login = () => {
     };
 
     return (
-        <div className="container" style={{ paddingTop: '10rem', display: 'flex', justifyContent: 'center' }}>
-            <div className="glass" style={{ width: '100%', maxWidth: '400px', padding: '3rem', textAlign: 'center' }}>
-                <div style={{ width: '64px', height: '64px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--primary)' }}>
-                    <Lock size={32} />
-                </div>
-                <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Admin Access</h2>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Please enter the administrator password to continue.</p>
+        <div className="container" style={{ paddingTop: '10rem', paddingBottom: '5rem' }}>
+            <div className="row justify-content-center">
+                <div className="col-12 col-sm-10 col-md-8 col-lg-5">
+                    <div className="glass p-4 p-md-5 text-center border-0 shadow-lg rounded-5">
+                        <div className="bg-primary bg-opacity-10 p-3 rounded-4 d-inline-flex align-items-center justify-content-center mb-4 text-primary">
+                            <Lock size={40} />
+                        </div>
+                        <h2 className="display-6 fw-bold mb-2">Admin Access</h2>
+                        <p className="text-muted mb-5 px-md-4">Please enter the administrator password to continue to the control panel.</p>
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <input
-                        type="password"
-                        placeholder="Admin Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }}
-                    />
-                    <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1rem' }}>
-                        Authorization <ArrowRight size={18} />
-                    </button>
-                </form>
+                        <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
+                            <div className="text-start">
+                                <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Security Key</label>
+                                <input
+                                    type="password"
+                                    placeholder="••••••••••••"
+                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3 text-center"
+                                    style={{ background: 'rgba(0,0,0,0.2) !important', letterSpacing: '0.2em' }}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                            <button type="submit" className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 mt-3 d-flex align-items-center justify-content-center gap-2 shadow">
+                                Authorization <ArrowRight size={20} />
+                            </button>
+                        </form>
+
+                        <div className="mt-5">
+                            <button onClick={() => navigate('/')} className="btn btn-link text-decoration-none text-muted small hover-text-white transition-all">
+                                ← Return to Art Void
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
+
 };
 
 export default Login;

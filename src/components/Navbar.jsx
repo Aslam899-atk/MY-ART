@@ -23,7 +23,7 @@ const Navbar = () => {
             }}>
             <div className="container-fluid p-0">
                 <Link className="navbar-brand d-flex align-items-center gap-2" to="/" style={{ fontWeight: '800', fontSize: '1.2rem' }}>
-                    <img src="/icon.png" alt="Falcon" style={{ width: '1.3cm', height: '1.3cm', borderRadius: '12px', objectFit: 'cover' }} />
+                    <img src={`${import.meta.env.BASE_URL}icon.png`} alt="Falcon" style={{ width: '1.3cm', height: '1.3cm', borderRadius: '12px', objectFit: 'cover' }} />
                     <span style={{ background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.5px' }}>
                         ART VOID
                     </span>

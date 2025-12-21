@@ -1,26 +1,26 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { db } from '../firebase';
+import {
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    runTransaction,
+    increment
+} from 'firebase/firestore';
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    const [products, setProducts] = useState(() => {
-        const saved = localStorage.getItem('art_products');
-        const defaultProducts = [
-            { id: 1, name: "Midnight Nebula", price: 250, image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80", category: "Abstract", likes: 0 },
-            { id: 2, name: "Golden Horizon", price: 180, image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80", category: "Landscape", likes: 0 },
-            { id: 3, name: "Ethereal Whispers", price: 320, image: "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80", category: "Modern", likes: 0 }
-        ];
-        if (!saved) return defaultProducts;
-        return JSON.parse(saved).map(p => ({ ...p, likes: p.likes || 0 }));
-    });
-
-    const [messages, setMessages] = useState(() => {
-        const saved = localStorage.getItem('art_messages');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    const [orders, setOrders] = useState(() => {
-        const saved = localStorage.getItem('art_orders');
+    const [products, setProducts] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [likedIds, setLikedIds] = useState(() => {
+        const saved = localStorage.getItem('art_likedIds');
         return saved ? JSON.parse(saved) : [];
     });
 
@@ -28,62 +28,147 @@ export const AppProvider = ({ children }) => {
         const saved = localStorage.getItem('art_admin_password');
         return saved ? saved : 'admin123';
     });
-
     const [isAdmin, setIsAdmin] = useState(false);
-    const [likedIds, setLikedIds] = useState(() => {
-        const saved = localStorage.getItem('art_likedIds');
-        return saved ? JSON.parse(saved) : [];
-    });
 
-    // Persist likedIds to localStorage
+    // Real-time listener for Products
+    useEffect(() => {
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const productsData = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            setProducts(productsData);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Real-time listener for Messages
+    useEffect(() => {
+        const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const messagesData = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            setMessages(messagesData);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Real-time listener for Orders
+    useEffect(() => {
+        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const ordersData = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            setOrders(ordersData);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Persist likedIds (Per device)
     useEffect(() => {
         localStorage.setItem('art_likedIds', JSON.stringify(likedIds));
     }, [likedIds]);
 
-    useEffect(() => {
-        localStorage.setItem('art_products', JSON.stringify(products));
-    }, [products]);
-
-    useEffect(() => {
-        localStorage.setItem('art_messages', JSON.stringify(messages));
-    }, [messages]);
-
-    useEffect(() => {
-        localStorage.setItem('art_orders', JSON.stringify(orders));
-    }, [orders]);
-
-    useEffect(() => {
-        localStorage.setItem('art_admin_password', adminPassword);
-    }, [adminPassword]);
-
-    const addProduct = (product) => setProducts([...products, { ...product, id: Date.now(), category: product.category || 'Artwork', likes: 0 }]);
-    const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
-    const updateProduct = (updated) => setProducts(products.map(p => p.id === updated.id ? updated : p));
-    const toggleLike = (id) => {
-        setProducts(prevProducts => prevProducts.map(p => {
-            if (p.id === id) {
-                const isLiked = likedIds.includes(id);
-                return { ...p, likes: isLiked ? Math.max(0, (p.likes || 0) - 1) : (p.likes || 0) + 1 };
-            }
-            return p;
-        }));
-
-        setLikedIds(prev => {
-            if (prev.includes(id)) {
-                return prev.filter(likedId => likedId !== id);
-            } else {
-                return [...prev, id];
-            }
-        });
+    const addProduct = async (product) => {
+        try {
+            await addDoc(collection(db, 'products'), {
+                ...product,
+                likes: 0,
+                createdAt: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Error adding product: ", error);
+        }
     };
 
-    const addMessage = (msg) => setMessages([...messages, { ...msg, id: Date.now(), date: new Date().toLocaleDateString() }]);
-    const deleteMessage = (id) => setMessages(messages.filter(m => m.id !== id));
+    const deleteProduct = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'products', id));
+        } catch (error) {
+            console.error("Error deleting product: ", error);
+        }
+    };
 
-    const addOrder = (order) => setOrders([...orders, { ...order, id: Date.now(), status: 'Pending', date: new Date().toLocaleDateString() }]);
-    const deleteOrder = (id) => setOrders(orders.filter(o => o.id !== id));
+    const updateProduct = async (updated) => {
+        const { id, ...data } = updated;
+        try {
+            await updateDoc(doc(db, 'products', id), data);
+        } catch (error) {
+            console.error("Error updating product: ", error);
+        }
+    };
 
-    const changePassword = (newPass) => setAdminPassword(newPass);
+    const toggleLike = async (id) => {
+        const isLiked = likedIds.includes(id);
+        const productRef = doc(db, 'products', id);
+
+        try {
+            await updateDoc(productRef, {
+                likes: increment(isLiked ? -1 : 1)
+            });
+
+            setLikedIds(prev => {
+                if (prev.includes(id)) {
+                    return prev.filter(likedId => likedId !== id);
+                } else {
+                    return [...prev, id];
+                }
+            });
+        } catch (error) {
+            console.error("Error toggling like: ", error);
+        }
+    };
+
+    const addMessage = async (msg) => {
+        try {
+            await addDoc(collection(db, 'messages'), {
+                ...msg,
+                date: new Date().toLocaleDateString(),
+                createdAt: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Error adding message: ", error);
+        }
+    };
+
+    const deleteMessage = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'messages', id));
+        } catch (error) {
+            console.error("Error deleting message: ", error);
+        }
+    };
+
+    const addOrder = async (order) => {
+        try {
+            await addDoc(collection(db, 'orders'), {
+                ...order,
+                status: 'Pending',
+                date: new Date().toLocaleDateString(),
+                createdAt: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Error adding order: ", error);
+        }
+    };
+
+    const deleteOrder = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'orders', id));
+        } catch (error) {
+            console.error("Error deleting order: ", error);
+        }
+    };
+
+    const changePassword = (newPass) => {
+        setAdminPassword(newPass);
+        localStorage.setItem('art_admin_password', newPass);
+    };
 
     return (
         <AppContext.Provider value={{
