@@ -4,9 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight } from 'lucide-react';
 
 const Login = () => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { setIsAdmin, adminPassword } = useContext(AppContext);
     const navigate = useNavigate();
+    // Hard‑coded credentials
+    const ADMIN_USERNAME = 'aslam';
+    const ADMIN_PASSWORD = 'aslam123';
 
     const handleLogin = (e) => {
         e.preventDefault();
