@@ -88,7 +88,7 @@ const Gallery = () => {
                             <div className="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-to-t from-black to-transparent d-flex justify-content-between align-items-end"
                                 style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
                                 <div>
-                                    {item.title && <h3 className="h6 text-white fw-bold mb-0">{item.title}</h3>}
+                                    {/* Title hidden as requested */}
                                 </div>
 
                                 <div className="d-flex gap-2">

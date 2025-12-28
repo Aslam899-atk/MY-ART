@@ -94,7 +94,7 @@ const Admin = () => {
             } else {
                 // Gallery Upload
                 await addGalleryItem({
-                    title: galleryFormData.title,
+                    title: '',
                     url: imageUrl,
                     type: imageFile?.type?.includes('video') ? 'video' : 'image'
                 });
@@ -103,7 +103,9 @@ const Admin = () => {
             setIsModalOpen(false);
             setEditingProduct(null);
             setFormData({ name: '', price: '', image: '', description: '' });
+            setFormData({ name: '', price: '', image: '', description: '' });
             setGalleryFormData({ title: '', image: '', type: 'image' });
+            setImageFile(null);
             setImageFile(null);
             setUploadProgress(0);
         } catch (error) {
@@ -363,17 +365,8 @@ const Admin = () => {
                                 </>
                             ) : (
                                 <div className="d-flex flex-column gap-2">
-                                    <label className="small fw-bold text-muted text-uppercase">Title / Caption</label>
-                                    <input
-                                        required
-                                        placeholder="e.g. Pencil Sketch #4"
-                                        className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                        style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                        value={galleryFormData.title}
-                                        onChange={e => setGalleryFormData({ ...galleryFormData, title: e.target.value })}
-                                    />
                                     <div className="alert alert-info border-0 bg-primary bg-opacity-10 text-primary small mt-2">
-                                        Gallery uploads support Images and Videos.
+                                        Gallery uploads support Images and Videos. No title required.
                                     </div>
                                 </div>
                             )}
@@ -389,7 +382,6 @@ const Admin = () => {
 
                                     {(uploadType === 'shop' ? formData.image : galleryFormData.image) && (
                                         <div className="position-relative">
-                                            {/* Simple preview logic */}
                                             <div className="bg-dark rounded-3 p-2 text-center text-muted small">File Selected</div>
                                             <button type="button" onClick={() => setImageFile(null)} className="btn btn-sm btn-dark position-absolute top-0 end-0 m-2 rounded-circle shadow"><X size={16} /></button>
                                         </div>
