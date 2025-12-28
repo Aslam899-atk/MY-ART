@@ -9,20 +9,15 @@ const Home = () => {
     const { galleryItems } = useContext(AppContext);
     return (
         <div className="home-wrapper position-relative overflow-hidden w-100">
-            {/* Video Banner Background */}
+            {/* Banner Background */}
             <div className="position-absolute top-0 start-0 w-100 vh-100 z-n1 overflow-hidden">
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
+                <img
+                    src={`${import.meta.env.BASE_URL}banner.png`}
+                    alt="Art Banner"
                     className="w-100 h-100 object-fit-cover"
-                    style={{ opacity: 0.5 }}
-                >
-                    <source src={`${import.meta.env.BASE_URL}banner.mp4`} type="video/mp4" />
-                </video>
+                />
                 <div className="position-absolute top-0 start-0 w-100 h-100"
-                    style={{ background: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.3), var(--bg-dark))' }}>
+                    style={{ background: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.5), var(--bg-dark))' }}>
                 </div>
             </div>
 
