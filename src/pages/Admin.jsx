@@ -103,9 +103,7 @@ const Admin = () => {
             setIsModalOpen(false);
             setEditingProduct(null);
             setFormData({ name: '', price: '', image: '', description: '' });
-            setFormData({ name: '', price: '', image: '', description: '' });
             setGalleryFormData({ title: '', image: '', type: 'image' });
-            setImageFile(null);
             setImageFile(null);
             setUploadProgress(0);
         } catch (error) {
