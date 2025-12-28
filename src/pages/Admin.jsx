@@ -108,7 +108,11 @@ const Admin = () => {
             setUploadProgress(0);
         } catch (error) {
             console.error("Upload failed:", error);
-            alert(`Upload failed: ${error.message || "Unknown error"}. Check console for details.`);
+            if (error.code === 'storage/retry-limit-exceeded') {
+                alert("Upload took too long! Please check your internet connection and try again.");
+            } else {
+                alert(`Upload failed: ${error.message || "Unknown error"}. Check console for details.`);
+            }
         } finally {
             setIsUploading(false);
         }
