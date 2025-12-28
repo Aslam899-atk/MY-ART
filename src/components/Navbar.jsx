@@ -39,6 +39,9 @@ const Navbar = () => {
                             <Link className="nav-link px-3 py-1" to="/" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Home</Link>
                         </li>
                         <li className="nav-item">
+                            <Link className="nav-link px-3 py-1" to="/gallery" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Gallery</Link>
+                        </li>
+                        <li className="nav-item">
                             <Link className="nav-link px-3 py-1" to="/shop" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Shop</Link>
                         </li>
                         <li className="nav-item">

@@ -37,14 +37,14 @@ const Shop = () => {
     return (
         <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
             <header className="mb-5">
-                <h1 className="display-3 fw-bold">The <span style={{ color: 'var(--primary)' }}>Gallery</span></h1>
-                <p className="lead text-muted">Browse our exclusive collection of premium artworks.</p>
+                <h1 className="display-3 fw-bold">The <span style={{ color: 'var(--primary)' }}>Shop</span></h1>
+                <p className="lead text-muted">Purchase premium artworks directly from the artist.</p>
 
                 {/* Search Bar */}
                 <div className="glass p-3 rounded-4 mt-4 d-flex align-items-center gap-3">
                     <input
                         type="text"
-                        placeholder="Search artworks..."
+                        placeholder="Search items..."
                         className="form-control bg-dark border-0 text-white py-3 rounded-3"
                         style={{ background: 'rgba(0,0,0,0.3) !important' }}
                         value={searchQuery}
@@ -67,36 +67,19 @@ const Shop = () => {
                                     className="img-fluid w-100 h-100 transition-all hover-zoom"
                                     style={{ objectFit: 'cover' }}
                                 />
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); toggleLike(product.id); }}
-                                    className="btn border-0 position-absolute m-3 end-0 top-0 d-flex align-items-center gap-2 px-3 py-2 rounded-4"
-                                    style={{
-                                        background: likedIds && likedIds.includes(product.id) ? 'rgba(239, 68, 68, 0.8)' : 'rgba(15, 23, 42, 0.6)',
-                                        backdropFilter: 'blur(8px)', color: 'white', zIndex: 2
-                                    }}
-                                >
-                                    <Heart size={18} fill={likedIds && likedIds.includes(product.id) ? "white" : "none"} />
-                                    <span>{product.likes || 0}</span>
-                                </button>
+                                {/* Like and price are hidden on card as requested */}
                             </div>
                             <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
                                 <div className="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <small className="text-primary fw-bold text-uppercase tracking-wider" style={{ fontSize: '0.7rem' }}>{product.category || 'Artwork'}</small>
                                         <h3 className="h5 mt-1 mb-0">{product.name}</h3>
-                                        <div className="d-flex gap-2">
-                                            {product.orientation && <span className="badge bg-secondary bg-opacity-25 text-muted small fw-normal">{product.orientation}</span>}
-                                        </div>
                                     </div>
-                                    <span className={`h5 fw-bold mb-0 ${product.price > 0 ? '' : 'text-muted small'}`}>
-                                        {product.price > 0 ? `$${product.price}` : 'Display Only'}
-                                    </span>
                                 </div>
                                 <button
                                     onClick={() => setSelectedProduct(product)}
                                     className="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-3 border-0 mt-auto"
                                 >
-                                    {product.price > 0 ? <><ShoppingBag size={18} /> Order Now</> : <><Mail size={18} /> Inquire</>}
+                                    <ShoppingBag size={18} /> Order Now
                                 </button>
                             </div>
                         </div>
@@ -121,20 +104,25 @@ const Shop = () => {
                                         <button onClick={() => setSelectedProduct(null)} className="btn text-muted p-0 border-0"><X size={24} /></button>
                                     </div>
 
-                                    <div className="d-flex gap-3 align-items-center p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                    <div className="d-flex gap-3 align-items-start p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
                                         <div className="flex-shrink-0">
                                             <img
                                                 src={selectedProduct.image}
                                                 alt={selectedProduct.name}
                                                 className="rounded-3"
-                                                style={{ width: '70px', height: '70px', objectFit: 'cover' }}
+                                                style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div>
-                                            <div className="fw-bold">{selectedProduct.name}</div>
-                                            <div className="text-primary fw-bold h5 mb-0">
-                                                {selectedProduct.price > 0 ? `$${selectedProduct.price}` : 'Inquire for Price'}
+                                            <div className="text-primary fw-bold h4 mb-1">
+                                                ${selectedProduct.price}
                                             </div>
+                                            <div className="fw-bold fs-5">{selectedProduct.name}</div>
+                                            {selectedProduct.description && (
+                                                <p className="text-muted small mt-2 mb-0 border-top border-secondary border-opacity-25 pt-2">
+                                                    {selectedProduct.description}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -174,7 +162,7 @@ const Shop = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </div >
+        </div>
     );
 };
 

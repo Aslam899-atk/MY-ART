@@ -10,24 +10,22 @@ import {
     query,
     orderBy,
     runTransaction,
-    increment
+    increment,
+    setDoc,
+    getDoc
 } from 'firebase/firestore';
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
+    const [galleryItems, setGalleryItems] = useState([]);
     const [messages, setMessages] = useState([]);
     const [orders, setOrders] = useState([]);
-    const [likedIds, setLikedIds] = useState(() => {
-        const saved = localStorage.getItem('art_likedIds');
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [likedIds, setLikedIds] = useState([]);
 
-    const [adminPassword, setAdminPassword] = useState(() => {
-        const saved = localStorage.getItem('art_admin_password');
-        return saved ? saved : 'admin123';
-    });
+    const [adminPassword, setAdminPassword] = useState('aslam123'); // Default fallback
+    const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
     // Real-time listener for Products
@@ -39,6 +37,34 @@ export const AppProvider = ({ children }) => {
                 id: doc.id
             }));
             setProducts(productsData);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Real-time listener for Admin Privacy (Password)
+    useEffect(() => {
+        const adminRef = doc(db, 'settings', 'admin');
+        const unsubscribe = onSnapshot(adminRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setAdminPassword(docSnap.data().password);
+            } else {
+                // Initialize if not exists
+                setDoc(doc(db, 'settings', 'admin'), { password: 'aslam123' });
+            }
+            setIsLoadingAuth(false);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // Real-time listener for Gallery Items
+    useEffect(() => {
+        const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const galleryData = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            setGalleryItems(galleryData);
         });
         return () => unsubscribe();
     }, []);
@@ -69,10 +95,7 @@ export const AppProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    // Persist likedIds (Per device)
-    useEffect(() => {
-        localStorage.setItem('art_likedIds', JSON.stringify(likedIds));
-    }, [likedIds]);
+
 
     const addProduct = async (product) => {
         try {
@@ -100,6 +123,47 @@ export const AppProvider = ({ children }) => {
             await updateDoc(doc(db, 'products', id), data);
         } catch (error) {
             console.error("Error updating product: ", error);
+        }
+    };
+
+    const addGalleryItem = async (item) => {
+        try {
+            await addDoc(collection(db, 'gallery'), {
+                ...item,
+                likes: 0,
+                createdAt: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Error adding gallery item: ", error);
+        }
+    };
+
+    const deleteGalleryItem = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'gallery', id));
+        } catch (error) {
+            console.error("Error deleting gallery item: ", error);
+        }
+    };
+
+    const toggleGalleryLike = async (id) => {
+        const isLiked = likedIds.includes(id);
+        const galleryRef = doc(db, 'gallery', id);
+
+        try {
+            await updateDoc(galleryRef, {
+                likes: increment(isLiked ? -1 : 1)
+            });
+
+            setLikedIds(prev => {
+                if (prev.includes(id)) {
+                    return prev.filter(likedId => likedId !== id);
+                } else {
+                    return [...prev, id];
+                }
+            });
+        } catch (error) {
+            console.error("Error toggling gallery like: ", error);
         }
     };
 
@@ -165,17 +229,21 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const changePassword = (newPass) => {
-        setAdminPassword(newPass);
-        localStorage.setItem('art_admin_password', newPass);
+    const changePassword = async (newPass) => {
+        try {
+            await setDoc(doc(db, 'settings', 'admin'), { password: newPass }, { merge: true });
+        } catch (error) {
+            console.error("Error updating password:", error);
+        }
     };
 
     return (
         <AppContext.Provider value={{
             products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
+            galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder,
-            isAdmin, setIsAdmin, adminPassword, changePassword
+            isAdmin, setIsAdmin, adminPassword, changePassword, isLoadingAuth
         }}>
             {children}
         </AppContext.Provider>

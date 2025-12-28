@@ -6,19 +6,20 @@ import { Lock, ArrowRight } from 'lucide-react';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { setIsAdmin, adminPassword } = useContext(AppContext);
+    const { setIsAdmin, adminPassword, isLoadingAuth } = useContext(AppContext);
     const navigate = useNavigate();
-    // Hard‑coded credentials
-    const ADMIN_USERNAME = 'aslam';
-    const ADMIN_PASSWORD = 'aslam123';
 
     const handleLogin = (e) => {
         e.preventDefault();
-        if (password === adminPassword) {
+
+        if (isLoadingAuth) return;
+
+        // Check against Firestore password
+        if (username === 'aslam' && password === adminPassword) {
             setIsAdmin(true);
             navigate('/admin');
         } else {
-            alert('Incorrect password!');
+            alert('Invalid Username or Password');
         }
     };
 
@@ -35,6 +36,15 @@ const Login = () => {
 
                         <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
                             <div className="text-start">
+                                <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Username</label>
+                                <input
+                                    type="text"
+                                    placeholder="Username"
+                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3 mb-3"
+                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
                                 <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Security Key</label>
                                 <input
                                     type="password"
@@ -45,8 +55,8 @@ const Login = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 mt-3 d-flex align-items-center justify-content-center gap-2 shadow">
-                                Authorization <ArrowRight size={20} />
+                            <button type="submit" disabled={isLoadingAuth} className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 mt-3 d-flex align-items-center justify-content-center gap-2 shadow">
+                                {isLoadingAuth ? 'Verifying...' : <>Authorization <ArrowRight size={20} /></>}
                             </button>
                         </form>
 
