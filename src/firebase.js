@@ -11,8 +11,8 @@ const firebaseConfig = {
     projectId: "art-void",
     storageBucket: "art-void.firebasestorage.app",
     messagingSenderId: "395298958512",
-    appId: "1:395298958512:web:29af9cf260abe105f29f75",
-    measurementId: "G-0CYLXYE3KR"
+    appId: "1:395298958512:web:78fef15dbeedb319f29f75",
+    measurementId: "G-XN6RXYZ1N4"
 };
 
 const app = initializeApp(firebaseConfig);
