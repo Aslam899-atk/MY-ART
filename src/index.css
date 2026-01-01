@@ -25,6 +25,10 @@ body {
   overflow-x: hidden;
 }
 
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
 .glass {
   background: var(--card-bg);
   backdrop-filter: blur(12px);

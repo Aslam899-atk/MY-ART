@@ -83,7 +83,7 @@ const Home = () => {
                         <h2 className="display-4 fw-bold">Recent <span style={{ color: 'var(--primary)' }}>Masterpieces</span></h2>
                         <p className="text-muted mb-0">A glimpse into our latest creations.</p>
                     </div>
-                    <Link to="/gallery" className="text-primary fw-bold text-decoration-none hover-underline-animation">
+                    <Link to="/galleryView" className="text-primary fw-bold text-decoration-none hover-underline-animation">
                         View Full Gallery &rarr;
                     </Link>
                 </motion.div>
