@@ -5,13 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Gallery = () => {
     const { galleryItems, toggleGalleryLike, likedIds } = useContext(AppContext);
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
-
-    const filteredItems = galleryItems.filter(item => {
-        if (!searchQuery) return true;
-        return item.title?.toLowerCase().includes(searchQuery.toLowerCase());
-    });
 
     const handleShare = async (item) => {
         if (navigator.share) {
@@ -35,24 +29,14 @@ const Gallery = () => {
             {/* Header with Search */}
             <header className="mb-5 text-center position-relative">
                 <h1 className="display-4 fw-bold mb-3">The <span style={{ color: 'var(--primary)' }}>Gallery</span></h1>
-                <p className="text-muted mb-4">Explore our exclusive portfolio of real paintings, calligraphy, and sketches.</p>
+                <p className="mb-4" style={{ color: '#e2e8f0' }}>Explore our exclusive portfolio of real paintings, calligraphy, and sketches.</p>
 
-                <div className="position-relative mx-auto mt-4" style={{ maxWidth: '600px' }}>
-                    <Search className="position-absolute text-muted" style={{ left: '1.2rem', top: '50%', transform: 'translateY(-50%)' }} size={20} />
-                    <input
-                        type="text"
-                        placeholder="Search gallery..."
-                        className="form-control bg-dark border-0 text-white py-3 ps-5 rounded-pill shadow-sm"
-                        style={{ background: 'rgba(0,0,0,0.3) !important' }}
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                    />
-                </div>
+
             </header>
 
             {/* Gallery Grid */}
             <div className="row g-4">
-                {filteredItems.map((item, index) => (
+                {galleryItems.map((item, index) => (
                     <div key={item.id} className="col-12 col-md-6 col-lg-4">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

@@ -36,12 +36,12 @@ const Shop = () => {
 
     return (
         <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
-            <header className="mb-5">
+            <header className="mb-5 text-center">
                 <h1 className="display-3 fw-bold">The <span style={{ color: 'var(--primary)' }}>Shop</span></h1>
-                <p className="lead text-muted">Purchase premium artworks directly from the artist.</p>
+                <p className="lead" style={{ color: '#e2e8f0' }}>Purchase premium artworks directly from the artist.</p>
 
                 {/* Search Bar */}
-                <div className="glass p-3 rounded-4 mt-4 d-flex align-items-center gap-3">
+                <div className="glass p-3 rounded-4 mt-4 d-flex align-items-center gap-3 mx-auto" style={{ maxWidth: '600px' }}>
                     <input
                         type="text"
                         placeholder="Search items..."
@@ -50,7 +50,7 @@ const Shop = () => {
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                     />
-                    <div className="text-muted small text-nowrap">
+                    <div className="text-white small text-nowrap">
                         {filteredProducts.length} results
                     </div>
                 </div>
