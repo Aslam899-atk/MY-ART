@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const Navbar = () => {
-    const { isAdmin } = useContext(AppContext);
+    const { isAdmin, user, logoutUser } = useContext(AppContext);
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top mx-auto mt-3 px-3"
@@ -57,6 +57,13 @@ const Navbar = () => {
                                 <Link to="/admin" className="btn-primary d-inline-flex align-items-center gap-2" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: '20px' }}>
                                     <LayoutDashboard size={14} /> Admin
                                 </Link>
+                            ) : user ? (
+                                <div className="d-flex align-items-center gap-3">
+                                    <span className="text-white small fw-bold d-none d-md-block">Hi, {user.username}</span>
+                                    <button onClick={logoutUser} className="btn nav-link p-0 border-0" title="Logout" style={{ color: 'var(--text-muted)' }}>
+                                        <LogIn size={18} style={{ transform: 'rotate(180deg)' }} />
+                                    </button>
+                                </div>
                             ) : (
                                 <Link to="/login" className="nav-link p-0" style={{ color: 'var(--text-muted)' }}>
                                     <LogIn size={18} />

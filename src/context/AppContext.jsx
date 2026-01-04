@@ -1,19 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { db } from '../firebase';
-import {
-    collection,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    onSnapshot,
-    query,
-    orderBy,
-    runTransaction,
-    increment,
-    setDoc,
-    getDoc
-} from 'firebase/firestore';
 
 export const AppContext = createContext();
 
@@ -22,228 +7,247 @@ export const AppProvider = ({ children }) => {
     const [galleryItems, setGalleryItems] = useState([]);
     const [messages, setMessages] = useState([]);
     const [orders, setOrders] = useState([]);
-    const [likedIds, setLikedIds] = useState(() => {
-        const saved = localStorage.getItem('art_likedIds');
-        return saved ? JSON.parse(saved) : [];
+
+    // User Auth State
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('art_user');
+        return saved ? JSON.parse(saved) : null;
     });
 
-    const [adminPassword, setAdminPassword] = useState('aslam123'); // Default fallback
+    const [likedIds, setLikedIds] = useState(() => {
+        return user ? [...(user.likedProducts || []), ...(user.likedGallery || [])] : [];
+    });
+
+    const [adminPassword, setAdminPassword] = useState('aslam123');
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // Real-time listener for Products
-    useEffect(() => {
-        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const productsData = snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
-            setProducts(productsData);
-        });
-        return () => unsubscribe();
-    }, []);
+    const API_URL = 'http://localhost:5000/api';
 
-    // Real-time listener for Admin Privacy (Password)
-    useEffect(() => {
-        const adminRef = doc(db, 'settings', 'admin');
-        const unsubscribe = onSnapshot(adminRef, (docSnap) => {
-            if (docSnap.exists()) {
-                setAdminPassword(docSnap.data().password);
-            } else {
-                // Initialize if not exists
-                setDoc(doc(db, 'settings', 'admin'), { password: 'aslam123' });
-            }
-            setIsLoadingAuth(false);
-        });
-        return () => unsubscribe();
-    }, []);
-
-    // Real-time listener for Gallery Items
-    useEffect(() => {
-        const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const galleryData = snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
-            setGalleryItems(galleryData);
-        });
-        return () => unsubscribe();
-    }, []);
-
-    // Real-time listener for Messages
-    useEffect(() => {
-        const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const messagesData = snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
-            setMessages(messagesData);
-        });
-        return () => unsubscribe();
-    }, []);
-
-    // Real-time listener for Orders
-    useEffect(() => {
-        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const ordersData = snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
-            setOrders(ordersData);
-        });
-        return () => unsubscribe();
-    }, []);
-
-
-
-    const addProduct = async (product) => {
+    // --- FETCH DATA ---
+    const fetchData = async () => {
         try {
-            await addDoc(collection(db, 'products'), {
-                ...product,
-                likes: 0,
-                createdAt: new Date().toISOString()
-            });
+            const [prodRes, galRes, msgRes, ordRes, passRes] = await Promise.all([
+                fetch(`${API_URL}/products`),
+                fetch(`${API_URL}/gallery`),
+                fetch(`${API_URL}/messages`),
+                fetch(`${API_URL}/orders`),
+                fetch(`${API_URL}/admin/password`)
+            ]);
+
+            setProducts(await prodRes.json());
+            setGalleryItems(await galRes.json());
+            setMessages(await msgRes.json());
+            setOrders(await ordRes.json());
+
+            const passData = await passRes.json();
+            if (passData.password) setAdminPassword(passData.password);
+
         } catch (error) {
-            console.error("Error adding product: ", error);
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoadingAuth(false);
         }
+    };
+
+    useEffect(() => {
+        fetchData();
+        // Poll for updates every 5 seconds (Simple Real-time simulation)
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // --- PRODUCTS ---
+    const addProduct = async (product) => {
+        await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        fetchData();
     };
 
     const deleteProduct = async (id) => {
-        try {
-            await deleteDoc(doc(db, 'products', id));
-        } catch (error) {
-            console.error("Error deleting product: ", error);
-        }
+        await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+        fetchData();
     };
 
     const updateProduct = async (updated) => {
-        const { id, ...data } = updated;
-        try {
-            await updateDoc(doc(db, 'products', id), data);
-        } catch (error) {
-            console.error("Error updating product: ", error);
-        }
+        // Not fully implemented in backend in this step, but placeholder
+        // In real app, add PUT /products/:id
     };
 
+    // --- GALLERY ---
     const addGalleryItem = async (item) => {
-        try {
-            await addDoc(collection(db, 'gallery'), {
-                ...item,
-                likes: 0,
-                createdAt: new Date().toISOString()
-            });
-        } catch (error) {
-            console.error("Error adding gallery item: ", error);
-        }
+        await fetch(`${API_URL}/gallery`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        });
+        fetchData();
     };
 
     const deleteGalleryItem = async (id) => {
-        try {
-            await deleteDoc(doc(db, 'gallery', id));
-        } catch (error) {
-            console.error("Error deleting gallery item: ", error);
-        }
+        await fetch(`${API_URL}/gallery/${id}`, { method: 'DELETE' });
+        fetchData();
     };
 
-    const toggleGalleryLike = async (id) => {
-        const isLiked = likedIds.includes(id);
-        const galleryRef = doc(db, 'gallery', id);
+    // --- LIKES (Unified Logic) ---
+    // Sync likedIds with User state whenever User changes
+    useEffect(() => {
+        if (user) {
+            setLikedIds([...(user.likedProducts || []), ...(user.likedGallery || [])]);
+        } else {
+            setLikedIds([]);
+        }
+    }, [user]);
 
+    const updateUserLikesInBackend = async (updatedUser) => {
+        if (!updatedUser || !updatedUser._id) return;
         try {
-            await updateDoc(galleryRef, {
-                likes: increment(isLiked ? -1 : 1)
-            });
-
-            setLikedIds(prev => {
-                let newLikes;
-                if (prev.includes(id)) {
-                    newLikes = prev.filter(likedId => likedId !== id);
-                } else {
-                    newLikes = [...prev, id];
-                }
-                localStorage.setItem('art_likedIds', JSON.stringify(newLikes));
-                return newLikes;
+            await fetch(`${API_URL}/users/${updatedUser._id}/likes`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    likedProducts: updatedUser.likedProducts,
+                    likedGallery: updatedUser.likedGallery
+                })
             });
         } catch (error) {
-            console.error("Error toggling gallery like: ", error);
+            console.error("Failed to sync likes to backend:", error);
         }
     };
 
     const toggleLike = async (id) => {
         const isLiked = likedIds.includes(id);
-        const productRef = doc(db, 'products', id);
 
-        try {
-            await updateDoc(productRef, {
-                likes: increment(isLiked ? -1 : 1)
-            });
+        // Optimistic UI Update
+        const newLikes = isLiked ? likedIds.filter(i => i !== id) : [...likedIds, id];
+        setLikedIds(newLikes);
 
-            setLikedIds(prev => {
-                let newLikes;
-                if (prev.includes(id)) {
-                    newLikes = prev.filter(likedId => likedId !== id);
-                } else {
-                    newLikes = [...prev, id];
-                }
-                localStorage.setItem('art_likedIds', JSON.stringify(newLikes));
-                return newLikes;
-            });
-        } catch (error) {
-            console.error("Error toggling like: ", error);
+        // Update Server Count
+        await fetch(`${API_URL}/products/${id}/like`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ increment: !isLiked })
+        });
+
+        // Update User State & Persist to DB
+        if (user) {
+            const updatedUser = {
+                ...user,
+                likedProducts: isLiked ? user.likedProducts.filter(x => x !== id) : [...(user.likedProducts || []), id]
+            };
+            setUser(updatedUser);
+            localStorage.setItem('art_user', JSON.stringify(updatedUser)); // Local Backup
+            updateUserLikesInBackend(updatedUser); // DB Sync
         }
+        fetchData();
     };
 
-    const addMessage = async (msg) => {
-        try {
-            await addDoc(collection(db, 'messages'), {
-                ...msg,
-                date: new Date().toLocaleDateString(),
-                createdAt: new Date().toISOString()
-            });
-        } catch (error) {
-            console.error("Error adding message: ", error);
+    const toggleGalleryLike = async (id) => {
+        const isLiked = likedIds.includes(id);
+
+        // Optimistic UI Update
+        const newLikes = isLiked ? likedIds.filter(i => i !== id) : [...likedIds, id];
+        setLikedIds(newLikes);
+
+        // Update Server Count
+        await fetch(`${API_URL}/gallery/${id}/like`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ increment: !isLiked })
+        });
+
+        // Update User State & Persist to DB
+        if (user) {
+            const updatedUser = {
+                ...user,
+                likedGallery: isLiked ? user.likedGallery.filter(x => x !== id) : [...(user.likedGallery || []), id]
+            };
+            setUser(updatedUser);
+            localStorage.setItem('art_user', JSON.stringify(updatedUser));
+            updateUserLikesInBackend(updatedUser);
         }
+        fetchData();
+    };
+
+    // --- MESSAGES & ORDERS ---
+    const addMessage = async (msg) => {
+        await fetch(`${API_URL}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(msg)
+        });
+        fetchData();
     };
 
     const deleteMessage = async (id) => {
-        try {
-            await deleteDoc(doc(db, 'messages', id));
-        } catch (error) {
-            console.error("Error deleting message: ", error);
-        }
+        await fetch(`${API_URL}/messages/${id}`, { method: 'DELETE' });
+        fetchData();
     };
 
     const addOrder = async (order) => {
-        try {
-            await addDoc(collection(db, 'orders'), {
-                ...order,
-                status: 'Pending',
-                date: new Date().toLocaleDateString(),
-                createdAt: new Date().toISOString()
-            });
-        } catch (error) {
-            console.error("Error adding order: ", error);
-        }
+        await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        });
+        fetchData();
     };
 
     const deleteOrder = async (id) => {
-        try {
-            await deleteDoc(doc(db, 'orders', id));
-        } catch (error) {
-            console.error("Error deleting order: ", error);
+        await fetch(`${API_URL}/orders/${id}`, { method: 'DELETE' });
+        fetchData();
+    };
+
+    // --- SETTINGS & AUTH ---
+    const changePassword = async (newPass) => {
+        await fetch(`${API_URL}/admin/password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: newPass })
+        });
+        setAdminPassword(newPass);
+    };
+
+    const loginUser = async (username, password) => {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+            localStorage.setItem('art_user', JSON.stringify(userData));
+            setLikedIds([...(userData.likedProducts || []), ...(userData.likedGallery || [])]);
+            return { success: true };
+        } else {
+            return { success: false, message: 'Invalid credentials' };
         }
     };
 
-    const changePassword = async (newPass) => {
-        try {
-            await setDoc(doc(db, 'settings', 'admin'), { password: newPass }, { merge: true });
-        } catch (error) {
-            console.error("Error updating password:", error);
+    const registerUser = async (username, password) => {
+        const res = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+            localStorage.setItem('art_user', JSON.stringify(userData));
+            return { success: true };
+        } else {
+            return { success: false, message: 'Registration failed' };
         }
+    };
+
+    const logoutUser = () => {
+        setUser(null);
+        setLikedIds([]);
+        localStorage.removeItem('art_user');
     };
 
     return (
@@ -252,7 +256,8 @@ export const AppProvider = ({ children }) => {
             galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder,
-            isAdmin, setIsAdmin, adminPassword, changePassword, isLoadingAuth
+            isAdmin, setIsAdmin, adminPassword, changePassword, isLoadingAuth,
+            user, loginUser, registerUser, logoutUser
         }}>
             {children}
         </AppContext.Provider>
