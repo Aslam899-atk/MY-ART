@@ -22,7 +22,10 @@ export const AppProvider = ({ children }) => {
     const [galleryItems, setGalleryItems] = useState([]);
     const [messages, setMessages] = useState([]);
     const [orders, setOrders] = useState([]);
-    const [likedIds, setLikedIds] = useState([]);
+    const [likedIds, setLikedIds] = useState(() => {
+        const saved = localStorage.getItem('art_likedIds');
+        return saved ? JSON.parse(saved) : [];
+    });
 
     const [adminPassword, setAdminPassword] = useState('aslam123'); // Default fallback
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
@@ -156,11 +159,14 @@ export const AppProvider = ({ children }) => {
             });
 
             setLikedIds(prev => {
+                let newLikes;
                 if (prev.includes(id)) {
-                    return prev.filter(likedId => likedId !== id);
+                    newLikes = prev.filter(likedId => likedId !== id);
                 } else {
-                    return [...prev, id];
+                    newLikes = [...prev, id];
                 }
+                localStorage.setItem('art_likedIds', JSON.stringify(newLikes));
+                return newLikes;
             });
         } catch (error) {
             console.error("Error toggling gallery like: ", error);
@@ -177,11 +183,14 @@ export const AppProvider = ({ children }) => {
             });
 
             setLikedIds(prev => {
+                let newLikes;
                 if (prev.includes(id)) {
-                    return prev.filter(likedId => likedId !== id);
+                    newLikes = prev.filter(likedId => likedId !== id);
                 } else {
-                    return [...prev, id];
+                    newLikes = [...prev, id];
                 }
+                localStorage.setItem('art_likedIds', JSON.stringify(newLikes));
+                return newLikes;
             });
         } catch (error) {
             console.error("Error toggling like: ", error);
