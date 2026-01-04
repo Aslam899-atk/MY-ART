@@ -57,26 +57,29 @@ const Admin = () => {
             let imageUrl = uploadType === 'shop' ? formData.image : galleryFormData.image;
 
             if (imageFile) {
-                const folder = uploadType === 'shop' ? 'products' : 'gallery';
-                const storageRef = ref(storage, `${folder}/${Date.now()}_${imageFile.name}`);
-                const uploadTask = uploadBytesResumable(storageRef, imageFile);
+                if (imageFile) {
+                    const formData = new FormData();
+                    formData.append('file', imageFile);
+                    formData.append('upload_preset', 'hnefpiqg'); // Your Cloudinary Upload Preset
+                    formData.append('cloud_name', 'dw7wcsate'); // Your Cloud Name
 
-                imageUrl = await new Promise((resolve, reject) => {
-                    uploadTask.on('state_changed',
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            setUploadProgress(Math.round(progress));
-                        },
-                        (error) => {
-                            console.error(error);
-                            reject(error);
-                        },
-                        async () => {
-                            const url = await getDownloadURL(uploadTask.snapshot.ref);
-                            resolve(url);
-                        }
-                    );
-                });
+                    // Determine resource type (image or video)
+                    const resourceType = imageFile.type.includes('video') ? 'video' : 'image';
+
+                    // Cloudinary Upload URL
+                    const response = await fetch(`https://api.cloudinary.com/v1_1/dw7wcsate/${resourceType}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.secure_url) {
+                        imageUrl = data.secure_url;
+                    } else {
+                        throw new Error("Cloudinary upload failed");
+                    }
+                }
             }
 
             if (uploadType === 'shop') {
