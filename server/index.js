@@ -3,8 +3,16 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins for now (or specify 'https://aslam899-atk.github.io')
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+    res.send('Art Void Server is Running!');
+});
 
 // MongoDB Connection
 const MONGO_URI = 'mongodb+srv://aslam:aslam123@cluster0.hsjlt5t.mongodb.net/art-void?retryWrites=true&w=majority&appName=Cluster0';
