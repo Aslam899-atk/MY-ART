@@ -279,11 +279,24 @@ const Admin = () => {
                         <div className="d-flex flex-column gap-4">
                             {orders.map(o => (
                                 <div key={o.id} className="glass p-4 border-0 rounded-4">
-                                    <div className="d-flex justify-content-between">
-                                        <h5 className="fw-bold">{o.productName}</h5>
-                                        <button onClick={() => deleteOrder(o.id)} className="btn btn-sm glass text-danger border-0"><Trash2 size={16} /></button>
+                                    <div className="d-flex align-items-center gap-3">
+                                        {o.image && (
+                                            <img
+                                                src={o.image}
+                                                alt={o.productName}
+                                                className="rounded-3"
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                            />
+                                        )}
+                                        <div className="flex-grow-1">
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <h5 className="fw-bold mb-1">{o.productName}</h5>
+                                                <button onClick={() => deleteOrder(o.id)} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
+                                            </div>
+                                            <div className="small text-muted">Customer: {o.customer} | {o.phone}</div>
+                                            <div className="small text-muted mt-1 text-truncate" style={{ maxWidth: '300px' }}>{o.address}</div>
+                                        </div>
                                     </div>
-                                    <div className="small text-muted">Customer: {o.customer} | {o.phone}</div>
                                 </div>
                             ))}
                         </div>

@@ -59,6 +59,7 @@ const Message = mongoose.model('Message', messageSchema);
 const orderSchema = new mongoose.Schema({
     productName: String,
     price: Number,
+    image: String, // Product Image URL
     customer: String,
     phone: String,
     email: String,

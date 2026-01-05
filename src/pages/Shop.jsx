@@ -24,7 +24,8 @@ const Shop = () => {
             customer: orderForm.name,
             phone: orderForm.phone,
             email: orderForm.email,
-            address: orderForm.address
+            address: orderForm.address,
+            image: selectedProduct.image
         });
         setIsSuccess(true);
         setTimeout(() => {
