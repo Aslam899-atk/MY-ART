@@ -22,7 +22,7 @@ export const AppProvider = ({ children }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    const API_URL = 'http://localhost:5000/api';
+    const API_URL = 'https://my-art-void-server.onrender.com/api';
 
     // --- FETCH DATA ---
     const fetchData = async () => {
