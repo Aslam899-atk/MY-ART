@@ -7,7 +7,7 @@ const Login = () => {
     const [mode, setMode] = useState('user'); // 'user' (login), 'register', 'admin'
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { setIsAdmin, adminPassword, isLoadingAuth, loginUser, registerUser } = useContext(AppContext);
+    const { setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser } = useContext(AppContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
 
@@ -16,7 +16,8 @@ const Login = () => {
         setError('');
 
         if (mode === 'admin') {
-            if (username === 'aslam' && password === adminPassword) {
+            const isValid = await verifyAdminPassword(password);
+            if (username === 'aslam' && isValid) {
                 setIsAdmin(true);
                 navigate('/admin');
             } else {

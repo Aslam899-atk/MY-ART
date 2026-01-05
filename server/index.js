@@ -192,19 +192,37 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
     res.json({ message: 'Deleted' });
 }));
 
+const bcrypt = require('bcryptjs'); // Add this at top
+
 // ADMIN AUTH
 app.get('/api/admin/password', asyncHandler(async (req, res) => {
     let setting = await Setting.findOne({ type: 'admin' });
     if (!setting) {
-        setting = new Setting({ type: 'admin', password: 'aslam123' });
+        // Create default admin with hashed password
+        const hashedPassword = await bcrypt.hash('aslam123', 10);
+        setting = new Setting({ type: 'admin', password: hashedPassword });
         await setting.save();
     }
-    res.json({ password: setting.password });
+    // We strictly DO NOT send the password back now. 
+    // We send a success flag or null to indicate it exists.
+    res.json({ configured: true });
+}));
+
+// Validate Admin Password (New Route for checking)
+app.post('/api/admin/verify', asyncHandler(async (req, res) => {
+    const { password } = req.body;
+    const setting = await Setting.findOne({ type: 'admin' });
+    if (setting && await bcrypt.compare(password, setting.password)) {
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false });
+    }
 }));
 
 app.post('/api/admin/password', asyncHandler(async (req, res) => {
     const { password } = req.body;
-    await Setting.findOneAndUpdate({ type: 'admin' }, { password }, { upsert: true });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await Setting.findOneAndUpdate({ type: 'admin' }, { password: hashedPassword }, { upsert: true });
     res.json({ success: true });
 }));
 
@@ -214,15 +232,20 @@ app.post('/api/auth/register', asyncHandler(async (req, res) => {
     const existing = await User.findOne({ username });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
-    const newUser = new User({ username, password, likedProducts: [], likedGallery: [] });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword, likedProducts: [], likedGallery: [] });
     await newUser.save();
     res.json(newUser);
 }));
 
 app.post('/api/auth/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ username, password });
+    const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
     res.json(user);
 }));
 
