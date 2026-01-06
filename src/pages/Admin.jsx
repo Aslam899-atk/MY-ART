@@ -3,8 +3,9 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, CheckCircle, Upload, Mail, User, Settings, Lock, Heart, Image as ImageIcon } from 'lucide-react';
-import { storage } from '../firebase';
-import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+// Cloudinary is used instead of Firebase Storage
+// import { storage } from '../firebase';
+// import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 
 const Admin = () => {
     const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, isAdmin, setIsAdmin, changePassword } = useContext(AppContext);

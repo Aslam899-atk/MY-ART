@@ -73,6 +73,7 @@ const Order = mongoose.model('Order', orderSchema);
 // 5. Admin Settings
 const settingSchema = new mongoose.Schema({
     type: String, // 'admin'
+    username: String,
     password: String
 });
 const Setting = mongoose.model('Setting', settingSchema);
@@ -198,9 +199,9 @@ const bcrypt = require('bcryptjs'); // Add this at top
 app.get('/api/admin/password', asyncHandler(async (req, res) => {
     let setting = await Setting.findOne({ type: 'admin' });
     if (!setting) {
-        // Create default admin with hashed password
-        const hashedPassword = await bcrypt.hash('aslam123', 10);
-        setting = new Setting({ type: 'admin', password: hashedPassword });
+        // Create default admin with username 'aslam' and hashed password '313aslam786'
+        const hashedPassword = await bcrypt.hash('313aslam786', 10);
+        setting = new Setting({ type: 'admin', username: 'aslam', password: hashedPassword });
         await setting.save();
     }
     // We strictly DO NOT send the password back now. 
