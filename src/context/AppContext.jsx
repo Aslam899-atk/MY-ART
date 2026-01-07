@@ -28,9 +28,10 @@ export const AppProvider = ({ children }) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // const API_URL = 'https://my-art-void-server.onrender.com/api';
-    // const API_URL = 'https://my-art-void-server.onrender.com/api';
-    const API_URL = 'http://localhost:5001/api';
+    // Dynamic API URL based on environment
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5001/api'
+        : 'https://my-art-void-server.onrender.com/api';
 
     // --- FETCH DATA ---
     const fetchData = async () => {
