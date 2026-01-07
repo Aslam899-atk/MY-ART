@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 const cors = require('cors');
 
 const app = express();
@@ -15,7 +17,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB Connection
-const MONGO_URI = 'mongodb+srv://aslam:aslam123@cluster0.hsjlt5t.mongodb.net/art-void?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/art-void';
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected Successfully'))

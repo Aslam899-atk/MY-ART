@@ -29,7 +29,8 @@ export const AppProvider = ({ children }) => {
     const [isAdmin, setIsAdmin] = useState(false);
 
     // const API_URL = 'https://my-art-void-server.onrender.com/api';
-    const API_URL = 'http://localhost:5000/api';
+    // const API_URL = 'https://my-art-void-server.onrender.com/api';
+    const API_URL = 'http://localhost:5001/api';
 
     // --- FETCH DATA ---
     const fetchData = async () => {
