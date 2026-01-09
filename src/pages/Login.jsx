@@ -4,9 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, ArrowRight, User, Mail, LogIn, UserPlus } from 'lucide-react';
 
 const Login = () => {
-    const [searchParams] = useSearchParams();
-    const isFromAdmin = searchParams.get('from') === 'admin';
-    const [mode, setMode] = useState(isFromAdmin ? 'admin' : 'user'); // 'user', 'register', 'admin'
+    const [mode, setMode] = useState('user'); // 'user', 'register'
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser, loginWithGoogle } = useContext(AppContext);
@@ -52,22 +50,7 @@ const Login = () => {
                     <div className="glass p-4 p-md-5 text-center border-0 shadow-lg rounded-5">
 
                         {/* Toggle Tabs - Hide if came strictly from Admin redirect for cleaner UI */}
-                        {!isFromAdmin && (
-                            <div className="d-flex justify-content-center gap-3 mb-4">
-                                <button
-                                    onClick={() => setMode('user')}
-                                    className={`btn rounded-pill px-4 ${mode === 'user' || mode === 'register' ? 'btn-primary' : 'btn-outline-light border-0 var(--text-muted)'}`}
-                                >
-                                    User
-                                </button>
-                                <button
-                                    onClick={() => setMode('admin')}
-                                    className={`btn rounded-pill px-4 ${mode === 'admin' ? 'btn-primary' : 'btn-outline-light border-0'}`}
-                                >
-                                    Admin
-                                </button>
-                            </div>
-                        )}
+                        {/* Admin Toggle Removed - Admin Login is now exclusively at /admin */}
 
                         {mode === 'admin' && (
                             <div className="bg-primary bg-opacity-10 p-3 rounded-4 d-inline-flex align-items-center justify-content-center mb-4 text-primary">
