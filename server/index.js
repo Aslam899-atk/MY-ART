@@ -234,6 +234,17 @@ app.post('/api/admin/verify', asyncHandler(async (req, res) => {
     }
 }));
 
+// Reset admin to default (temporary recovery endpoint)
+app.post('/api/admin/reset-to-default', asyncHandler(async (req, res) => {
+    const hashedPassword = await bcrypt.hash('313aslam786', 10);
+    await Setting.findOneAndUpdate(
+        { type: 'admin' },
+        { username: 'aslam', password: hashedPassword },
+        { upsert: true }
+    );
+    res.json({ success: true, message: 'Admin reset to default credentials' });
+}));
+
 app.post('/api/admin/password', asyncHandler(async (req, res) => {
     const { password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
