@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Heart } from 'lucide-react';
+import { ArrowRight, Sparkles, Heart, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
