@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 export const AppContext = createContext();
 
@@ -235,17 +237,48 @@ export const AppProvider = ({ children }) => {
         });
     };
 
-    const verifyAdminPassword = async (password) => {
+    const verifyAdminPassword = async (username, password) => {
         try {
             const res = await fetch(`${API_URL}/admin/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ username, password })
             });
             const data = await res.json();
             return data.success;
         } catch (e) {
             return false;
+        }
+    };
+
+    const loginWithGoogle = async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const googleUser = result.user;
+
+            // Sync with backend
+            const res = await fetch(`${API_URL}/users/google-auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: googleUser.email,
+                    name: googleUser.displayName,
+                    googleId: googleUser.uid
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data);
+                localStorage.setItem('art_user', JSON.stringify(data));
+                if (data.likedProducts) setLikedIds([...data.likedProducts, ...data.likedGallery]);
+                return { success: true };
+            } else {
+                return { success: false, message: 'Backend sync failed' };
+            }
+        } catch (error) {
+            console.error("Google Login Error:", error);
+            return { success: false, message: error.message };
         }
     };
 
@@ -294,7 +327,8 @@ export const AppProvider = ({ children }) => {
             galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder,
-            isAdmin, setIsAdmin, changePassword, verifyAdminPassword, isLoadingAuth,
+            isAdmin, setIsAdmin, changePassword, verifyAdminPassword,
+            loginWithGoogle, isLoadingAuth,
             user, loginUser, registerUser, logoutUser
         }}>
             {children}

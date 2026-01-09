@@ -8,11 +8,16 @@ import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, Ch
 // import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 
 const Admin = () => {
-    const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, isAdmin, setIsAdmin, changePassword } = useContext(AppContext);
+    const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, isAdmin, setIsAdmin, changePassword, verifyAdminPassword } = useContext(AppContext);
     const [activeTab, setActiveTab] = useState('products');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('shop'); // 'shop' or 'gallery'
     const [editingProduct, setEditingProduct] = useState(null);
+
+    // Admin Login State (Inline)
+    const [adminLogin, setAdminLogin] = useState({ username: '', password: '' });
+    const [adminAuthError, setAdminAuthError] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
 
     // Shop Form Data
     const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '' });
@@ -26,7 +31,65 @@ const Admin = () => {
     const [passUpdateStatus, setPassUpdateStatus] = useState('');
     const navigate = useNavigate();
 
-    if (!isAdmin) return <Navigate to="/login?from=admin" />;
+    const handleAdminLogin = async (e) => {
+        e.preventDefault();
+        setIsVerifying(true);
+        setAdminAuthError('');
+        const isValid = await verifyAdminPassword(adminLogin.username, adminLogin.password);
+        setIsVerifying(false);
+
+        if (isValid) {
+            setIsAdmin(true);
+        } else {
+            setAdminAuthError('Invalid Credentials');
+        }
+    };
+
+    if (!isAdmin) {
+        return (
+            <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: '80vh', paddingTop: '6rem' }}>
+                <div className="glass p-5 rounded-5 shadow-lg w-100" style={{ maxWidth: '450px' }}>
+                    <div className="text-center mb-5">
+                        <div className="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-primary">
+                            <Lock size={32} />
+                        </div>
+                        <h1 className="h3 fw-bold mb-0">Admin Access</h1>
+                    </div>
+
+                    {adminAuthError && <div className="alert alert-danger py-2 small border-0 bg-danger bg-opacity-10 text-danger mb-4">{adminAuthError}</div>}
+
+                    <form onSubmit={handleAdminLogin} className="d-flex flex-column gap-3">
+                        <div className="d-flex flex-column gap-2">
+                            <label className="small fw-bold text-muted text-uppercase ms-1">Username</label>
+                            <input
+                                type="text"
+                                required
+                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3"
+                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                value={adminLogin.username}
+                                onChange={e => setAdminLogin({ ...adminLogin, username: e.target.value })}
+                            />
+                        </div>
+                        <div className="d-flex flex-column gap-2">
+                            <label className="small fw-bold text-muted text-uppercase ms-1">Password</label>
+                            <input
+                                type="password"
+                                required
+                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3"
+                                style={{ background: 'rgba(0,0,0,0.2) !important', letterSpacing: '0.1em' }}
+                                value={adminLogin.password}
+                                onChange={e => setAdminLogin({ ...adminLogin, password: e.target.value })}
+                            />
+                        </div>
+
+                        <button type="submit" disabled={isVerifying} className="btn btn-primary w-100 py-3 rounded-3 fw-bold mt-3 shadow">
+                            {isVerifying ? 'Verifying...' : 'Access Dashboard'}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
     const handleLogout = () => {
         setIsAdmin(false);

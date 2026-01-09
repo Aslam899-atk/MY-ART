@@ -83,6 +83,7 @@ const Setting = mongoose.model('Setting', settingSchema);
 // 6. User (For Likes & Accounts)
 const userSchema = new mongoose.Schema({
     username: String,
+    email: { type: String, unique: true, sparse: true }, // Added for Google Auth
     password: String, // In real app, hash this!
     likedProducts: [String],
     likedGallery: [String]
@@ -213,9 +214,9 @@ app.get('/api/admin/password', asyncHandler(async (req, res) => {
 
 // Validate Admin Password (New Route for checking)
 app.post('/api/admin/verify', asyncHandler(async (req, res) => {
-    const { password } = req.body;
+    const { username, password } = req.body;
     const setting = await Setting.findOne({ type: 'admin' });
-    if (setting && await bcrypt.compare(password, setting.password)) {
+    if (setting && setting.username === username && await bcrypt.compare(password, setting.password)) {
         res.json({ success: true });
     } else {
         res.status(401).json({ success: false });
@@ -227,6 +228,26 @@ app.post('/api/admin/password', asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await Setting.findOneAndUpdate({ type: 'admin' }, { password: hashedPassword }, { upsert: true });
     res.json({ success: true });
+}));
+
+// Google Authentication
+app.post('/api/users/google-auth', asyncHandler(async (req, res) => {
+    const { email, name, googleId } = req.body;
+    let user = await User.findOne({ email });
+
+    if (user) {
+        res.json(user);
+    } else {
+        const password = await bcrypt.hash(googleId + "secure_art_void", 10);
+        user = await User.create({
+            username: name,
+            email,
+            password,
+            likedProducts: [],
+            likedGallery: []
+        });
+        res.status(201).json(user);
+    }
 }));
 
 // USER AUTH
