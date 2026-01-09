@@ -219,6 +219,12 @@ const Home = () => {
                                 Continue without signing in
                             </button>
                         </div>
+
+                        <div className="mt-2 text-center">
+                            <Link to="/admin" className="text-secondary text-decoration-none opacity-50 small hover-opacity-100" style={{ fontSize: '0.7rem' }}>
+                                <Lock size={10} className="me-1 mb-1" /> Admin
+                            </Link>
+                        </div>
                     </motion.div>
                 </div>
             )}

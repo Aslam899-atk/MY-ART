@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs'); // Added here
 dotenv.config();
 const cors = require('cors');
 
@@ -195,8 +196,6 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
     await Order.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 }));
-
-const bcrypt = require('bcryptjs'); // Add this at top
 
 // ADMIN AUTH
 app.get('/api/admin/password', asyncHandler(async (req, res) => {
