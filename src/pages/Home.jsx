@@ -214,40 +214,6 @@ const Home = () => {
                             </button>
                         </div>
 
-                        <div className="d-flex align-items-center gap-2 my-1 mb-3">
-                            <div className="flex-grow-1 border-top border-secondary opacity-25"></div>
-                            <span className="text-muted small" style={{ fontSize: '0.75rem' }}>OR LOG IN MANUALLY</span>
-                            <div className="flex-grow-1 border-top border-secondary opacity-25"></div>
-                        </div>
-
-                        <form onSubmit={handleHomeLogin} className="d-flex flex-column gap-3">
-                            <div className="position-relative">
-                                <input
-                                    type="text"
-                                    placeholder="Username"
-                                    required
-                                    className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                    value={loginForm.username}
-                                    onChange={e => setLoginForm({ ...loginForm, username: e.target.value })}
-                                />
-                            </div>
-                            <div className="position-relative">
-                                <input
-                                    type="password"
-                                    placeholder="Password"
-                                    required
-                                    className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                    value={loginForm.password}
-                                    onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
-                                />
-                            </div>
-                            <button type="submit" disabled={isLoggingIn} className="btn btn-secondary w-100 py-2 rounded-3 fw-bold mt-1 shadow-sm fs-sm">
-                                {isLoggingIn ? 'Signing In...' : 'Sign In'}
-                            </button>
-                        </form>
-
                         <div className="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
                             <button onClick={handleGuestAccess} className="btn btn-link text-decoration-none text-muted small">
                                 Continue without signing in
