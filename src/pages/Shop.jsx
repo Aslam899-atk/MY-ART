@@ -68,7 +68,20 @@ const Shop = () => {
                                     className="img-fluid w-100 h-100 transition-all hover-zoom"
                                     style={{ objectFit: 'cover' }}
                                 />
-                                {/* Like and price are hidden on card as requested */}
+                                <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                                    <span className="badge glass text-white border-0 shadow-sm">${product.price}</span>
+                                </div>
+                                <div className="position-absolute bottom-0 end-0 m-3">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleLike(product.id);
+                                        }}
+                                        className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
+                                    >
+                                        <Heart size={18} fill={likedIds.includes(product.id) ? "var(--accent)" : "none"} className={likedIds.includes(product.id) ? "text-danger" : ""} />
+                                    </button>
+                                </div>
                             </div>
                             <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
                                 <div className="d-flex justify-content-between align-items-start">

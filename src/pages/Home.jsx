@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,43 @@ import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const Home = () => {
-    const { galleryItems } = useContext(AppContext);
+    const { galleryItems, user, loginUser } = useContext(AppContext);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+    const [authError, setAuthError] = useState('');
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+    // Show login modal on mount if not logged in
+    React.useEffect(() => {
+        if (!user) {
+            // Check session storage to avoid annoying popup on every refresh if they explicitly chose guest?
+            // User requested "frist open", implies session.
+            const isGuest = sessionStorage.getItem('art_guest_mode');
+            if (!isGuest) {
+                const timer = setTimeout(() => setShowLoginModal(true), 1000);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [user]);
+
+    const handleHomeLogin = async (e) => {
+        e.preventDefault();
+        setIsLoggingIn(true);
+        setAuthError('');
+        const res = await loginUser(loginForm.username, loginForm.password);
+        setIsLoggingIn(false);
+        if (res.success) {
+            setShowLoginModal(false);
+        } else {
+            setAuthError(res.message);
+        }
+    };
+
+    const handleGuestAccess = () => {
+        setShowLoginModal(false);
+        sessionStorage.setItem('art_guest_mode', 'true');
+    };
+
     return (
         <div className="home-wrapper position-relative overflow-hidden w-100">
             {/* Banner Background */}
@@ -142,8 +178,60 @@ const Home = () => {
                     }
                 `}</style>
             </section>
+
+            {/* LOGIN POPUP MODAL */}
+            {showLoginModal && (
+                <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 9999 }}>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="glass p-5 rounded-5 shadow-lg position-relative w-100"
+                        style={{ maxWidth: '400px', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+                    >
+                        <div className="text-center mb-4">
+                            <h2 className="h3 fw-bold mb-1">Welcome to Art Void</h2>
+                            <p className="text-muted small">Sign in to save your favorite artworks.</p>
+                        </div>
+
+                        {authError && <div className="alert alert-danger py-2 small">{authError}</div>}
+
+                        <form onSubmit={handleHomeLogin} className="d-flex flex-column gap-3">
+                            <div className="position-relative">
+                                <input
+                                    type="text"
+                                    placeholder="Username"
+                                    required
+                                    className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                    value={loginForm.username}
+                                    onChange={e => setLoginForm({ ...loginForm, username: e.target.value })}
+                                />
+                            </div>
+                            <div className="position-relative">
+                                <input
+                                    type="password"
+                                    placeholder="Password"
+                                    required
+                                    className="form-control bg-dark border-0 text-white py-3 rounded-3"
+                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                    value={loginForm.password}
+                                    onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
+                                />
+                            </div>
+                            <button type="submit" disabled={isLoggingIn} className="btn btn-primary w-100 py-3 rounded-3 fw-bold mt-2 shadow">
+                                {isLoggingIn ? 'Signing In...' : 'Sign In'}
+                            </button>
+                        </form>
+
+                        <div className="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
+                            <button onClick={handleGuestAccess} className="btn btn-link text-decoration-none text-muted small">
+                                Continue without signing in
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 };
-
 export default Home;

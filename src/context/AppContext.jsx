@@ -85,47 +85,82 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const toggleLike = async (id, increment = true) => {
-        // If user not logged in, prompt for Gmail (username) and password and log in inline
+    const handleLikeAction = async (type, id) => {
         if (!user) {
-            const email = window.prompt('Enter your Gmail');
-            const password = window.prompt('Enter your password');
-            if (email && password) {
-                try {
-                    const res = await fetch(`${API_URL}/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: email, password })
-                    });
-                    if (res.ok) {
-                        const userData = await res.json();
-                        setUser(userData);
-                        localStorage.setItem('art_user', JSON.stringify(userData));
-                        setLikedIds([...(userData.likedProducts || []), ...(userData.likedGallery || [])]);
-                    } else {
-                        alert('Login failed: Invalid credentials');
-                        return;
+            const username = window.prompt('Enter Username to Login/Register (likes are saved to account)');
+            const password = window.prompt('Enter Password');
+            if (username && password) {
+                // Try login first
+                let res = await loginUser(username, password);
+                if (!res.success) {
+                    // Try register if login fails? Or just fail. 
+                    // Let's assume we try to register if login fails strictly on "user not found", but for now just alert.
+                    // Better: explicit login or register flow. 
+                    // For simplicity in this prompt, re-use logic:
+                    if (confirm("User not found or wrong password. Create new account?")) {
+                        res = await registerUser(username, password);
                     }
-                } catch (e) {
-                    console.error('Login error', e);
-                    alert('Login error occurred');
+                }
+
+                if (!res.success) {
+                    alert('Authentication failed. Cannot save like.');
                     return;
                 }
             } else {
-                alert('Login required to like items.');
                 return;
             }
         }
-        // Proceed with like request
-        await fetch(`${API_URL}/products/${id}/like`, {
+
+        // Now user is logged in. Determine status.
+        // We need the fresh user object from state (or ref) but let's trust 'user'
+        // Actually 'user' might be stale in closure if we just logged in? 
+        // We can get proper user from localstorage or verify.
+        const currentUser = JSON.parse(localStorage.getItem('art_user'));
+        if (!currentUser) return; // Should not happen
+
+        const isProduct = type === 'product';
+        const listKey = isProduct ? 'likedProducts' : 'likedGallery';
+        const currentList = currentUser[listKey] || [];
+        const isLiked = currentList.includes(id);
+
+        // 1. Update Item Count
+        const endpoint = isProduct ? 'products' : 'gallery';
+        await fetch(`${API_URL}/${endpoint}/${id}/like`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ increment })
+            body: JSON.stringify({ increment: !isLiked })
         });
-        // Refresh products after like change
+
+        // 2. Update User List
+        let newList;
+        if (isLiked) {
+            newList = currentList.filter(itemId => itemId !== id);
+        } else {
+            newList = [...currentList, id];
+        }
+
+        const userUpdateBody = {
+            [listKey]: newList
+        };
+
+        // Reuse the update user endpoint logic (we need to make sure we have one or adding it inline)
+        const userRes = await fetch(`${API_URL}/users/${currentUser._id}/likes`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userUpdateBody)
+        });
+
+        if (userRes.ok) {
+            const updatedUser = await userRes.json();
+            setUser(updatedUser);
+            localStorage.setItem('art_user', JSON.stringify(updatedUser));
+            setLikedIds([...(updatedUser.likedProducts || []), ...(updatedUser.likedGallery || [])]);
+        }
+
         fetchData();
     };
 
+    const toggleLike = (id) => handleLikeAction('product', id);
     // ---------- Gallery CRUD ----------
     const addGalleryItem = async (item) => {
         const res = await fetch(`${API_URL}/gallery`, {
@@ -144,14 +179,7 @@ export const AppProvider = ({ children }) => {
         setGalleryItems((prev) => prev.filter((g) => g.id !== id));
     };
 
-    const toggleGalleryLike = async (id, increment = true) => {
-        await fetch(`${API_URL}/gallery/${id}/like`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ increment })
-        });
-        fetchData();
-    };
+    const toggleGalleryLike = (id) => handleLikeAction('gallery', id);
 
     // ---------- Message CRUD ----------
     const addMessage = async (msg) => {

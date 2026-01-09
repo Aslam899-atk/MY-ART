@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Lock, ArrowRight, User, Mail, LogIn, UserPlus } from 'lucide-react';
 
 const Login = () => {
-    const [mode, setMode] = useState('user'); // 'user' (login), 'register', 'admin'
+    const location = useLocation();
+    const [mode, setMode] = useState(location.state?.from === 'admin' ? 'admin' : 'user'); // 'user', 'register', 'admin'
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser } = useContext(AppContext);
@@ -17,7 +18,7 @@ const Login = () => {
 
         if (mode === 'admin') {
             const isValid = await verifyAdminPassword(password);
-            if (username === 'aslam' && isValid) {
+            if (isValid) {
                 setIsAdmin(true);
                 navigate('/admin');
             } else {
@@ -88,18 +89,23 @@ const Login = () => {
                         {error && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger mb-4">{error}</div>}
 
                         <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
+                            {mode !== 'admin' && (
+                                <div className="text-start">
+                                    <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Username</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Username"
+                                        required
+                                        className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3 mb-3"
+                                        style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                    />
+                                </div>
+                            )}
+
                             <div className="text-start">
-                                <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Username</label>
-                                <input
-                                    type="text"
-                                    placeholder="Username"
-                                    required
-                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3 mb-3"
-                                    style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                                <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">Password</label>
+                                <label className="small fw-bold text-muted text-uppercase mb-2 ms-1">{mode === 'admin' ? 'Admin Password' : 'Password'}</label>
                                 <input
                                     type="password"
                                     placeholder="••••••••••••"
@@ -141,8 +147,8 @@ const Login = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

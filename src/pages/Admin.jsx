@@ -26,7 +26,7 @@ const Admin = () => {
     const [passUpdateStatus, setPassUpdateStatus] = useState('');
     const navigate = useNavigate();
 
-    if (!isAdmin) return <Navigate to="/login" />;
+    if (!isAdmin) return <Navigate to="/login" state={{ from: 'admin' }} />;
 
     const handleLogout = () => {
         setIsAdmin(false);
