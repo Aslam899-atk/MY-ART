@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, ArrowRight, User, Mail, LogIn, UserPlus } from 'lucide-react';
 
 const Login = () => {
-    const location = useLocation();
-    const [mode, setMode] = useState(location.state?.from === 'admin' ? 'admin' : 'user'); // 'user', 'register', 'admin'
+    const [searchParams] = useSearchParams();
+    const isFromAdmin = searchParams.get('from') === 'admin';
+    const [mode, setMode] = useState(isFromAdmin ? 'admin' : 'user'); // 'user', 'register', 'admin'
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser } = useContext(AppContext);
@@ -51,7 +52,7 @@ const Login = () => {
                     <div className="glass p-4 p-md-5 text-center border-0 shadow-lg rounded-5">
 
                         {/* Toggle Tabs - Hide if came strictly from Admin redirect for cleaner UI */}
-                        {location.state?.from !== 'admin' && (
+                        {!isFromAdmin && (
                             <div className="d-flex justify-content-center gap-3 mb-4">
                                 <button
                                     onClick={() => setMode('user')}
