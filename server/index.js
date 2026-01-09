@@ -215,7 +215,19 @@ app.get('/api/admin/password', asyncHandler(async (req, res) => {
 // Validate Admin Password (New Route for checking)
 app.post('/api/admin/verify', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    const setting = await Setting.findOne({ type: 'admin' });
+    let setting = await Setting.findOne({ type: 'admin' });
+
+    // Auto-initialize admin if missing (Self-healing)
+    if (!setting) {
+        if (username === 'aslam' && password === '313aslam786') {
+            const hashedPassword = await bcrypt.hash('313aslam786', 10);
+            setting = new Setting({ type: 'admin', username: 'aslam', password: hashedPassword });
+            await setting.save();
+        } else {
+            return res.status(401).json({ success: false });
+        }
+    }
+
     if (setting && setting.username === username && await bcrypt.compare(password, setting.password)) {
         res.json({ success: true });
     } else {
