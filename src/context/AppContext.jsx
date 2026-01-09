@@ -144,7 +144,8 @@ export const AppProvider = ({ children }) => {
         };
 
         // Reuse the update user endpoint logic (we need to make sure we have one or adding it inline)
-        const userRes = await fetch(`${API_URL}/users/${currentUser._id}/likes`, {
+        const userId = currentUser.id || currentUser._id;
+        const userRes = await fetch(`${API_URL}/users/${userId}/likes`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userUpdateBody)

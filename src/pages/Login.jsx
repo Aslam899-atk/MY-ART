@@ -50,21 +50,23 @@ const Login = () => {
                 <div className="col-12 col-sm-10 col-md-8 col-lg-5">
                     <div className="glass p-4 p-md-5 text-center border-0 shadow-lg rounded-5">
 
-                        {/* Toggle Tabs */}
-                        <div className="d-flex justify-content-center gap-3 mb-4">
-                            <button
-                                onClick={() => setMode('user')}
-                                className={`btn rounded-pill px-4 ${mode === 'user' || mode === 'register' ? 'btn-primary' : 'btn-outline-light border-0 var(--text-muted)'}`}
-                            >
-                                User
-                            </button>
-                            <button
-                                onClick={() => setMode('admin')}
-                                className={`btn rounded-pill px-4 ${mode === 'admin' ? 'btn-primary' : 'btn-outline-light border-0'}`}
-                            >
-                                Admin
-                            </button>
-                        </div>
+                        {/* Toggle Tabs - Hide if came strictly from Admin redirect for cleaner UI */}
+                        {location.state?.from !== 'admin' && (
+                            <div className="d-flex justify-content-center gap-3 mb-4">
+                                <button
+                                    onClick={() => setMode('user')}
+                                    className={`btn rounded-pill px-4 ${mode === 'user' || mode === 'register' ? 'btn-primary' : 'btn-outline-light border-0 var(--text-muted)'}`}
+                                >
+                                    User
+                                </button>
+                                <button
+                                    onClick={() => setMode('admin')}
+                                    className={`btn rounded-pill px-4 ${mode === 'admin' ? 'btn-primary' : 'btn-outline-light border-0'}`}
+                                >
+                                    Admin
+                                </button>
+                            </div>
+                        )}
 
                         {mode === 'admin' && (
                             <div className="bg-primary bg-opacity-10 p-3 rounded-4 d-inline-flex align-items-center justify-content-center mb-4 text-primary">
