@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Heart, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
