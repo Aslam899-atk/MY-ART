@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { Send, Mail, User, MessageCircle, Upload, X } from 'lucide-react';
+import { Send, Mail, User, MessageCircle, Upload, X, Instagram } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
@@ -65,18 +65,18 @@ const Contact = () => {
                                 </div>
 
                                 <div className="d-flex align-items-center gap-3">
-                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Mail size={24} /></div>
+                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Instagram size={24} /></div>
                                     <div>
-                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Email</div>
-                                        <div className="text-white">studio@artvoid.com</div>
+                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Instagram</div>
+                                        <a href="https://www.instagram.com/aslamtk35?igsh=ZnFhenBpajFrdDB3" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none">@aslamtk35</a>
                                     </div>
                                 </div>
 
                                 <div className="d-flex align-items-center gap-3">
-                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><MessageCircle size={24} /></div>
+                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Send size={24} /></div>
                                     <div>
-                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Socials</div>
-                                        <div className="text-white">@artvoid_studio</div>
+                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Telegram</div>
+                                        <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none">@aslamtk35</a>
                                     </div>
                                 </div>
                             </div>
