@@ -103,13 +103,13 @@ const Shop = () => {
 
             <AnimatePresence>
                 {selectedProduct && (
-                    <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
+                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000, overflowY: 'auto' }}>
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass p-4 p-md-5 position-relative w-100"
-                            style={{ maxWidth: '500px' }}
+                            className="glass p-4 p-md-5 position-relative w-100 my-auto"
+                            style={{ maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}
                         >
                             {!isSuccess ? (
                                 <>
