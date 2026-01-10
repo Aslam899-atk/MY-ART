@@ -463,9 +463,20 @@ const Admin = () => {
                                     </label>
 
                                     {(uploadType === 'shop' ? formData.image : galleryFormData.image) && (
-                                        <div className="position-relative">
-                                            <div className="bg-dark rounded-3 p-2 text-center text-muted small">File Selected</div>
-                                            <button type="button" onClick={() => setImageFile(null)} className="btn btn-sm btn-dark position-absolute top-0 end-0 m-2 rounded-circle shadow"><X size={16} /></button>
+                                        <div className="position-relative rounded-3 overflow-hidden" style={{ height: '150px' }}>
+                                            {(uploadType === 'gallery' && galleryFormData.type === 'video') || (imageFile?.type?.includes('video')) ? (
+                                                <video src={uploadType === 'shop' ? formData.image : galleryFormData.image} className="w-100 h-100 object-fit-cover" muted />
+                                            ) : (
+                                                <img src={uploadType === 'shop' ? formData.image : galleryFormData.image} alt="Preview" className="w-100 h-100 object-fit-cover" />
+                                            )}
+                                            <div className="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                                                <div className="badge bg-dark bg-opacity-75 backdrop-blur shadow-sm">Current Preview</div>
+                                                <button type="button" onClick={() => {
+                                                    setImageFile(null);
+                                                    if (uploadType === 'shop') setFormData({ ...formData, image: '' });
+                                                    else setGalleryFormData({ ...galleryFormData, image: '' });
+                                                }} className="btn btn-sm btn-danger rounded-circle shadow-sm p-1"><X size={14} /></button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -478,7 +489,7 @@ const Admin = () => {
                                         {imageFile ? `Uploading ${uploadProgress}%` : 'Saving...'}
                                     </>
                                 ) : (
-                                    'Upload to Collection'
+                                    editingProduct ? 'Update Product' : 'Upload to Collection'
                                 )}
                             </button>
                         </form>

@@ -116,6 +116,11 @@ app.delete('/api/products/:id', asyncHandler(async (req, res) => {
     res.json({ message: 'Deleted' });
 }));
 
+app.put('/api/products/:id', asyncHandler(async (req, res) => {
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedProduct);
+}));
+
 app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
     const { increment } = req.body;
     const product = await Product.findById(req.params.id);
