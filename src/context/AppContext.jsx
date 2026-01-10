@@ -89,28 +89,9 @@ export const AppProvider = ({ children }) => {
 
     const handleLikeAction = async (type, id) => {
         if (!user) {
-            const username = window.prompt('Enter Username to Login/Register (likes are saved to account)');
-            const password = window.prompt('Enter Password');
-            if (username && password) {
-                // Try login first
-                let res = await loginUser(username, password);
-                if (!res.success) {
-                    // Try register if login fails? Or just fail. 
-                    // Let's assume we try to register if login fails strictly on "user not found", but for now just alert.
-                    // Better: explicit login or register flow. 
-                    // For simplicity in this prompt, re-use logic:
-                    if (confirm("User not found or wrong password. Create new account?")) {
-                        res = await registerUser(username, password);
-                    }
-                }
-
-                if (!res.success) {
-                    alert('Authentication failed. Cannot save like.');
-                    return;
-                }
-            } else {
-                return;
-            }
+            // Trigger Google login as requested (login with gmail)
+            const res = await loginWithGoogle();
+            if (!res.success) return;
         }
 
         // Now user is logged in. Determine status.

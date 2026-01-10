@@ -69,7 +69,7 @@ const Shop = () => {
                                     style={{ objectFit: 'cover' }}
                                 />
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                                    <span className="badge glass text-white border-0 shadow-sm">${product.price}</span>
+                                    <span className="badge glass text-white border-0 shadow-sm">₹{product.price}</span>
                                 </div>
                                 <div className="position-absolute bottom-0 end-0 m-3">
                                     <button
@@ -129,7 +129,7 @@ const Shop = () => {
                                         </div>
                                         <div>
                                             <div className="text-primary fw-bold h4 mb-1">
-                                                ${selectedProduct.price}
+                                                ₹{selectedProduct.price}
                                             </div>
                                             <div className="fw-bold fs-5">{selectedProduct.name}</div>
                                             {selectedProduct.description && (

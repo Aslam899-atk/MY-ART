@@ -270,7 +270,7 @@ const Admin = () => {
                                                 <span className="fw-medium">{p.name}</span>
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 border-0 fw-bold text-primary">${p.price}</td>
+                                        <td className="py-3 px-4 border-0 fw-bold text-primary">₹{p.price}</td>
                                         <td className="py-3 px-4 border-0">
                                             <div className="d-flex align-items-center gap-2 text-danger">
                                                 <Heart size={14} fill="var(--accent)" /> {p.likes || 0}
@@ -434,7 +434,7 @@ const Admin = () => {
                                     </div>
 
                                     <div className="d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase">Price ($) <span className="text-secondary fw-normal">(Optional)</span></label>
+                                        <label className="small fw-bold text-muted text-uppercase">Price (₹) <span className="text-secondary fw-normal">(Optional)</span></label>
                                         <input
                                             type="number"
                                             placeholder="0.00"
