@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, CheckCircle, Upload, Mail, User, Settings, Lock, Heart, Image as ImageIcon } from 'lucide-react';
+import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart, Image as ImageIcon } from 'lucide-react';
 // Cloudinary is used instead of Firebase Storage
 // import { storage } from '../firebase';
 // import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
@@ -258,7 +258,7 @@ const Admin = () => {
                             </thead>
                             <tbody>
                                 {products.map(p => (
-                                    <tr key={p.id} className="border-bottom border-secondary border-opacity-10">
+                                    <tr key={p._id || p.id} className="border-bottom border-secondary border-opacity-10">
                                         <td className="py-3 px-4 border-0">
                                             <div className="d-flex align-items-center gap-3">
                                                 <img
@@ -279,7 +279,7 @@ const Admin = () => {
                                         <td className="py-3 px-4 border-0 text-end">
                                             <div className="d-flex gap-2 justify-content-end">
                                                 <button onClick={() => openEdit(p)} className="btn btn-sm glass text-primary border-0 p-2"><Edit3 size={16} /></button>
-                                                <button onClick={() => deleteProduct(p.id)} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
+                                                <button onClick={() => deleteProduct(p._id || p.id)} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -299,7 +299,7 @@ const Admin = () => {
                         </div>
                         <div className="row g-3">
                             {galleryItems.map(item => (
-                                <div key={item.id} className="col-6 col-md-3">
+                                <div key={item._id || item.id} className="col-6 col-md-3">
                                     <div className="position-relative group overflow-hidden rounded-3" style={{ height: '200px' }}>
                                         {item.type === 'video' ? (
                                             <video src={item.url} className="w-100 h-100 object-fit-cover" muted />
@@ -307,7 +307,7 @@ const Admin = () => {
                                             <img src={item.url} alt={item.title} className="w-100 h-100 object-fit-cover" />
                                         )}
                                         <div className="position-absolute top-0 end-0 p-2">
-                                            <button onClick={() => deleteGalleryItem(item.id)} className="btn btn-sm bg-danger text-white border-0 shadow"><Trash2 size={16} /></button>
+                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm bg-danger text-white border-0 shadow"><Trash2 size={16} /></button>
                                         </div>
                                         <div className="position-absolute bottom-0 start-0 p-2 w-100 bg-dark bg-opacity-50">
                                             <small className="text-white fw-bold truncate">{item.title || 'Untitled'}</small>
@@ -327,9 +327,9 @@ const Admin = () => {
                         </div>
                         <div className="row g-4">
                             {messages.map(m => (
-                                <div key={m.id} className="col-12">
+                                <div key={m._id || m.id} className="col-12">
                                     <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
-                                        <button onClick={() => deleteMessage(m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
+                                        <button onClick={() => deleteMessage(m._id || m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
 
                                         <div className="d-flex flex-column flex-md-row gap-4">
                                             {m.image && (
@@ -406,9 +406,9 @@ const Admin = () => {
                         </div>
                         <div className="row g-4">
                             {orders.map(o => (
-                                <div key={o.id} className="col-12">
+                                <div key={o._id || o.id} className="col-12">
                                     <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
-                                        <button onClick={() => deleteOrder(o.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
+                                        <button onClick={() => deleteOrder(o._id || o.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
 
                                         <div className="d-flex flex-column flex-md-row gap-4">
                                             {o.image && (
@@ -435,14 +435,18 @@ const Admin = () => {
                                                             <User size={14} className="text-primary" />
                                                             <span className="fw-bold text-white">{o.customer || 'Guest User'}</span>
                                                         </div>
-                                                        <div className="d-flex align-items-center gap-2 small text-muted">
-                                                            <Phone size={14} />
-                                                            <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
-                                                        </div>
-                                                        <div className="d-flex align-items-center gap-2 small text-muted mt-1">
-                                                            <Mail size={14} />
-                                                            <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email || 'No email provided'}</a>
-                                                        </div>
+                                                        {o.phone && (
+                                                            <div className="d-flex align-items-center gap-2 small text-muted">
+                                                                <Phone size={14} />
+                                                                <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
+                                                            </div>
+                                                        )}
+                                                        {o.email && (
+                                                            <div className="d-flex align-items-center gap-2 small text-muted mt-1">
+                                                                <Mail size={14} />
+                                                                <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email}</a>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div className="col-12 col-md-6">
