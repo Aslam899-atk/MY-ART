@@ -71,7 +71,7 @@ export const AppProvider = ({ children }) => {
 
     const deleteProduct = async (id) => {
         await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
-        setProducts((prev) => prev.filter((p) => p.id !== id));
+        setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id));
     };
 
     const updateProduct = async (product) => {
@@ -83,7 +83,7 @@ export const AppProvider = ({ children }) => {
         });
         if (res.ok) {
             const updated = await res.json();
-            setProducts((prev) => prev.map((p) => (p.id === id ? updated : p)));
+            setProducts((prev) => prev.map((p) => ((p._id || p.id) === id ? updated : p)));
         }
     };
 
@@ -160,7 +160,7 @@ export const AppProvider = ({ children }) => {
 
     const deleteGalleryItem = async (id) => {
         await fetch(`${API_URL}/gallery/${id}`, { method: 'DELETE' });
-        setGalleryItems((prev) => prev.filter((g) => g.id !== id));
+        setGalleryItems((prev) => prev.filter((g) => (g._id || g.id) !== id));
     };
 
     const toggleGalleryLike = (id) => handleLikeAction('gallery', id);
@@ -180,7 +180,7 @@ export const AppProvider = ({ children }) => {
 
     const deleteMessage = async (id) => {
         await fetch(`${API_URL}/messages/${id}`, { method: 'DELETE' });
-        setMessages((prev) => prev.filter((m) => m.id !== id));
+        setMessages((prev) => prev.filter((m) => (m._id || m.id) !== id));
     };
 
     // ---------- Order CRUD ----------
@@ -198,7 +198,7 @@ export const AppProvider = ({ children }) => {
 
     const deleteOrder = async (id) => {
         await fetch(`${API_URL}/orders/${id}`, { method: 'DELETE' });
-        setOrders((prev) => prev.filter((o) => o.id !== id));
+        setOrders((prev) => prev.filter((o) => (o._id || o.id) !== id));
     };
 
     useEffect(() => {
