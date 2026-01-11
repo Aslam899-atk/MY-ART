@@ -320,49 +320,147 @@ const Admin = () => {
                 )}
 
                 {activeTab === 'messages' && (
-                    <div className="d-flex flex-column gap-5">
-                        {/* Messages content reused */}
-                        <div className="text-muted">Inquiries shown here... (Same as before)</div>
-                        <div className="row g-3">
+                    <div className="d-flex flex-column gap-4">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                            <h3 className="h4 fw-bold mb-0">Inbox</h3>
+                            <div className="text-muted small">{messages.length} messages total</div>
+                        </div>
+                        <div className="row g-4">
                             {messages.map(m => (
                                 <div key={m.id} className="col-12">
-                                    <div className="glass p-4 rounded-4 position-relative">
-                                        <button onClick={() => deleteMessage(m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3"><Trash2 size={16} /></button>
-                                        <div className="fw-bold">{m.name} <span className="text-muted fw-normal">({m.email})</span></div>
-                                        <p className="mb-0 mt-2">{m.message}</p>
+                                    <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
+                                        <button onClick={() => deleteMessage(m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
+
+                                        <div className="d-flex flex-column flex-md-row gap-4">
+                                            {m.image && (
+                                                <div className="flex-shrink-0">
+                                                    <img
+                                                        src={m.image}
+                                                        alt="Reference"
+                                                        className="rounded-3 shadow-sm"
+                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', cursor: 'pointer' }}
+                                                        onClick={() => window.open(m.image, '_blank')}
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="flex-grow-1">
+                                                <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+                                                    <span className={`badge border-0 rounded-pill px-3 py-2 ${m.type === 'service' ? 'bg-primary' : 'bg-secondary'}`}>
+                                                        {m.type === 'service' ? 'Order / Service Request' : 'General Inquiry'}
+                                                    </span>
+                                                    <span className="text-muted small">{m.date}</span>
+                                                </div>
+
+                                                <div className="row g-3">
+                                                    <div className="col-12 col-md-6">
+                                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                                            <User size={14} className="text-primary" />
+                                                            <span className="fw-bold text-white">{m.name}</span>
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-2 small text-muted">
+                                                            <Mail size={14} />
+                                                            <a href={`mailto:${m.email}`} className="text-muted text-decoration-none hover-primary">{m.email}</a>
+                                                        </div>
+                                                        {m.phone && (
+                                                            <div className="d-flex align-items-center gap-2 small text-muted mt-1">
+                                                                <Phone size={14} />
+                                                                <a href={`tel:${m.phone}`} className="text-muted text-decoration-none hover-primary">{m.phone}</a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {m.address && (
+                                                        <div className="col-12 col-md-6">
+                                                            <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Address</div>
+                                                            <div className="small text-white-50">{m.address}</div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
+                                                        <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+                                                            {m.type === 'service' ? 'Comment / Notes' : 'Message'}
+                                                        </div>
+                                                        <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
+                            {messages.length === 0 && (
+                                <div className="col-12 text-center py-5">
+                                    <div className="text-muted opacity-50 mb-3"><MessageSquare size={64} /></div>
+                                    <div className="h5 text-muted">No messages yet.</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'orders' && (
-                    <div>
-                        <h3 className="h4 fw-bold mb-4">Recent Orders</h3>
-                        <div className="d-flex flex-column gap-4">
+                    <div className="d-flex flex-column gap-4">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                            <h3 className="h4 fw-bold mb-0">Active Orders</h3>
+                            <div className="text-muted small">{orders.length} orders total</div>
+                        </div>
+                        <div className="row g-4">
                             {orders.map(o => (
-                                <div key={o.id} className="glass p-4 border-0 rounded-4">
-                                    <div className="d-flex align-items-center gap-3">
-                                        {o.image && (
-                                            <img
-                                                src={o.image}
-                                                alt={o.productName}
-                                                className="rounded-3"
-                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                            />
-                                        )}
-                                        <div className="flex-grow-1">
-                                            <div className="d-flex justify-content-between align-items-start">
-                                                <h5 className="fw-bold mb-1">{o.productName}</h5>
-                                                <button onClick={() => deleteOrder(o.id)} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
+                                <div key={o.id} className="col-12">
+                                    <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
+                                        <button onClick={() => deleteOrder(o.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
+
+                                        <div className="d-flex flex-column flex-md-row gap-4">
+                                            {o.image && (
+                                                <div className="flex-shrink-0">
+                                                    <img
+                                                        src={o.image}
+                                                        alt={o.productName}
+                                                        className="rounded-3 shadow-sm"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="flex-grow-1">
+                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <h5 className="fw-bold mb-0 text-primary">{o.productName}</h5>
+                                                        <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="row g-3">
+                                                    <div className="col-12 col-md-6">
+                                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                                            <User size={14} className="text-primary" />
+                                                            <span className="fw-bold text-white">{o.customer || 'Guest User'}</span>
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-2 small text-muted">
+                                                            <Phone size={14} />
+                                                            <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-2 small text-muted mt-1">
+                                                            <Mail size={14} />
+                                                            <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email || 'No email provided'}</a>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-12 col-md-6">
+                                                        <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Shipping Address</div>
+                                                        <div className="small text-white-50">{o.address || 'No address provided'}</div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="small text-muted">Customer: {o.customer} | {o.phone}</div>
-                                            <div className="small text-muted mt-1 text-truncate" style={{ maxWidth: '300px' }}>{o.address}</div>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                            {orders.length === 0 && (
+                                <div className="col-12 text-center py-5">
+                                    <div className="text-muted opacity-50 mb-3"><ShoppingBag size={64} /></div>
+                                    <div className="h5 text-muted">No orders yet.</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

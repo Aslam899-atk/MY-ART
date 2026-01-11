@@ -52,7 +52,11 @@ const Gallery = mongoose.model('Gallery', gallerySchema);
 const messageSchema = new mongoose.Schema({
     name: String,
     email: String,
+    phone: String,
+    address: String,
     message: String,
+    image: String, // Base64 or URL
+    type: { type: String, default: 'inquiry' }, // 'inquiry' or 'service'
     date: String,
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
