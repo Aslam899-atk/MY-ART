@@ -71,6 +71,8 @@ const orderSchema = new mongoose.Schema({
     phone: String,
     email: String,
     address: String,
+    notes: String, // Added for custom requests
+    type: { type: String, default: 'product' }, // 'product' or 'service'
     status: { type: String, default: 'Pending' },
     date: String,
     createdAt: { type: Date, default: Date.now }

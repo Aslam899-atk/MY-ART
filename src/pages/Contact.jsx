@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const Contact = () => {
     const [msgType, setMsgType] = useState('inquiry'); // 'inquiry' or 'service'
     const [formData, setFormData] = useState({ name: '', email: '', message: '', image: '', phone: '', address: '' });
-    const { addMessage } = useContext(AppContext);
+    const { addMessage, addOrder } = useContext(AppContext);
     const [submitted, setSubmitted] = useState(false);
 
     const handleImageUpload = (e) => {
@@ -22,7 +22,28 @@ const Contact = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        addMessage({ ...formData, type: msgType });
+
+        if (msgType === 'service') {
+            addOrder({
+                productName: 'Custom Service Request',
+                customer: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                address: formData.address,
+                notes: formData.message,
+                image: formData.image,
+                type: 'service',
+                price: 0
+            });
+        } else {
+            addMessage({
+                name: formData.name,
+                email: formData.email,
+                message: formData.message,
+                type: 'inquiry'
+            });
+        }
+
         setSubmitted(true);
         setFormData({ name: '', email: '', message: '', image: '', phone: '', address: '' });
         setTimeout(() => setSubmitted(false), 5000);

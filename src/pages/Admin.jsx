@@ -345,8 +345,8 @@ const Admin = () => {
                                             )}
                                             <div className="flex-grow-1">
                                                 <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
-                                                    <span className={`badge border-0 rounded-pill px-3 py-2 ${m.type === 'service' ? 'bg-primary' : 'bg-secondary'}`}>
-                                                        {m.type === 'service' ? 'Order / Service Request' : 'General Inquiry'}
+                                                    <span className="badge border-0 rounded-pill px-3 py-2 bg-secondary">
+                                                        General Inquiry
                                                     </span>
                                                     <span className="text-muted small">{m.date}</span>
                                                 </div>
@@ -378,7 +378,7 @@ const Admin = () => {
 
                                                     <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
                                                         <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-                                                            {m.type === 'service' ? 'Comment / Notes' : 'Message'}
+                                                            Message
                                                         </div>
                                                         <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
                                                     </div>
@@ -425,7 +425,12 @@ const Admin = () => {
                                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                                     <div>
                                                         <h5 className="fw-bold mb-0 text-primary">{o.productName}</h5>
-                                                        <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
+                                                        <div className="d-flex align-items-center gap-2 mt-1">
+                                                            <span className={`badge border-0 rounded-pill px-2 py-1 small ${o.type === 'service' ? 'bg-info bg-opacity-25 text-info' : 'bg-success bg-opacity-25 text-success'}`} style={{ fontSize: '0.7rem' }}>
+                                                                {o.type === 'service' ? 'Custom Request' : 'Product Order'}
+                                                            </span>
+                                                            <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -453,6 +458,13 @@ const Admin = () => {
                                                         <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Shipping Address</div>
                                                         <div className="small text-white-50">{o.address || 'No address provided'}</div>
                                                     </div>
+
+                                                    {o.notes && (
+                                                        <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
+                                                            <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Comment / Notes</div>
+                                                            <p className="mb-0 text-white-50 small" style={{ whiteSpace: 'pre-wrap' }}>{o.notes}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
