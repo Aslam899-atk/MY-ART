@@ -413,11 +413,16 @@ const Admin = () => {
                                         <div className="d-flex flex-column flex-md-row gap-4">
                                             {o.image && (
                                                 <div className="flex-shrink-0">
+                                                    <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem', letterSpacing: '0.05em' }}>
+                                                        {o.type === 'service' ? 'Reference Image' : 'Product Image'}
+                                                    </div>
                                                     <img
                                                         src={o.image}
                                                         alt={o.productName}
                                                         className="rounded-3 shadow-sm"
-                                                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                                                        style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
+                                                        onClick={() => window.open(o.image, '_blank')}
+                                                        title="Click to view full image"
                                                     />
                                                 </div>
                                             )}
