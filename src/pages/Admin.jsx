@@ -466,7 +466,9 @@ const Admin = () => {
 
                                                     {o.notes && (
                                                         <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
-                                                            <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Comment / Notes</div>
+                                                            <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+                                                                {o.type === 'service' ? 'Request Info / Service Details' : 'Design Notes / Comments'}
+                                                            </div>
                                                             <p className="mb-0 text-white-50 small" style={{ whiteSpace: 'pre-wrap' }}>{o.notes}</p>
                                                         </div>
                                                     )}
