@@ -221,8 +221,8 @@ const Admin = () => {
                 {[
                     { id: 'products', icon: Package, label: 'Shop Items', count: products.length },
                     { id: 'gallery', icon: ImageIcon, label: 'Gallery', count: galleryItems.length },
-                    { id: 'messages', icon: MessageSquare, label: 'Messages', count: messages.length },
-                    { id: 'orders', icon: ShoppingBag, label: 'Orders', count: orders.length },
+                    { id: 'messages', icon: MessageSquare, label: 'Inquiries', count: messages.filter(m => m.type !== 'service').length },
+                    { id: 'orders', icon: ShoppingBag, label: 'Orders', count: orders.length + messages.filter(m => m.type === 'service').length },
                     { id: 'settings', icon: Settings, label: 'Settings' }
                 ].map(tab => (
                     <div key={tab.id} className="col-6 col-md-3">
@@ -323,10 +323,10 @@ const Admin = () => {
                     <div className="d-flex flex-column gap-4">
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <h3 className="h4 fw-bold mb-0">Inbox</h3>
-                            <div className="text-muted small">{messages.length} messages total</div>
+                            <div className="text-muted small">{messages.filter(m => m.type !== 'service').length} inquiries total</div>
                         </div>
                         <div className="row g-4">
-                            {messages.map(m => (
+                            {messages.filter(m => m.type !== 'service').map(m => (
                                 <div key={m._id || m.id} className="col-12">
                                     <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
                                         <button onClick={() => deleteMessage(m._id || m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
@@ -388,10 +388,10 @@ const Admin = () => {
                                     </div>
                                 </div>
                             ))}
-                            {messages.length === 0 && (
+                            {messages.filter(m => m.type !== 'service').length === 0 && (
                                 <div className="col-12 text-center py-5">
                                     <div className="text-muted opacity-50 mb-3"><MessageSquare size={64} /></div>
-                                    <div className="h5 text-muted">No messages yet.</div>
+                                    <div className="h5 text-muted">No inquiries yet.</div>
                                 </div>
                             )}
                         </div>
@@ -402,83 +402,101 @@ const Admin = () => {
                     <div className="d-flex flex-column gap-4">
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <h3 className="h4 fw-bold mb-0">Active Orders</h3>
-                            <div className="text-muted small">{orders.length} orders total</div>
+                            <div className="text-muted small">
+                                {[...orders, ...messages.filter(msg => msg.type === 'service')].length} items total
+                            </div>
                         </div>
                         <div className="row g-4">
-                            {orders.map(o => (
-                                <div key={o._id || o.id} className="col-12">
-                                    <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
-                                        <button onClick={() => deleteOrder(o._id || o.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
+                            {[
+                                ...orders.map(o => ({ ...o, _isOrder: true })),
+                                ...messages.filter(m => m.type === 'service').map(m => ({
+                                    ...m,
+                                    productName: 'Custom Service Request',
+                                    customer: m.name,
+                                    notes: m.message,
+                                    _isMessage: true
+                                }))
+                            ]
+                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                .map(o => (
+                                    <div key={o._id || o.id} className="col-12">
+                                        <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
+                                            <button
+                                                onClick={() => o._isMessage ? deleteMessage(o._id || o.id) : deleteOrder(o._id || o.id)}
+                                                className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
 
-                                        <div className="d-flex flex-column flex-md-row gap-4">
-                                            {o.image && (
-                                                <div className="flex-shrink-0">
-                                                    <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem', letterSpacing: '0.05em' }}>
-                                                        {o.type === 'service' ? 'Reference Image' : 'Product Image'}
+                                            <div className="d-flex flex-column flex-md-row gap-4">
+                                                {o.image && (
+                                                    <div className="flex-shrink-0">
+                                                        <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem', letterSpacing: '0.05em' }}>
+                                                            {o.type === 'service' ? 'Reference Image' : 'Product Image'}
+                                                        </div>
+                                                        <img
+                                                            src={o.image}
+                                                            alt={o.productName}
+                                                            className="rounded-3 shadow-sm"
+                                                            style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
+                                                            onClick={() => window.open(o.image, '_blank')}
+                                                            title="Click to view full image"
+                                                        />
                                                     </div>
-                                                    <img
-                                                        src={o.image}
-                                                        alt={o.productName}
-                                                        className="rounded-3 shadow-sm"
-                                                        style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
-                                                        onClick={() => window.open(o.image, '_blank')}
-                                                        title="Click to view full image"
-                                                    />
-                                                </div>
-                                            )}
-                                            <div className="flex-grow-1">
-                                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                                    <div>
-                                                        <h5 className="fw-bold mb-0 text-primary">{o.productName}</h5>
-                                                        <div className="d-flex align-items-center gap-2 mt-1">
-                                                            <span className={`badge border-0 rounded-pill px-2 py-1 small ${o.type === 'service' ? 'bg-info bg-opacity-25 text-info' : 'bg-success bg-opacity-25 text-success'}`} style={{ fontSize: '0.7rem' }}>
-                                                                {o.type === 'service' ? 'Custom Request' : 'Product Order'}
-                                                            </span>
-                                                            <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
+                                                )}
+                                                <div className="flex-grow-1">
+                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                        <div>
+                                                            <h5 className="fw-bold mb-0 text-primary">{o.productName}</h5>
+                                                            <div className="d-flex align-items-center gap-2 mt-1">
+                                                                <span className={`badge border-0 rounded-pill px-2 py-1 small ${o.type === 'service' ? 'bg-info bg-opacity-25 text-info' : 'bg-success bg-opacity-25 text-success'}`} style={{ fontSize: '0.7rem' }}>
+                                                                    {o.type === 'service' ? 'Custom Request' : 'Product Order'}
+                                                                </span>
+                                                                <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="row g-3">
-                                                    <div className="col-12 col-md-6">
-                                                        <div className="d-flex align-items-center gap-2 mb-1">
-                                                            <User size={14} className="text-primary" />
-                                                            <span className="fw-bold text-white">{o.customer || 'Guest User'}</span>
+                                                    <div className="row g-3">
+                                                        <div className="col-12 col-md-6">
+                                                            <div className="d-flex align-items-center gap-2 mb-1">
+                                                                <User size={14} className="text-primary" />
+                                                                <span className="fw-bold text-white">{o.customer || o.name || 'Guest User'}</span>
+                                                            </div>
+                                                            {(o.phone) && (
+                                                                <div className="d-flex align-items-center gap-2 small text-muted">
+                                                                    <Phone size={14} />
+                                                                    <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
+                                                                </div>
+                                                            )}
+                                                            {(o.email) && (
+                                                                <div className="d-flex align-items-center gap-2 small text-muted mt-1">
+                                                                    <Mail size={14} />
+                                                                    <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email}</a>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        {o.phone && (
-                                                            <div className="d-flex align-items-center gap-2 small text-muted">
-                                                                <Phone size={14} />
-                                                                <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
+
+                                                        <div className="col-12 col-md-6">
+                                                            <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Shipping Address</div>
+                                                            <div className="small text-white-50">{o.address || 'No address provided'}</div>
+                                                        </div>
+
+                                                        {(o.notes || o.message) && (
+                                                            <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
+                                                                <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+                                                                    {o.type === 'service' ? 'Request Info / Service Details' : 'Design Notes / Comments'}
+                                                                </div>
+                                                                <p className="mb-0 text-white-50 small" style={{ whiteSpace: 'pre-wrap' }}>{o.notes || o.message}</p>
                                                             </div>
                                                         )}
-                                                        {o.email && (
-                                                            <div className="d-flex align-items-center gap-2 small text-muted mt-1">
-                                                                <Mail size={14} />
-                                                                <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email}</a>
-                                                            </div>
-                                                        )}
                                                     </div>
-
-                                                    <div className="col-12 col-md-6">
-                                                        <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Shipping Address</div>
-                                                        <div className="small text-white-50">{o.address || 'No address provided'}</div>
-                                                    </div>
-
-                                                    {o.notes && (
-                                                        <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
-                                                            <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-                                                                {o.type === 'service' ? 'Request Info / Service Details' : 'Design Notes / Comments'}
-                                                            </div>
-                                                            <p className="mb-0 text-white-50 small" style={{ whiteSpace: 'pre-wrap' }}>{o.notes}</p>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                            {orders.length === 0 && (
+                                ))}
+                            {[...orders, ...messages.filter(m => m.type === 'service')].length === 0 && (
                                 <div className="col-12 text-center py-5">
                                     <div className="text-muted opacity-50 mb-3"><ShoppingBag size={64} /></div>
                                     <div className="h5 text-muted">No orders yet.</div>
