@@ -34,8 +34,20 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: var(--glass-shadow);
+}
+
+img {
+  border-radius: 20px;
+}
+
+.navbar img {
+  border-radius: 12px !important;
+}
+
+.home-wrapper .vh-100 img {
+  border-radius: 0 !important;
 }
 
 .container {
