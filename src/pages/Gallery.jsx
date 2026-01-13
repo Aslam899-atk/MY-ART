@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { Heart, Search, Share2, ZoomIn, X, Play } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Gallery = () => {
     const { galleryItems, toggleGalleryLike, likedIds } = useContext(AppContext);
@@ -15,7 +15,7 @@ const Gallery = () => {
                     text: 'Check out this amazing artwork on Art Void!',
                     url: window.location.href
                 });
-            } catch (err) {
+            } catch {
                 console.log('Share canceled');
             }
         } else {
@@ -38,7 +38,7 @@ const Gallery = () => {
             <div className="row g-4">
                 {galleryItems.map((item, index) => (
                     <div key={item.id} className="col-12 col-md-6 col-lg-4">
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
@@ -101,7 +101,7 @@ const Gallery = () => {
                                     </div>
                                 </div>
                             )}
-                        </motion.div>
+                        </Motion.div>
                     </div>
                 ))}
             </div>
@@ -109,7 +109,7 @@ const Gallery = () => {
             {/* Lightbox Modal */}
             <AnimatePresence>
                 {selectedItem && selectedItem.type !== 'video' && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -120,7 +120,7 @@ const Gallery = () => {
                         <button className="position-absolute top-0 end-0 m-4 btn text-white border-0 p-2" onClick={() => setSelectedItem(null)}>
                             <X size={32} />
                         </button>
-                        <motion.img
+                        <Motion.img
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
@@ -130,7 +130,7 @@ const Gallery = () => {
                             style={{ maxHeight: '90vh', maxWidth: '100%' }}
                             onClick={e => e.stopPropagation()}
                         />
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
         </div>

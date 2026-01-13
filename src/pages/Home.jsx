@@ -1,16 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Heart, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { AppContext } from '../context/AppContext';
 
 const Home = () => {
-    const { galleryItems, user, loginUser, loginWithGoogle } = useContext(AppContext);
+    const { galleryItems, user, loginWithGoogle } = useContext(AppContext);
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-    const [authError, setAuthError] = useState('');
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
+
 
     // Show login modal on mount if not logged in
     React.useEffect(() => {
@@ -25,18 +23,7 @@ const Home = () => {
         }
     }, [user]);
 
-    const handleHomeLogin = async (e) => {
-        e.preventDefault();
-        setIsLoggingIn(true);
-        setAuthError('');
-        const res = await loginUser(loginForm.username, loginForm.password);
-        setIsLoggingIn(false);
-        if (res.success) {
-            setShowLoginModal(false);
-        } else {
-            setAuthError(res.message);
-        }
-    };
+
 
     const handleGuestAccess = () => {
         setShowLoginModal(false);
@@ -59,7 +46,7 @@ const Home = () => {
 
             <div className="container" style={{ paddingTop: '12rem', minHeight: '100vh' }}>
                 <section className="d-flex flex-column align-items-center text-center gap-4">
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
@@ -68,9 +55,9 @@ const Home = () => {
                     >
                         <Sparkles size={14} />
                         NEW COLLECTION DROP 2024
-                    </motion.div>
+                    </Motion.div>
 
-                    <motion.h1
+                    <Motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
@@ -78,9 +65,9 @@ const Home = () => {
                         style={{ lineHeight: 1.1 }}
                     >
                         Real <span style={{ color: 'var(--primary)' }}>Paintings,</span> <br /> Calligraphy & Pencil Art
-                    </motion.h1>
+                    </Motion.h1>
 
-                    <motion.p
+                    <Motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
@@ -89,9 +76,9 @@ const Home = () => {
                     >
                         Experience the authentic touch of handmade art.
                         From detailed pencil drawings to masterful calligraphy and oil paintings.
-                    </motion.p>
+                    </Motion.p>
 
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.6 }}
@@ -103,12 +90,12 @@ const Home = () => {
                         <button className="btn glass border-1 text-white px-4 py-3">
                             Learn More
                         </button>
-                    </motion.div>
+                    </Motion.div>
                 </section>
             </div>
 
             <section className="container-fluid px-4 py-5 mt-5">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -122,13 +109,13 @@ const Home = () => {
                     <Link to="/galleryView" className="text-primary fw-bold text-decoration-none hover-underline-animation">
                         View Full Gallery &rarr;
                     </Link>
-                </motion.div>
+                </Motion.div>
 
                 {/* 5-Column Grid Layout (PC: 5, Tab: 3, Phone: 2) */}
                 <div className="row g-3 px-lg-5">
                     {galleryItems && galleryItems.slice(0, 5).map((item, index) => (
                         <div key={item.id} className="col-6 col-md-4 col-lg-custom-5">
-                            <motion.div
+                            <Motion.div
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -141,7 +128,7 @@ const Home = () => {
                                 ) : (
                                     <img src={item.url} alt={item.title} className="w-100 h-100 object-fit-cover transition-transform duration-500 hover-zoom" />
                                 )}
-                            </motion.div>
+                            </Motion.div>
                         </div>
                     ))}
                 </div>
@@ -182,7 +169,7 @@ const Home = () => {
             {/* LOGIN POPUP MODAL */}
             {showLoginModal && (
                 <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 9999 }}>
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         className="glass p-5 rounded-5 shadow-lg position-relative w-100"
@@ -193,7 +180,7 @@ const Home = () => {
                             <p className="text-muted small">Sign in to save your favorite artworks.</p>
                         </div>
 
-                        {authError && <div className="alert alert-danger py-2 small">{authError}</div>}
+
 
                         {/* Google Login - PRIMARY OPTION */}
                         <div className="d-flex flex-column gap-2 mb-3">
@@ -221,7 +208,7 @@ const Home = () => {
                         </div>
 
 
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </div>

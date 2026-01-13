@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart, Image as ImageIcon } from 'lucide-react';
 // Cloudinary is used instead of Firebase Storage
 // import { storage } from '../firebase';
@@ -528,7 +528,7 @@ const Admin = () => {
 
             {isModalOpen && (
                 <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         className="glass p-4 p-md-5 position-relative w-100 overflow-auto"
@@ -632,7 +632,7 @@ const Admin = () => {
                                 )}
                             </button>
                         </form>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </div>

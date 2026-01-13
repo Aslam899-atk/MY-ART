@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ShoppingCart, LogIn, LayoutDashboard, Palette } from 'lucide-react';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { Send, Mail, User, MessageCircle, Upload, X, Instagram } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const Contact = () => {
     const [msgType, setMsgType] = useState('inquiry'); // 'inquiry' or 'service'
@@ -197,14 +197,14 @@ const Contact = () => {
                                 </button>
 
                                 {submitted && (
-                                    <motion.div
+                                    <Motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         className="text-center text-success fw-bold p-3 rounded-3"
                                         style={{ background: 'rgba(16, 185, 129, 0.1)' }}
                                     >
                                         {msgType === 'service' ? 'Request submitted successfully!' : 'Message sent successfully!'}
-                                    </motion.div>
+                                    </Motion.div>
                                 )}
                             </form>
                         </div>

@@ -1,0 +1,12 @@
+﻿
+> art-web@0.0.0 lint
+> eslint .
+
+
+C:\Users\MSI\Music\MY ART WEB\src\context\AppContext.jsx
+  5:14  error    Fast refresh only works when a file only exports components. Move your React context(s) to a separate file  react-refresh/only-export-components
+  7:1   warning  Unused eslint-disable directive (no problems were reported from 'react-refresh/only-export-components')
+
+Γ£û 2 problems (1 error, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

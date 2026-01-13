@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 
@@ -26,7 +27,7 @@ export const AppProvider = ({ children }) => {
         return user ? [...(user.likedProducts || []), ...(user.likedGallery || [])] : [];
     });
 
-    const [adminPassword, setAdminPassword] = useState('aslam123');
+
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
@@ -36,7 +37,7 @@ export const AppProvider = ({ children }) => {
         : 'https://my-art-void-server.onrender.com/api';
 
     // --- FETCH DATA ---
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const [prodRes, galRes, msgRes, ordRes] = await Promise.all([
                 fetch(`${API_URL}/products`),
@@ -54,7 +55,7 @@ export const AppProvider = ({ children }) => {
         } finally {
             setIsLoadingAuth(false);
         }
-    };
+    }, [API_URL]);
 
     // ---------- Product CRUD ----------
     const addProduct = async (product) => {
@@ -205,7 +206,7 @@ export const AppProvider = ({ children }) => {
         fetchData();
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchData]);
 
     // ... (Keep existing Product/Gallery/Message/Order functions)
 
@@ -227,7 +228,7 @@ export const AppProvider = ({ children }) => {
             });
             const data = await res.json();
             return data.success;
-        } catch (e) {
+        } catch {
             return false;
         }
     };

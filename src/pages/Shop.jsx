@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
     const { products, addOrder, toggleLike, likedIds } = useContext(AppContext);
@@ -104,7 +104,7 @@ const Shop = () => {
             <AnimatePresence>
                 {selectedProduct && (
                     <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000, overflowY: 'auto' }}>
-                        <motion.div
+                        <Motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
@@ -172,7 +172,7 @@ const Shop = () => {
                                     <p className="lead text-muted">We have received your order for <strong className="text-white">{selectedProduct.name}</strong>. We will contact you soon!</p>
                                 </div>
                             )}
-                        </motion.div>
+                        </Motion.div>
                     </div>
                 )}
             </AnimatePresence>

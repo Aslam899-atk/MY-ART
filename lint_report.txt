@@ -1,0 +1,24 @@
+﻿
+C:\Users\MSI\Music\MY ART WEB\src\components\Navbar.jsx
+  2:16  error  'useNavigate' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MSI\Music\MY ART WEB\src\context\AppContext.jsx
+    5:14  error    Fast refresh only works when a file only exports components. Move your React context(s) to a separate file    react-refresh/only-export-components
+   29:12  error    'adminPassword' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                 no-unused-vars
+   29:27  error    'setAdminPassword' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  208:8   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  230:18  error    'e' is defined but never used                                                                                 no-unused-vars
+
+C:\Users\MSI\Music\MY ART WEB\src\pages\Gallery.jsx
+  18:22  error  'err' is defined but never used  no-unused-vars
+
+C:\Users\MSI\Music\MY ART WEB\src\pages\Home.jsx
+  11:23  error  'setLoginForm' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  13:12  error  'isLoggingIn' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  28:11  error  'handleHomeLogin' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MSI\Music\MY ART WEB\src\pages\Login.jsx
+  3:23  error  'useSearchParams' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Γ£û 11 problems (10 errors, 1 warning)
+
