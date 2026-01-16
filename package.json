@@ -14,8 +14,9 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
     "firebase": "^12.7.0",
-    "framer-motion": "^12.23.26",
+    "framer-motion": "^12.26.2",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

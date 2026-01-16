@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import LazyImage from '../components/LazyImage';
 import { Heart, Search, Share2, ZoomIn, X, Play } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -59,10 +60,10 @@ const Gallery = () => {
                                     }}
                                 />
                             ) : (
-                                <img
+                                <LazyImage
                                     src={item.url}
                                     alt={item.title || 'Artwork'}
-                                    className="w-100 h-100 object-fit-cover transition-transform duration-500"
+                                    className="w-100 h-100 transition-transform duration-500"
                                     onClick={() => setSelectedItem(item)}
                                     style={{ cursor: 'pointer' }}
                                 />

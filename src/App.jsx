@@ -9,6 +9,7 @@ import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
+import SupabaseHelp from './pages/SupabaseHelp';
 
 
 function AppContent() {
@@ -34,19 +35,9 @@ function AppContent() {
         img.onerror = resolve;
       }));
 
-      // 4. Preload initial Gallery Images (First 5)
-      if (galleryItems && galleryItems.length > 0) {
-        galleryItems.slice(0, 5).forEach(item => {
-          if (item.type !== 'video' && item.url) {
-            promises.push(new Promise((resolve) => {
-              const img = new Image();
-              img.src = item.url;
-              img.onload = resolve;
-              img.onerror = resolve;
-            }));
-          }
-        });
-      }
+      // 4. Preload initial Gallery Images (Skipped for faster initial render)
+      // We now use LazyImage component for better UX
+
 
       // 5. Wait for window load (optional but requested "fully loaded")
       if (document.readyState !== 'complete') {
@@ -79,6 +70,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/supabase-help" element={<SupabaseHelp />} />
         </Routes>
 
         <footer style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', borderTop: '1px solid var(--glass-border)', marginTop: '4rem' }}>

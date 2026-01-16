@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import LazyImage from '../components/LazyImage';
 import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -62,10 +63,10 @@ const Shop = () => {
                     <div key={product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
                         <div className="glass animate-fade-in h-100 overflow-hidden d-flex flex-column border-0">
                             <div className="position-relative overflow-hidden" style={{ height: '260px' }}>
-                                <img
+                                <LazyImage
                                     src={product.image}
                                     alt={product.name}
-                                    className="img-fluid w-100 h-100 transition-all hover-zoom"
+                                    className="w-100 h-100 transition-all hover-zoom"
                                     style={{ objectFit: 'cover' }}
                                 />
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
