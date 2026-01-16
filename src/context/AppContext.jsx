@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { auth, googleProvider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { supabase } from '../lib/supabaseClient';
 
 export const AppContext = createContext();
 
@@ -10,6 +9,7 @@ export const AppProvider = ({ children }) => {
     const [galleryItems, setGalleryItems] = useState([]);
     const [messages, setMessages] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [users, setUsers] = useState([]);
 
     // User Auth State
     const [user, setUser] = useState(() => {
@@ -39,17 +39,19 @@ export const AppProvider = ({ children }) => {
     // --- FETCH DATA ---
     const fetchData = useCallback(async () => {
         try {
-            const [prodRes, galRes, msgRes, ordRes] = await Promise.all([
+            const [prodRes, galRes, msgRes, ordRes, usersRes] = await Promise.all([
                 fetch(`${API_URL}/products`),
                 fetch(`${API_URL}/gallery`),
                 fetch(`${API_URL}/messages`),
-                fetch(`${API_URL}/orders`)
+                fetch(`${API_URL}/orders`),
+                fetch(`${API_URL}/users`)
             ]);
 
             setProducts(await prodRes.json());
             setGalleryItems(await galRes.json());
             setMessages(await msgRes.json());
             setOrders(await ordRes.json());
+            setUsers(await usersRes.json());
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -114,6 +116,8 @@ export const AppProvider = ({ children }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ increment: !isLiked })
         });
+        // We optimistically updated UI? No, we wait for fetchData maybe.
+        // But let's proceed to update user immediately.
 
         // 2. Update User List
         let newList;
@@ -138,7 +142,7 @@ export const AppProvider = ({ children }) => {
         if (userRes.ok) {
             const updatedUser = await userRes.json();
             setUser(updatedUser);
-            localStorage.setItem('art_user', JSON.stringify(updatedUser));
+            localStorage.setItem('art_user', JSON.stringify(updatedUser)); // Persist locally!
             setLikedIds([...(updatedUser.likedProducts || []), ...(updatedUser.likedGallery || [])]);
         }
 
@@ -208,7 +212,48 @@ export const AppProvider = ({ children }) => {
         return () => clearInterval(interval);
     }, [fetchData]);
 
-    // ... (Keep existing Product/Gallery/Message/Order functions)
+    // --- AUTH LISTENER FOR SUPABASE ---
+    useEffect(() => {
+        // Listen for auth changes (Login, Logout, Auto-refresh)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                const { user: googleUser } = session;
+
+                // Sync with your custom MongoDB backend
+                try {
+                    const res = await fetch(`${API_URL}/users/google-auth`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: googleUser.email,
+                            name: googleUser.user_metadata.full_name || googleUser.email.split('@')[0],
+                            googleId: googleUser.id, // Now sending Supabase ID
+                            avatar: googleUser.user_metadata.avatar_url // Added Avatar
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        setUser(data);
+                        localStorage.setItem('art_user', JSON.stringify(data));
+                        // Restore likes locally
+                        if (data.likedProducts) {
+                            setLikedIds([...(data.likedProducts || []), ...(data.likedGallery || [])]);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Backend Sync Error:", e);
+                }
+            } else if (event === 'SIGNED_OUT') {
+                setUser(null);
+                setLikedIds([]);
+                localStorage.removeItem('art_user');
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [API_URL]);
+
 
     // --- SETTINGS & AUTH ---
     const changePassword = async (newPass) => {
@@ -235,29 +280,14 @@ export const AppProvider = ({ children }) => {
 
     const loginWithGoogle = async () => {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            const googleUser = result.user;
-
-            // Sync with backend
-            const res = await fetch(`${API_URL}/users/google-auth`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: googleUser.email,
-                    name: googleUser.displayName,
-                    googleId: googleUser.uid
-                })
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
             });
-
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data);
-                localStorage.setItem('art_user', JSON.stringify(data));
-                if (data.likedProducts) setLikedIds([...data.likedProducts, ...data.likedGallery]);
-                return { success: true };
-            } else {
-                return { success: false, message: 'Backend sync failed' };
-            }
+            if (error) throw error;
+            return { success: true };
         } catch (error) {
             console.error("Google Login Error:", error);
             return { success: false, message: error.message };
@@ -297,7 +327,8 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    const logoutUser = () => {
+    const logoutUser = async () => {
+        await supabase.auth.signOut();
         setUser(null);
         setLikedIds([]);
         localStorage.removeItem('art_user');
@@ -309,6 +340,7 @@ export const AppProvider = ({ children }) => {
             galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder,
+            users,
             isAdmin, setIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth,
             user, loginUser, registerUser, logoutUser

@@ -94,7 +94,10 @@ const userSchema = new mongoose.Schema({
     email: { type: String, unique: true, sparse: true }, // Added for Google Auth
     password: String, // In real app, hash this!
     likedProducts: [String],
-    likedGallery: [String]
+    likedGallery: [String],
+    googleId: String, // Store the Supabase/Google ID
+    avatar: String, // Added for profile pic
+    createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
 const User = mongoose.model('User', userSchema);
 
@@ -105,6 +108,12 @@ const User = mongoose.model('User', userSchema);
 const asyncHandler = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
+
+// USER MANAGEMENT
+app.get('/api/users', asyncHandler(async (req, res) => {
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json(users);
+}));
 
 // ACTIONS
 app.get('/api/products', asyncHandler(async (req, res) => {
@@ -270,6 +279,11 @@ app.post('/api/users/google-auth', asyncHandler(async (req, res) => {
     let user = await User.findOne({ email });
 
     if (user) {
+        // Update googleId/avatar if missing (migration path)
+        let updated = false;
+        if (!user.googleId && googleId) { user.googleId = googleId; updated = true; }
+        if (req.body.avatar && user.avatar !== req.body.avatar) { user.avatar = req.body.avatar; updated = true; }
+        if (updated) await user.save();
         res.json(user);
     } else {
         const password = await bcrypt.hash(googleId + "secure_art_void", 10);
@@ -277,6 +291,8 @@ app.post('/api/users/google-auth', asyncHandler(async (req, res) => {
             username: name,
             email,
             password,
+            googleId,
+            avatar: req.body.avatar,
             likedProducts: [],
             likedGallery: []
         });

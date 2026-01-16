@@ -8,7 +8,7 @@ import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, Ch
 // import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 
 const Admin = () => {
-    const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, isAdmin, setIsAdmin, changePassword, verifyAdminPassword } = useContext(AppContext);
+    const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, users, isAdmin, setIsAdmin, changePassword, verifyAdminPassword } = useContext(AppContext);
     const [activeTab, setActiveTab] = useState('products');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('shop'); // 'shop' or 'gallery'
@@ -223,6 +223,7 @@ const Admin = () => {
                     { id: 'gallery', icon: ImageIcon, label: 'Gallery', count: galleryItems.length },
                     { id: 'messages', icon: MessageSquare, label: 'Inquiries', count: messages.filter(m => m.type !== 'service').length },
                     { id: 'orders', icon: ShoppingBag, label: 'Orders', count: orders.length + messages.filter(m => m.type === 'service').length },
+                    { id: 'users', icon: User, label: 'Users', count: users?.length || 0 }, // Added Users Tab
                     { id: 'settings', icon: Settings, label: 'Settings' }
                 ].map(tab => (
                     <div key={tab.id} className="col-6 col-md-3">
@@ -239,6 +240,60 @@ const Admin = () => {
             </div>
 
             <div className="glass p-4 p-md-5 animate-fade-in border-0 shadow-lg">
+                {activeTab === 'users' && ( // Added Users Tab Content
+                    <div className="table-responsive">
+                        <h3 className="h4 fw-bold mb-4">User Accounts</h3>
+                        <table className="table table-dark table-hover align-middle border-0">
+                            <thead>
+                                <tr className="text-muted border-bottom border-secondary">
+                                    <th className="py-3 px-4 border-0">Name</th>
+                                    <th className="py-3 px-4 border-0">Email / ID</th>
+                                    <th className="py-3 px-4 border-0">Joined</th>
+                                    <th className="py-3 px-4 border-0 text-end">Likes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users?.map(u => (
+                                    <tr key={u._id || u.id} className="border-bottom border-secondary border-opacity-10">
+                                        <td className="py-3 px-4 border-0 fw-bold text-white">
+                                            <div className="d-flex align-items-center gap-2">
+                                                {u.avatar ? (
+                                                    <img src={u.avatar} alt="" className="rounded-circle" style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
+                                                ) : u.email ? (
+                                                    <div className="bg-primary bg-opacity-25 p-2 rounded-circle text-primary"><User size={16} /></div>
+                                                ) : (
+                                                    <div className="bg-secondary bg-opacity-25 p-2 rounded-circle text-muted"><User size={16} /></div>
+                                                )}
+                                                {u.username}
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4 border-0 text-muted">
+                                            {u.email ? (
+                                                <span className="text-info opacity-75"><Mail size={14} className="me-1" />{u.email}</span>
+                                            ) : (
+                                                <span className="small opacity-50">Local Account</span>
+                                            )}
+                                        </td>
+                                        <td className="py-3 px-4 border-0 text-muted small">
+                                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown'}
+                                        </td>
+                                        <td className="py-3 px-4 border-0 text-end">
+                                            <span className="badge bg-secondary bg-opacity-25 text-white">
+                                                {(u.likedProducts?.length || 0) + (u.likedGallery?.length || 0)} Likes
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {(!users || users.length === 0) && (
+                                    <tr>
+                                        <td colSpan="4" className="text-center py-5 text-muted">No users found.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
                 {activeTab === 'products' && (
                     <div className="table-responsive">
                         <div className="d-flex justify-content-between align-items-center mb-4">
