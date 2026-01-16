@@ -225,18 +225,21 @@ const Admin = () => {
                     { id: 'orders', icon: ShoppingBag, label: 'Orders', count: orders.length + messages.filter(m => m.type === 'service').length },
                     { id: 'users', icon: User, label: 'Users', count: users?.length || 0 }, // Added Users Tab
                     { id: 'settings', icon: Settings, label: 'Settings' }
-                ].map(tab => (
-                    <div key={tab.id} className="col-6 col-md-3">
-                        <button
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 rounded-4 border-0 transition-all ${activeTab === tab.id ? 'btn-primary shadow' : 'glass text-white opacity-75'}`}
-                        >
-                            <tab.icon size={20} />
-                            <span className="d-none d-sm-inline">{tab.label}</span>
-                            {tab.count !== undefined && <span className="badge bg-white text-dark rounded-pill ms-1">{tab.count}</span>}
-                        </button>
-                    </div>
-                ))}
+                ].map(tab => {
+                    const Icon = tab.icon;
+                    return (
+                        <div key={tab.id} className="col-6 col-md-3">
+                            <button
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 rounded-4 border-0 transition-all ${activeTab === tab.id ? 'btn-primary shadow' : 'glass text-white opacity-75'}`}
+                            >
+                                <Icon size={20} />
+                                <span className="d-none d-sm-inline">{tab.label}</span>
+                                {tab.count !== undefined && <span className="badge bg-white text-dark rounded-pill ms-1">{tab.count}</span>}
+                            </button>
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="glass p-4 p-md-5 animate-fade-in border-0 shadow-lg">

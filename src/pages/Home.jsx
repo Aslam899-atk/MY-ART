@@ -21,7 +21,7 @@ const Home = () => {
             window.addEventListener('load', handleLoad);
         }
         return () => window.removeEventListener('load', handleLoad);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Show login modal on mount if not logged in
     React.useEffect(() => {
@@ -34,6 +34,7 @@ const Home = () => {
                 return () => clearTimeout(timer);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const handleGuestAccess = () => {
@@ -230,6 +231,8 @@ const Home = () => {
                     </div>
                 )}
             </div>
-            );
+        </>
+    );
 };
-            export default Home;
+
+export default Home;
