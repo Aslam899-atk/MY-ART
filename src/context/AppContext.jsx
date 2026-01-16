@@ -240,9 +240,14 @@ export const AppProvider = ({ children }) => {
                         if (data.likedProducts) {
                             setLikedIds([...(data.likedProducts || []), ...(data.likedGallery || [])]);
                         }
+                    } else {
+                        const errData = await res.json();
+                        console.error("Backend Sync Failed:", errData);
+                        alert("Backend Sync Failed: " + (errData.message || res.statusText));
                     }
                 } catch (e) {
                     console.error("Backend Sync Error:", e);
+                    alert("Backend Sync Error: " + e.message);
                 }
             } else if (event === 'SIGNED_OUT') {
                 setUser(null);
@@ -279,17 +284,26 @@ export const AppProvider = ({ children }) => {
     };
 
     const loginWithGoogle = async () => {
+        if (supabase.auth.signInWithOAuth === undefined || !import.meta.env.VITE_SUPABASE_URL) {
+            alert("SUPABASE CONFIG MISSING: Please check your Vercel Environment Variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+            return { success: false };
+        }
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: window.location.origin,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    }
                 }
             });
             if (error) throw error;
             return { success: true };
         } catch (error) {
             console.error("Google Login Error:", error);
+            alert("Login Failed: " + error.message);
             return { success: false, message: error.message };
         }
     };
