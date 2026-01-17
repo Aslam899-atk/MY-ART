@@ -29,7 +29,9 @@ export const AppProvider = ({ children }) => {
 
 
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('art_admin_active') === 'true';
+    });
 
     // Dynamic API URL based on environment
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -54,8 +56,6 @@ export const AppProvider = ({ children }) => {
             setUsers(await usersRes.json());
         } catch (error) {
             console.error("Error fetching data:", error);
-        } finally {
-            setIsLoadingAuth(false);
         }
     }, [API_URL]);
 
@@ -207,48 +207,29 @@ export const AppProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        fetchData();
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, [fetchData]);
 
     // --- AUTH LISTENER FOR SUPABASE ---
     useEffect(() => {
-        // Listen for auth changes (Login, Logout, Auto-refresh)
+        // 1. Initial Session Check
+        const checkInitialSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await syncUserWithBackend(session.user);
+            }
+            // After checking session AND fetching initial data, we are done loading
+            await fetchData();
+            setIsLoadingAuth(false);
+        };
+
+        checkInitialSession();
+
+        // 2. Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session) {
-                const { user: googleUser } = session;
-
-                // Sync with your custom MongoDB backend
-                try {
-                    const res = await fetch(`${API_URL}/users/google-auth`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: googleUser.email,
-                            name: googleUser.user_metadata.full_name || googleUser.email.split('@')[0],
-                            googleId: googleUser.id, // Now sending Supabase ID
-                            avatar: googleUser.user_metadata.avatar_url // Added Avatar
-                        })
-                    });
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        setUser(data);
-                        localStorage.setItem('art_user', JSON.stringify(data));
-                        // Restore likes locally
-                        if (data.likedProducts) {
-                            setLikedIds([...(data.likedProducts || []), ...(data.likedGallery || [])]);
-                        }
-                    } else {
-                        const errData = await res.json();
-                        console.error("Backend Sync Failed:", errData);
-                        alert("Backend Sync Failed: " + (errData.message || res.statusText));
-                    }
-                } catch (e) {
-                    console.error("Backend Sync Error:", e);
-                    alert("Backend Sync Error: " + e.message);
-                }
+                await syncUserWithBackend(session.user);
             } else if (event === 'SIGNED_OUT') {
                 setUser(null);
                 setLikedIds([]);
@@ -257,7 +238,33 @@ export const AppProvider = ({ children }) => {
         });
 
         return () => subscription.unsubscribe();
-    }, [API_URL]);
+    }, [fetchData]);
+
+    const syncUserWithBackend = async (googleUser) => {
+        try {
+            const res = await fetch(`${API_URL}/users/google-auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: googleUser.email,
+                    name: googleUser.user_metadata?.full_name || googleUser.email.split('@')[0],
+                    googleId: googleUser.id,
+                    avatar: googleUser.user_metadata?.avatar_url
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data);
+                localStorage.setItem('art_user', JSON.stringify(data));
+                if (data.likedProducts) {
+                    setLikedIds([...(data.likedProducts || []), ...(data.likedGallery || [])]);
+                }
+            }
+        } catch (e) {
+            console.error("Backend Sync Error:", e);
+        }
+    };
 
 
     // --- SETTINGS & AUTH ---
@@ -345,7 +352,18 @@ export const AppProvider = ({ children }) => {
         await supabase.auth.signOut();
         setUser(null);
         setLikedIds([]);
+        setIsAdmin(false);
         localStorage.removeItem('art_user');
+        localStorage.removeItem('art_admin_active');
+    };
+
+    const handleSetIsAdmin = (value) => {
+        setIsAdmin(value);
+        if (value) {
+            localStorage.setItem('art_admin_active', 'true');
+        } else {
+            localStorage.removeItem('art_admin_active');
+        }
     };
 
     return (
@@ -355,7 +373,7 @@ export const AppProvider = ({ children }) => {
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder,
             users,
-            isAdmin, setIsAdmin, changePassword, verifyAdminPassword,
+            isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth,
             user, loginUser, registerUser, logoutUser
         }}>

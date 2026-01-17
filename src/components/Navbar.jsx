@@ -47,9 +47,7 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link className="nav-link px-3 py-1" to="/contact" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Contact</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link px-3 py-1" to="/supabase-help" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Help</Link>
-                        </li>
+
 
                         <li className="nav-item d-none d-lg-block mx-1">
                             <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.1)' }}></div>

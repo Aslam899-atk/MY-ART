@@ -7,7 +7,7 @@ import { AppContext } from '../context/AppContext';
 import './Home.css';
 
 const Home = () => {
-    const { galleryItems, user, loginWithGoogle } = useContext(AppContext);
+    const { galleryItems, user, loginWithGoogle, isLoadingAuth } = useContext(AppContext);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -25,17 +25,17 @@ const Home = () => {
 
     // Show login modal on mount if not logged in
     React.useEffect(() => {
+        if (isLoadingAuth) return;
         if (!user) {
-            // Check session storage to avoid annoying popup on every refresh if they explicitly chose guest?
-            // User requested "frist open", implies session.
             const isGuest = sessionStorage.getItem('art_guest_mode');
             if (!isGuest) {
                 const timer = setTimeout(() => setShowLoginModal(true), 1000);
                 return () => clearTimeout(timer);
             }
+        } else {
+            setShowLoginModal(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [user, isLoadingAuth]);
 
     const handleGuestAccess = () => {
         setShowLoginModal(false);

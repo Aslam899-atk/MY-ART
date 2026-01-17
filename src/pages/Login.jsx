@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight, User, Mail, LogIn, UserPlus } from 'lucide-react';
@@ -7,9 +7,15 @@ const Login = () => {
     const [mode, setMode] = useState('user'); // 'user', 'register'
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser, loginWithGoogle } = useContext(AppContext);
+    const { user, isAdmin, setIsAdmin, verifyAdminPassword, isLoadingAuth, loginUser, registerUser, loginWithGoogle } = useContext(AppContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (!isLoadingAuth && (user || isAdmin)) {
+            navigate(isAdmin ? '/admin' : '/');
+        }
+    }, [user, isAdmin, isLoadingAuth, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

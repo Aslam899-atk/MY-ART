@@ -256,33 +256,41 @@ const Admin = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users?.map(u => (
+                                {Array.from(new Map(users?.map(u => [u.email || u.id || u._id, u])).values()).map(u => (
                                     <tr key={u._id || u.id} className="border-bottom border-secondary border-opacity-10">
                                         <td className="py-3 px-4 border-0 fw-bold text-white">
-                                            <div className="d-flex align-items-center gap-2">
+                                            <div className="d-flex align-items-center gap-3">
                                                 {u.avatar ? (
-                                                    <img src={u.avatar} alt="" className="rounded-circle" style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
-                                                ) : u.email ? (
-                                                    <div className="bg-primary bg-opacity-25 p-2 rounded-circle text-primary"><User size={16} /></div>
+                                                    <img src={u.avatar} alt="" className="rounded-circle shadow-sm border border-secondary border-opacity-25" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
                                                 ) : (
-                                                    <div className="bg-secondary bg-opacity-25 p-2 rounded-circle text-muted"><User size={16} /></div>
+                                                    <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                                                        <User size={20} />
+                                                    </div>
                                                 )}
-                                                {u.username}
+                                                <div className="d-flex flex-column">
+                                                    <span className="text-white">{u.username || 'Unnamed User'}</span>
+                                                    {u.googleId && <span className="small text-muted fw-normal" style={{ fontSize: '0.7rem' }}>Google Linked</span>}
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 border-0 text-muted">
+                                        <td className="py-3 px-4 border-0">
                                             {u.email ? (
-                                                <span className="text-info opacity-75"><Mail size={14} className="me-1" />{u.email}</span>
+                                                <div className="d-flex flex-column">
+                                                    <span className="text-info opacity-75 small d-flex align-items-center gap-1">
+                                                        <Mail size={12} /> {u.email}
+                                                    </span>
+                                                    <span className="small opacity-50" style={{ fontSize: '0.7rem' }}>ID: {u.googleId || u.id || u._id}</span>
+                                                </div>
                                             ) : (
                                                 <span className="small opacity-50">Local Account</span>
                                             )}
                                         </td>
                                         <td className="py-3 px-4 border-0 text-muted small">
-                                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown'}
+                                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Join date unknown'}
                                         </td>
                                         <td className="py-3 px-4 border-0 text-end">
-                                            <span className="badge bg-secondary bg-opacity-25 text-white">
-                                                {(u.likedProducts?.length || 0) + (u.likedGallery?.length || 0)} Likes
+                                            <span className="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">
+                                                {(u.likedProducts?.length || 0) + (u.likedGallery?.length || 0)} Total Likes
                                             </span>
                                         </td>
                                     </tr>
