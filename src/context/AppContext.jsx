@@ -23,9 +23,9 @@ export const AppProvider = ({ children }) => {
         }
     });
 
-    const [likedIds, setLikedIds] = useState(() => {
+    const likedIds = React.useMemo(() => {
         return user ? [...(user.likedProducts || []), ...(user.likedGallery || [])] : [];
-    });
+    }, [user]);
 
 
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
@@ -92,17 +92,12 @@ export const AppProvider = ({ children }) => {
 
     const handleLikeAction = async (type, id) => {
         if (!user) {
-            // Trigger Google login as requested (login with gmail)
             const res = await loginWithGoogle();
-            if (!res.success) return;
+            return; // Supabase redirect happens here
         }
 
-        // Now user is logged in. Determine status.
-        // We need the fresh user object from state (or ref) but let's trust 'user'
-        // Actually 'user' might be stale in closure if we just logged in? 
-        // We can get proper user from localstorage or verify.
-        const currentUser = JSON.parse(localStorage.getItem('art_user'));
-        if (!currentUser) return; // Should not happen
+        const currentUser = user;
+        if (!currentUser) return;
 
         const isProduct = type === 'product';
         const listKey = isProduct ? 'likedProducts' : 'likedGallery';
@@ -142,8 +137,7 @@ export const AppProvider = ({ children }) => {
         if (userRes.ok) {
             const updatedUser = await userRes.json();
             setUser(updatedUser);
-            localStorage.setItem('art_user', JSON.stringify(updatedUser)); // Persist locally!
-            setLikedIds([...(updatedUser.likedProducts || []), ...(updatedUser.likedGallery || [])]);
+            localStorage.setItem('art_user', JSON.stringify(updatedUser));
         }
 
         fetchData();
@@ -257,9 +251,6 @@ export const AppProvider = ({ children }) => {
                 const data = await res.json();
                 setUser(data);
                 localStorage.setItem('art_user', JSON.stringify(data));
-                if (data.likedProducts) {
-                    setLikedIds([...(data.likedProducts || []), ...(data.likedGallery || [])]);
-                }
             }
         } catch (e) {
             console.error("Backend Sync Error:", e);

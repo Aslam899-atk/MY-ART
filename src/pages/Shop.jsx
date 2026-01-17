@@ -60,7 +60,7 @@ const Shop = () => {
 
             <div className="row g-4">
                 {filteredProducts.map(product => (
-                    <div key={product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div key={product._id || product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
                         <div className="glass animate-fade-in h-100 overflow-hidden d-flex flex-column border-0">
                             <div className="position-relative overflow-hidden" style={{ height: '260px' }}>
                                 <LazyImage
@@ -76,11 +76,11 @@ const Shop = () => {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            toggleLike(product.id);
+                                            toggleLike(product._id || product.id);
                                         }}
                                         className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
                                     >
-                                        <Heart size={18} fill={likedIds.includes(product.id) ? "var(--accent)" : "none"} className={likedIds.includes(product.id) ? "text-danger" : ""} />
+                                        <Heart size={18} fill={likedIds.includes(product._id || product.id) ? "var(--accent)" : "none"} className={likedIds.includes(product._id || product.id) ? "text-danger" : ""} />
                                     </button>
                                 </div>
                             </div>

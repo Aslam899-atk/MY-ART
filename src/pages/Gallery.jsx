@@ -38,7 +38,7 @@ const Gallery = () => {
             {/* Gallery Grid */}
             <div className="row g-4">
                 {galleryItems.map((item, index) => (
-                    <div key={item.id} className="col-12 col-md-6 col-lg-4">
+                    <div key={item._id || item.id} className="col-12 col-md-6 col-lg-4">
                         <Motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -78,11 +78,11 @@ const Gallery = () => {
 
                                 <div className="d-flex gap-2">
                                     <button
-                                        onClick={() => toggleGalleryLike(item.id)}
+                                        onClick={() => toggleGalleryLike(item._id || item.id)}
                                         className="btn p-2 rounded-circle hover-scale text-white border-0"
                                         style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(5px)' }}
                                     >
-                                        <Heart size={20} fill={likedIds.includes(item.id) ? "white" : "none"} className={likedIds.includes(item.id) ? "text-white" : ""} />
+                                        <Heart size={20} fill={likedIds.includes(item._id || item.id) ? "white" : "none"} className={likedIds.includes(item._id || item.id) ? "text-white" : ""} />
                                     </button>
                                     <button
                                         onClick={() => handleShare(item)}
