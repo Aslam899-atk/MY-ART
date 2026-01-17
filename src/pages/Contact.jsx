@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { Send, Mail, User, MessageCircle, Upload, X, Instagram } from 'lucide-react';
+import { Send, Mail, User, MessageCircle, Upload, X, Instagram, Phone, MapPin } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 
 const Contact = () => {
@@ -25,7 +25,7 @@ const Contact = () => {
 
         if (msgType === 'service') {
             addOrder({
-                productName: 'Custom Service Request',
+                productName: 'Custom Commission Request',
                 customer: formData.name,
                 email: formData.email,
                 phone: formData.phone,
@@ -50,163 +50,214 @@ const Contact = () => {
     };
 
     return (
-        <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
             <div className="row justify-content-center">
-                <div className="col-12 col-lg-10">
+                <div className="col-12 col-lg-11">
                     <header className="text-center mb-5">
-                        <h1 className="display-3 fw-bold">Message <span style={{ color: 'var(--primary)' }}>Hub</span></h1>
-                        <p className="lead text-muted">Choose the type of message you'd like to send.</p>
+                        <Motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-primary fw-bold small text-uppercase mb-2 letter-spacing-2"
+                            style={{ letterSpacing: '3px' }}
+                        >
+                            Get In Touch
+                        </Motion.div>
+                        <Motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="display-2 fw-bold mb-3"
+                        >
+                            Project <span className="text-gradient">Inquiries</span>
+                        </Motion.h1>
+                        <Motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="lead text-muted mx-auto"
+                            style={{ maxWidth: '600px' }}
+                        >
+                            Ready to transform your vision into a masterpiece? Whether it's a custom commission or a general query, we're here to help.
+                        </Motion.p>
                     </header>
 
-                    <div className="d-flex gap-3 mb-5 justify-content-center flex-wrap">
-                        <button
-                            onClick={() => setMsgType('inquiry')}
-                            className={`btn rounded-4 px-4 py-3 border-0 transition-all ${msgType === 'inquiry' ? 'btn-primary' : 'glass text-white'}`}
-                        >
-                            General Inquiry
-                        </button>
-                        <button
-                            onClick={() => setMsgType('service')}
-                            className={`btn rounded-4 px-4 py-3 border-0 transition-all ${msgType === 'service' ? 'btn-primary' : 'glass text-white'}`}
-                        >
-                            Order / Service Request
-                        </button>
-                    </div>
-
                     <div className="row g-5">
-                        <div className="col-12 col-md-5">
-                            <div className="glass p-4 p-md-5 h-100 d-flex flex-column gap-4 border-0">
-                                <div>
-                                    <h3 className="fw-bold mb-3">{msgType === 'inquiry' ? 'Contact Info' : 'Request Info'}</h3>
-                                    <p className="text-muted mb-0">
-                                        {msgType === 'inquiry'
-                                            ? 'We usually respond to general inquiries within 24 hours.'
-                                            : 'Please provide details for your custom order or service request.'}
-                                    </p>
-                                </div>
+                        {/* SIDEBAR INFO */}
+                        <div className="col-lg-4 order-lg-2">
+                            <div className="d-flex flex-column gap-4">
+                                <div className="glass p-5 border-0">
+                                    <h3 className="h4 fw-bold mb-4 font-serif">Studio Details</h3>
 
-                                <div className="d-flex align-items-center gap-3">
-                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Instagram size={24} /></div>
-                                    <div>
-                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Instagram</div>
-                                        <a href="https://www.instagram.com/aslamtk35?igsh=ZnFhenBpajFrdDB3" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none">@aslamtk35</a>
+                                    <div className="d-flex flex-column gap-4">
+                                        <div className="d-flex align-items-start gap-3">
+                                            <div className="text-primary p-2 rounded-3" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Instagram size={20} /></div>
+                                            <div>
+                                                <div className="small fw-bold opacity-50 mb-1">Instagram</div>
+                                                <a href="https://www.instagram.com/aslamtk35" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none hover-text-primary transition-all">@aslamtk35</a>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex align-items-start gap-3">
+                                            <div className="text-primary p-2 rounded-3" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Send size={20} /></div>
+                                            <div>
+                                                <div className="small fw-bold opacity-50 mb-1">Telegram</div>
+                                                <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none hover-text-primary transition-all">@aslamtk35</a>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex align-items-start gap-3">
+                                            <div className="text-primary p-2 rounded-3" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Mail size={20} /></div>
+                                            <div>
+                                                <div className="small fw-bold opacity-50 mb-1">Email</div>
+                                                <span className="text-white">studio@artvoid.com</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="d-flex align-items-center gap-3">
-                                    <div className="text-primary p-3 rounded-circle" style={{ background: 'rgba(99, 102, 241, 0.1)' }}><Send size={24} /></div>
-                                    <div>
-                                        <div className="fw-bold small text-uppercase tracking-wider opacity-50">Telegram</div>
-                                        <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none">@aslamtk35</a>
-                                    </div>
+                                <div className="glass p-5 border-0 bg-primary bg-opacity-10">
+                                    <h4 className="h5 fw-bold mb-3">Our Process</h4>
+                                    <ul className="list-unstyled small text-muted d-flex flex-column gap-3 mb-0">
+                                        <li className="d-flex gap-2">
+                                            <span className="text-primary fw-bold">01.</span>
+                                            Submit your request with references.
+                                        </li>
+                                        <li className="d-flex gap-2">
+                                            <span className="text-primary fw-bold">02.</span>
+                                            Get a detailed consultation and quote.
+                                        </li>
+                                        <li className="d-flex gap-2">
+                                            <span className="text-primary fw-bold">03.</span>
+                                            Review drafts during the creation phase.
+                                        </li>
+                                        <li className="d-flex gap-2">
+                                            <span className="text-primary fw-bold">04.</span>
+                                            Worldwide shipping of your masterpiece.
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="col-12 col-md-7">
-                            <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
-                                <div className="d-flex flex-column gap-2">
-                                    <label className="small fw-bold text-muted text-uppercase">Name</label>
-                                    <div className="position-relative">
-                                        <User size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                        {/* FORM AREA */}
+                        <div className="col-lg-8 order-lg-1">
+                            <div className="glass p-4 p-md-5 border-0">
+                                <div className="d-flex gap-3 mb-5 p-2 rounded-pill glass" style={{ maxWidth: '400px', background: 'rgba(255,255,255,0.05)' }}>
+                                    <button
+                                        onClick={() => setMsgType('inquiry')}
+                                        className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'inquiry' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
+                                    >
+                                        General Inquiry
+                                    </button>
+                                    <button
+                                        onClick={() => setMsgType('service')}
+                                        className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'service' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
+                                    >
+                                        Commission/Order
+                                    </button>
+                                </div>
+
+                                <form onSubmit={handleSubmit} className="row g-4">
+                                    <div className="col-md-6 d-flex flex-column gap-2">
+                                        <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Full Name</label>
                                         <input
                                             required
-                                            placeholder="Your Name"
-                                            className="form-control bg-dark border-0 text-white ps-5 py-3 rounded-3"
-                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                            placeholder="Enter your name"
+                                            className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
+                                            style={{ background: 'rgba(255,255,255,0.03)' }}
                                             value={formData.name}
                                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         />
                                     </div>
-                                </div>
 
-                                {msgType === 'service' && (
-                                    <div className="row g-3">
-                                        <div className="col-12 col-sm-6 d-flex flex-column gap-2">
-                                            <label className="small fw-bold text-muted text-uppercase">Phone No</label>
-                                            <input
-                                                required
-                                                placeholder="+1 234 567 890"
-                                                className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                                value={formData.phone}
-                                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="col-12 col-sm-6 d-flex flex-column gap-2">
-                                            <label className="small fw-bold text-muted text-uppercase">Address</label>
-                                            <input
-                                                required
-                                                placeholder="Shipping Address"
-                                                className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                                value={formData.address}
-                                                onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="d-flex flex-column gap-2">
-                                    <label className="small fw-bold text-muted text-uppercase">{msgType === 'service' ? 'Gmail Address' : 'Email'}</label>
-                                    <div className="position-relative">
-                                        <Mail size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                    <div className="col-md-6 d-flex flex-column gap-2">
+                                        <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Email Address</label>
                                         <input
                                             required
                                             type="email"
                                             placeholder="your@email.com"
-                                            className="form-control bg-dark border-0 text-white ps-5 py-3 rounded-3"
-                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                            className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
+                                            style={{ background: 'rgba(255,255,255,0.03)' }}
                                             value={formData.email}
                                             onChange={e => setFormData({ ...formData, email: e.target.value })}
                                         />
                                     </div>
-                                </div>
 
-                                <div className="d-flex flex-column gap-2">
-                                    <label className="small fw-bold text-muted text-uppercase">{msgType === 'service' ? 'Comment / Notes' : 'Message'}</label>
-                                    <textarea
-                                        required
-                                        rows="4"
-                                        placeholder={msgType === 'service' ? "Describe your order or project details..." : "What's on your mind?"}
-                                        className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                        style={{ background: 'rgba(0,0,0,0.2) !important', resize: 'none' }}
-                                        value={formData.message}
-                                        onChange={e => setFormData({ ...formData, message: e.target.value })}
-                                    />
-                                </div>
-
-                                {msgType === 'service' && (
-                                    <div className="d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase">Reference Image (Optional)</label>
-                                        <label className="btn glass border-0 text-white py-3 rounded-3 d-flex align-items-center justify-content-center gap-2" style={{ border: '1px dashed var(--glass-border) !important' }}>
-                                            <Upload size={18} /> {formData.image ? 'Image Selected' : 'Select Artwork'}
-                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="d-none" />
-                                        </label>
-                                        {formData.image && (
-                                            <div className="position-relative mt-2">
-                                                <img src={formData.image} alt="Preview" className="w-100 rounded-3" style={{ height: '120px', objectFit: 'cover' }} />
-                                                <button type="button" onClick={() => setFormData({ ...formData, image: '' })} className="btn btn-sm position-absolute top-0 end-0 m-2 rounded-circle" style={{ background: 'rgba(0,0,0,0.5)', color: 'white' }}><X size={14} /></button>
+                                    {msgType === 'service' && (
+                                        <>
+                                            <div className="col-md-6 d-flex flex-column gap-2">
+                                                <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Phone Number</label>
+                                                <input
+                                                    required
+                                                    placeholder="+91 0000 000 000"
+                                                    className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
+                                                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                                                    value={formData.phone}
+                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                />
                                             </div>
-                                        )}
+                                            <div className="col-md-6 d-flex flex-column gap-2">
+                                                <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Shipping Address</label>
+                                                <input
+                                                    required
+                                                    placeholder="City, Country"
+                                                    className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
+                                                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                                                    value={formData.address}
+                                                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <div className="col-12 d-flex flex-column gap-2">
+                                        <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Your Message</label>
+                                        <textarea
+                                            required
+                                            rows="5"
+                                            placeholder={msgType === 'service' ? "Tell us about your custom commission idea..." : "How can we help you today?"}
+                                            className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
+                                            style={{ background: 'rgba(255,255,255,0.03)', resize: 'none' }}
+                                            value={formData.message}
+                                            onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                        />
                                     </div>
-                                )}
 
-                                <button type="submit" className="btn btn-primary py-3 rounded-3 d-flex align-items-center justify-content-center gap-2 border-0 fw-bold mt-2">
-                                    <Send size={18} /> {msgType === 'service' ? 'Submit Request' : 'Send Message'}
-                                </button>
+                                    {msgType === 'service' && (
+                                        <div className="col-12 d-flex flex-column gap-2">
+                                            <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Reference Artwork (Optional)</label>
+                                            <label className="btn glass border-0 text-white py-4 rounded-3 d-flex flex-column align-items-center justify-content-center gap-2" style={{ border: '2px dashed var(--glass-border) !important', background: 'rgba(255,255,255,0.02)' }}>
+                                                <Upload size={24} className="opacity-50" />
+                                                <span className="small opacity-50">{formData.image ? 'File Selected' : 'Drag or click to upload reference'}</span>
+                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="d-none" />
+                                            </label>
+                                            {formData.image && (
+                                                <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="position-relative mt-3">
+                                                    <img src={formData.image} alt="Preview" className="w-100 rounded-3 shadow-sm" style={{ height: '200px', objectFit: 'cover' }} />
+                                                    <button type="button" onClick={() => setFormData({ ...formData, image: '' })} className="btn btn-sm position-absolute top-0 end-0 m-2 rounded-circle glass" style={{ background: 'rgba(0,0,0,0.5)', color: 'white' }}><X size={16} /></button>
+                                                </Motion.div>
+                                            )}
+                                        </div>
+                                    )}
 
-                                {submitted && (
-                                    <Motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="text-center text-success fw-bold p-3 rounded-3"
-                                        style={{ background: 'rgba(16, 185, 129, 0.1)' }}
-                                    >
-                                        {msgType === 'service' ? 'Request submitted successfully!' : 'Message sent successfully!'}
-                                    </Motion.div>
-                                )}
-                            </form>
+                                    <div className="col-12 mt-4">
+                                        <button type="submit" className="btn btn-primary btn-lg w-100 py-3 rounded-pill d-flex align-items-center justify-content-center gap-3 border-0 fw-bold shadow-lg">
+                                            <Send size={20} /> {msgType === 'service' ? 'Send Brief' : 'Submit Inquiry'}
+                                        </button>
+                                    </div>
+
+                                    {submitted && (
+                                        <Motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="col-12 text-center text-success fw-bold p-3 rounded-4 mt-3"
+                                            style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+                                        >
+                                            Thank you! Our studio team will contact you shortly.
+                                        </Motion.div>
+                                    )}
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,3 +267,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

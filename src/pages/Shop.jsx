@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
-import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart } from 'lucide-react';
+import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
@@ -37,24 +37,43 @@ const Shop = () => {
     };
 
     return (
-        <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
             <header className="mb-5 text-center">
-                <h1 className="display-3 fw-bold">The <span style={{ color: 'var(--primary)' }}>Shop</span></h1>
-                <p className="lead" style={{ color: '#e2e8f0' }}>Purchase premium artworks directly from the artist.</p>
+                <Motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-primary fw-bold small text-uppercase mb-2 letter-spacing-1"
+                >
+                    Premium Store
+                </Motion.div>
+                <Motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="display-2 fw-bold mb-4"
+                >
+                    The <span className="text-gradient">Shop</span>
+                </Motion.h1>
+                <Motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="lead text-muted mx-auto mb-5"
+                    style={{ maxWidth: '600px' }}
+                >
+                    Acquire original masterpieces and limited edition prints from our exclusive studio collection.
+                </Motion.p>
 
                 {/* Search Bar */}
-                <div className="glass p-3 rounded-4 mt-4 d-flex align-items-center gap-3 mx-auto" style={{ maxWidth: '600px' }}>
+                <div className="glass p-2 rounded-pill mt-4 d-flex align-items-center gap-3 mx-auto shadow-lg" style={{ maxWidth: '500px', background: 'rgba(255,255,255,0.05)' }}>
+                    <div className="ps-3 text-muted"><Search size={18} /></div>
                     <input
                         type="text"
-                        placeholder="Search items..."
-                        className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                        style={{ background: 'rgba(0,0,0,0.3) !important' }}
+                        placeholder="Search artworks..."
+                        className="form-control bg-transparent border-0 text-white py-2 shadow-none"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                     />
-                    <div className="text-white small text-nowrap">
-                        {filteredProducts.length} results
-                    </div>
                 </div>
             </header>
 

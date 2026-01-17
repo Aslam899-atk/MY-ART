@@ -22,11 +22,16 @@ const Navbar = () => {
                 transform: 'translateX(-50%)'
             }}>
             <div className="container-fluid p-0">
-                <Link className="navbar-brand d-flex align-items-center gap-2" to="/" style={{ fontWeight: '800', fontSize: '1.2rem' }}>
-                    <img src={`${import.meta.env.BASE_URL}icon.png`} alt="Falcon" style={{ width: '1.3cm', height: '1.3cm', borderRadius: '12px', objectFit: 'cover' }} />
-                    <span style={{ background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '0.5px' }}>
-                        ART VOID
-                    </span>
+                <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }}>
+                    <img src={`${import.meta.env.BASE_URL}icon.png`} alt="Falcon" style={{ width: '1.2cm', height: '1.2cm', borderRadius: '12px', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+                    <div className="d-flex flex-column">
+                        <span className="text-gradient" style={{ letterSpacing: '1px', lineHeight: '1', fontSize: '1.2rem' }}>
+                            ART VOID
+                        </span>
+                        <span style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: 'bold', letterSpacing: '2px' }}>
+                            STUDIO
+                        </span>
+                    </div>
                 </Link>
 
                 <button className="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style={{ padding: '0.25rem' }}>
@@ -36,16 +41,16 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-3 mt-2 mt-lg-0">
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1" to="/" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Home</Link>
+                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1" to="/gallery" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Gallery</Link>
+                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/gallery" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Gallery</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1" to="/shop" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Shop</Link>
+                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/shop" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Shop</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1" to="/contact" style={{ fontSize: '0.9rem', fontWeight: '500' }}>Contact</Link>
+                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/contact" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Contact</Link>
                         </li>
 
 
