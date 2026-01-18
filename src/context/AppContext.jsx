@@ -200,6 +200,18 @@ export const AppProvider = ({ children }) => {
         setOrders((prev) => prev.filter((o) => (o._id || o.id) !== id));
     };
 
+    const updateOrderStatus = async (id, status) => {
+        const res = await fetch(`${API_URL}/orders/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        if (res.ok) {
+            const updated = await res.json();
+            setOrders((prev) => prev.map((o) => ((o._id || o.id) === id ? updated : o)));
+        }
+    };
+
     useEffect(() => {
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
@@ -362,7 +374,7 @@ export const AppProvider = ({ children }) => {
             products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
             galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
-            orders, addOrder, deleteOrder,
+            orders, addOrder, deleteOrder, updateOrderStatus,
             users,
             isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth,

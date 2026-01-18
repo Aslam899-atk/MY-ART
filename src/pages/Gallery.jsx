@@ -39,26 +39,27 @@ const Gallery = () => {
                 <Motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-primary fw-bold small text-uppercase mb-2 letter-spacing-1"
+                    className="text-primary fw-bold small text-uppercase mb-2 letter-spacing-2"
+                    style={{ letterSpacing: '3px' }}
                 >
-                    Exhibition
+                    Project Lab
                 </Motion.div>
                 <Motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="display-2 fw-bold mb-4"
+                    className="display-2 fw-bold mb-4 font-heading"
                 >
-                    The <span className="text-gradient">Portfolio</span>
+                    Technical <span className="text-gradient">Exhibition</span>
                 </Motion.h1>
                 <Motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className="lead text-muted mx-auto mb-5"
-                    style={{ maxWidth: '600px' }}
+                    style={{ maxWidth: '650px' }}
                 >
-                    A curated collection of handcrafted artworks, each telling a unique story through traditional techniques.
+                    A collection of digital solutions and technical experiments. Every piece represents a challenge solved through code, design, and artistic engineering.
                 </Motion.p>
 
                 {/* Filters */}
@@ -67,7 +68,7 @@ const Gallery = () => {
                         <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`btn rounded-pill px-4 py-2 border-0 transition-all small fw-bold ${filter === cat ? 'btn-primary' : 'glass text-white opacity-75 hover-opacity-100'}`}
+                            className={`btn rounded-pill px-4 py-2 border-0 transition-all small fw-bold ${filter === cat ? 'btn-primary shadow-glow' : 'glass text-white opacity-60 hover-opacity-100'}`}
                         >
                             {cat}
                         </button>

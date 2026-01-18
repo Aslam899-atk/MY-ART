@@ -1,340 +1,247 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { motion as Motion } from 'framer-motion';
-import { ArrowRight, Sparkles, ShieldCheck, Globe, Award, Star, Quote } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Github, Linkedin, Mail, ExternalLink, Code2, Sparkles, Terminal, Database, Cpu, ChevronRight, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { AppContext } from '../context/AppContext';
-import './Home.css';
-
 const Home = () => {
-    const { galleryItems, user, loginWithGoogle, isLoadingAuth } = useContext(AppContext);
-    const [showLoginModal, setShowLoginModal] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        const handleLoad = () => setIsLoaded(true);
-        if (document.readyState === 'complete') {
-            setIsLoaded(true);
-        } else {
-            window.addEventListener('load', handleLoad);
-        }
-        return () => window.removeEventListener('load', handleLoad);
+        setIsLoaded(true);
     }, []);
 
-    React.useEffect(() => {
-        if (isLoadingAuth) return;
-        if (!user) {
-            const isGuest = sessionStorage.getItem('art_guest_mode');
-            if (!isGuest) {
-                const timer = setTimeout(() => setShowLoginModal(true), 1200);
-                return () => clearTimeout(timer);
-            }
-        } else {
-            setShowLoginModal(false);
-        }
-    }, [user, isLoadingAuth]);
-
-    const handleGuestAccess = () => {
-        setShowLoginModal(false);
-        sessionStorage.setItem('art_guest_mode', 'true');
-    };
-
-    const services = [
+    const projects = [
         {
-            title: "Pencil Art",
-            desc: "Hyper-realistic portraits and detailed sketches capturing every fine detail with precision.",
-            icon: <Sparkles className="text-primary" />
+            title: "Art Void Studio",
+            category: "Full-Stack • Creative E-commerce",
+            description: "A premium art commerce platform featuring real-time curation, secure authentication via Supabase, and high-performance image delivery.",
+            tags: ["React", "Supabase", "Framer Motion", "Render"],
+            link: "/gallery",
+            github: "https://github.com/Aslam899-atk/MY-ART",
+            image: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+            featured: true
         },
         {
-            title: "Oil Painting",
-            desc: "Traditional oil on canvas masterpieces with rich textures and vibrant color palettes.",
-            icon: <Award className="text-primary" />
+            title: "Al-Bayan Library",
+            category: "Management System",
+            description: "Enterprise-grade library management system with advanced search indexing, member tracking, and automated fine calculation.",
+            tags: ["Node.js", "MongoDB", "Express", "Bootstrap"],
+            link: "#",
+            github: "https://github.com/Aslam899-atk",
+            image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80"
         },
         {
-            title: "Custom Calligraphy",
-            desc: "Elegant hand-lettered artworks for certificates, weddings, and personalized gifts.",
-            icon: <Star className="text-primary" />
+            title: "Harmonic Music Hub",
+            category: "Streaming Application",
+            description: "Sleek music player with cloud synchronization, dynamic playlist generation, and reactive UI elements.",
+            tags: ["React", "Firebase", "Web Audio API"],
+            link: "#",
+            github: "https://github.com/Aslam899-atk",
+            image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80"
         }
     ];
 
-    const testimonials = [
-        {
-            name: "Rahul Verma",
-            role: "Art Collector",
-            content: "The level of detail in the pencil sketch I ordered was beyond my expectations. A true masterpiece.",
-            rating: 5
-        },
-        {
-            name: "Sarah Jenkins",
-            role: "Interior Designer",
-            content: "Art Void's oil paintings have transformed my clients' spaces. Timeless and professional work.",
-            rating: 5
-        },
-        {
-            name: "Dr. Anjali Nair",
-            role: "Gift Buyer",
-            content: "Ordered a calligraphy piece for an anniversary. The craftsmanship and delivery were flawless.",
-            rating: 5
-        }
+    const skills = [
+        { name: "Frontend", icons: [<Code2 size={24} />], tech: ["React", "Next.js", "Framer Motion", "Tailwind"] },
+        { name: "Backend", icons: [<Database size={24} />], tech: ["Node.js", "Express", "MongoDB", "Supabase"] },
+        { name: "DevOps", icons: [<Terminal size={24} />], tech: ["Git", "Vercel", "Render", "Firebase"] },
+        { name: "Hardware", icons: [<Cpu size={24} />], tech: ["Embedded C", "Arduino", "IoT Protocols"] }
     ];
 
     return (
-        <>
-            {!isLoaded && (
-                <div className="preloader">
-                    <div className="spinner"></div>
+        <div className="portfolio-root bg-dark text-white overflow-hidden">
+            {/* Background Glows */}
+            <div className="position-fixed top-0 start-0 w-100 h-100 pointer-events-none" style={{ zIndex: 0 }}>
+                <div className="position-absolute top-10 start-10 bg-primary opacity-10 rounded-circle blur-3xl" style={{ width: '40vw', height: '40vw' }}></div>
+                <div className="position-absolute bottom-10 end-10 bg-accent opacity-5 rounded-circle blur-3xl" style={{ width: '30vw', height: '30vw' }}></div>
+            </div>
+
+            {/* HERO SECTION */}
+            <section className="min-vh-100 d-flex align-items-center position-relative pt-5">
+                <div className="container">
+                    <div className="row align-items-center g-5">
+                        <div className="col-lg-7">
+                            <Motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass mb-4 border-0">
+                                    <Sparkles size={16} className="text-primary" />
+                                    <span className="small fw-bold letter-spacing-2 opacity-75">AVAILABLE FOR NEW PROJECTS</span>
+                                </div>
+                                <h1 className="display-1 fw-bold mb-4 font-heading">
+                                    Architecting <span className="text-gradient">Digital</span> Experiences.
+                                </h1>
+                                <p className="lead text-muted mb-5 pe-lg-5" style={{ fontSize: '1.25rem', lineHeight: '1.8' }}>
+                                    I am <span className="text-white fw-bold">Aslam TK</span>, a Full-Stack Developer specializing in high-performance web applications with a focus on immersive UI and creative technical solutions.
+                                </p>
+                                <div className="d-flex flex-wrap gap-3">
+                                    <Link to="/contact" className="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
+                                        Hire Me <ArrowRight size={20} className="ms-2" />
+                                    </Link>
+                                    <button className="btn glass btn-lg rounded-pill px-5 py-3 fw-bold border-0 text-white">
+                                        View Works
+                                    </button>
+                                </div>
+                            </Motion.div>
+                        </div>
+                        <div className="col-lg-5 d-none d-lg-block">
+                            <Motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1, delay: 0.2 }}
+                                className="position-relative"
+                            >
+                                <div className="glass rounded-4 p-4 border-0 rotate-3 shadow-2xl overflow-hidden position-relative">
+                                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-br from-primary to-transparent opacity-10"></div>
+                                    <pre className="m-0 small text-primary opacity-75 font-code">
+                                        <code>{`const developer = {
+  name: 'Aslam TK',
+  role: 'Full Stack Architect',
+  skills: ['React', 'Node', 'Cloud'],
+  vision: 'Build clean, scalable art',
+  available: true
+};
+
+function buildMasterpiece(idea) {
+  return assemble(idea).polish();
+}`}</code>
+                                    </pre>
+                                </div>
+                                <div className="position-absolute -bottom-10 -start-10 glass p-3 rounded-4 border-0 -rotate-6 shadow-xl">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="bg-success rounded-circle" style={{ width: 12, height: 12 }}></div>
+                                        <span className="small fw-bold">99.9% Up-time Solutions</span>
+                                    </div>
+                                </div>
+                            </Motion.div>
+                        </div>
+                    </div>
                 </div>
-            )}
-            <div className="home-wrapper">
-                {/* HERO SECTION */}
-                <section className="hero-section position-relative vh-100 d-flex align-items-center">
-                    <div className="position-absolute top-0 start-0 w-100 h-100 z-n1">
-                        <img
-                            src={`${import.meta.env.BASE_URL}banner.png`}
-                            alt="Art Banner"
-                            className="w-100 h-100 object-fit-cover opacity-50"
-                        />
-                        <div className="position-absolute top-0 start-0 w-100 h-100"
-                            style={{ background: 'linear-gradient(to bottom, rgba(7, 11, 20, 0.4), var(--bg-dark))' }}>
-                        </div>
-                    </div>
+            </section>
 
-                    <div className="container position-relative z-1">
-                        <div className="row">
-                            <div className="col-lg-8">
+            {/* FEATURED PROJECTS */}
+            <section className="py-10 position-relative">
+                <div className="container">
+                    <header className="mb-10">
+                        <div className="text-primary fw-bold small text-uppercase mb-2 tracking-widest">Case Studies</div>
+                        <h2 className="display-4 fw-bold mb-0">Featured <span className="text-gradient">Creations</span></h2>
+                    </header>
+
+                    <div className="row g-5">
+                        {projects.map((project, idx) => (
+                            <div key={idx} className={project.featured ? "col-12" : "col-lg-6"}>
                                 <Motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4"
-                                    style={{ background: 'rgba(99, 102, 241, 0.15)', border: '1px solid var(--primary)', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 'bold' }}
+                                    whileHover={{ y: -10 }}
+                                    className="glass rounded-5 overflow-hidden border-0 h-100 group position-relative"
                                 >
-                                    <ShieldCheck size={16} /> ELITE ARTISTRY STUDIO
-                                </Motion.div>
-                                <Motion.h1
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="display-1 fw-bold mb-4"
-                                >
-                                    Crafting <span className="text-gradient">Timeless</span> <br />
-                                    <span className="font-serif italic">Masterpieces.</span>
-                                </Motion.h1>
-                                <Motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                    className="lead text-muted mb-5"
-                                    style={{ maxWidth: '600px', fontSize: '1.25rem' }}
-                                >
-                                    We bridge the gap between imagination and reality through elite-level handcrafted art.
-                                    Professional services for collectors and enthusiasts worldwide.
-                                </Motion.p>
-                                <Motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.6 }}
-                                    className="d-flex gap-3"
-                                >
-                                    <Link to="/shop" className="btn btn-primary btn-lg rounded-pill px-5 py-3 d-flex align-items-center gap-2">
-                                        View Collections <ArrowRight size={20} />
-                                    </Link>
-                                    <Link to="/contact" className="btn glass text-white btn-lg rounded-pill px-5 py-3">
-                                        Commission Art
-                                    </Link>
-                                </Motion.div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* TRUST & STATS */}
-                <section className="py-5 bg-glow">
-                    <div className="container">
-                        <div className="row g-4 text-center">
-                            {[
-                                { label: 'Trusted Clients', val: '500+' },
-                                { label: 'Artworks Delivered', val: '1.2k+' },
-                                { label: 'Global Shipping', val: '25+' },
-                                { label: 'Customer Rating', val: '4.9/5' }
-                            ].map((stat, i) => (
-                                <div key={i} className="col-6 col-md-3">
-                                    <h3 className="h1 fw-bold text-gradient mb-1">{stat.val}</h3>
-                                    <p className="text-muted small text-uppercase fw-bold m-0">{stat.label}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* SERVICES SECTION */}
-                <section className="py-5 bg-dark">
-                    <div className="container py-5">
-                        <div className="text-center mb-5">
-                            <h2 className="display-4 fw-bold mb-3">Our <span className="text-primary">Expertise</span></h2>
-                            <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>
-                                Every stroke is intentional. Every piece is unique. We specialize in traditional techniques refined for the modern world.
-                            </p>
-                        </div>
-                        <div className="row g-4">
-                            {services.map((s, i) => (
-                                <div key={i} className="col-md-4">
-                                    <Motion.div
-                                        whileHover={{ y: -10 }}
-                                        className="glass p-5 h-100 d-flex flex-column align-items-center text-center gap-4 transition-all"
-                                    >
-                                        <div className="p-3 rounded-4" style={{ background: 'rgba(99, 102, 241, 0.1)' }}>
-                                            {React.cloneElement(s.icon, { size: 40 })}
-                                        </div>
-                                        <h3 className="h3 fw-bold m-0">{s.title}</h3>
-                                        <p className="text-muted m-0">{s.desc}</p>
-                                    </Motion.div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* RECENT WORK PREVIEW */}
-                <section className="py-5">
-                    <div className="container py-5">
-                        <div className="d-flex justify-content-between align-items-end mb-5">
-                            <div>
-                                <h2 className="display-4 fw-bold m-0 text-gradient">The Gallery</h2>
-                                <p className="text-muted m-0">A curated selection of our most recent works.</p>
-                            </div>
-                            <Link to="/gallery" className="text-primary fw-bold text-decoration-none">
-                                View Full Portfolio &rarr;
-                            </Link>
-                        </div>
-                        <div className="row g-3">
-                            {galleryItems && galleryItems.slice(0, 5).map((item, index) => (
-                                <div key={item.id} className="col-6 col-md-4 col-lg-custom-5">
-                                    <Motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        whileInView={{ opacity: 1, scale: 1 }}
-                                        viewport={{ once: true }}
-                                        className="card glass border-0 h-100 overflow-hidden"
-                                        style={{ minHeight: '300px' }}
-                                    >
-                                        <img src={item.url} alt={item.title} className="w-100 h-100 object-fit-cover hover-zoom" />
-                                    </Motion.div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* TESTIMONIALS */}
-                <section className="py-5 bg-glow">
-                    <div className="container py-5">
-                        <h2 className="display-4 fw-bold text-center mb-5 font-serif">What Clients Say</h2>
-                        <div className="row g-4">
-                            {testimonials.map((t, i) => (
-                                <div key={i} className="col-md-4">
-                                    <div className="glass p-4 h-100">
-                                        <Quote className="text-primary mb-3" size={30} />
-                                        <p className="text-muted font-italic mb-4" style={{ fontStyle: 'italic' }}>"{t.content}"</p>
-                                        <div className="d-flex align-items-center gap-3">
-                                            <div className="flex-grow-1">
-                                                <h5 className="fw-bold mb-0">{t.name}</h5>
-                                                <p className="small text-muted mb-0">{t.role}</p>
+                                    <div className="row g-0 h-100">
+                                        <div className={project.featured ? "col-lg-7" : "col-12"}>
+                                            <div className="position-relative h-100" style={{ minHeight: '300px' }}>
+                                                <img src={project.image} alt={project.title} className="w-100 h-100 object-fit-cover transition-all duration-700 group-hover-scale" />
+                                                <div className="position-absolute top-0 start-0 m-4">
+                                                    <span className="glass px-3 py-1 rounded-pill small fw-bold text-white border-0">{project.category}</span>
+                                                </div>
                                             </div>
-                                            <div className="d-flex gap-1 text-warning">
-                                                {[...Array(t.rating)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                                        </div>
+                                        <div className={project.featured ? "col-lg-5" : "col-12"}>
+                                            <div className="p-5 d-flex flex-column h-100">
+                                                <h3 className="h2 fw-bold mb-3">{project.title}</h3>
+                                                <p className="text-muted mb-4 flex-grow-1">{project.description}</p>
+                                                <div className="d-flex flex-wrap gap-2 mb-5">
+                                                    {project.tags.map(tag => (
+                                                        <span key={tag} className="small px-2 py-1 rounded bg-white bg-opacity-5 text-primary fw-bold">{tag}</span>
+                                                    ))}
+                                                </div>
+                                                <div className="d-flex gap-4 align-items-center">
+                                                    <Link to={project.link} className="text-white text-decoration-none fw-bold hover-text-primary d-flex align-items-center gap-2">
+                                                        Live Demo <ExternalLink size={16} />
+                                                    </Link>
+                                                    <a href={project.github} target="_blank" className="text-muted text-decoration-none fw-bold hover-text-white d-flex align-items-center gap-2">
+                                                        Source <Github size={16} />
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </Motion.div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* SKILLS MATRIX */}
+            <section className="py-10 bg-white bg-opacity-5">
+                <div className="container text-center">
+                    <header className="mb-10 mx-auto" style={{ maxWidth: '600px' }}>
+                        <h2 className="display-4 fw-bold mb-4">Technical <span className="text-gradient">Stack</span></h2>
+                        <p className="text-muted">A comprehensive toolkit optimized for modern web performance and creative flexibility.</p>
+                    </header>
+
+                    <div className="row g-4">
+                        {skills.map((skill, idx) => (
+                            <div key={idx} className="col-md-6 col-lg-3">
+                                <Motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    className="glass p-5 rounded-4 h-100 border-0"
+                                >
+                                    <div className="text-primary mb-4 d-flex justify-content-center">{skill.icons}</div>
+                                    <h4 className="fw-bold mb-3">{skill.name}</h4>
+                                    <div className="d-flex flex-wrap gap-2 justify-content-center">
+                                        {skill.tech.map(t => (
+                                            <span key={t} className="small opacity-50 fw-semibold">{t}</span>
+                                        ))}
+                                    </div>
+                                </Motion.div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* TRUST SIGNALS */}
+            <section className="py-10">
+                <div className="container">
+                    <div className="glass p-5 p-lg-10 rounded-5 border-0 position-relative overflow-hidden">
+                        <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
+                            <div className="col-lg-8">
+                                <h2 className="display-5 fw-bold mb-4">Let's build the next big thing <span className="text-gradient">together</span>.</h2>
+                                <p className="lead text-muted mb-5">Currently open to freelance opportunities and full-time positions where I can bridge the gap between engineering and art.</p>
+                                <div className="d-flex flex-wrap gap-4">
+                                    <a href="mailto:aslamtk@example.com" className="btn btn-primary rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
+                                        Drop an Email
+                                    </a>
+                                    <div className="d-flex gap-3 align-items-center">
+                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Github size={24} /></a>
+                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Linkedin size={24} /></a>
+                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Mail size={24} /></a>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* TRUST SIGNALS */}
-                <section className="py-5 border-top border-secondary border-opacity-10">
-                    <div className="container py-4">
-                        <div className="row g-5 align-items-center">
-                            <div className="col-md-3 d-flex align-items-center gap-3">
-                                <ShieldCheck className="text-primary" size={40} />
-                                <div><h6 className="fw-bold mb-1">Authentic Art</h6><p className="small text-muted mb-0">100% Hand-drawn</p></div>
                             </div>
-                            <div className="col-md-3 d-flex align-items-center gap-3">
-                                <Globe className="text-primary" size={40} />
-                                <div><h6 className="fw-bold mb-1">Global Delivery</h6><p className="small text-muted mb-0">Safe Worldwide Shipping</p></div>
-                            </div>
-                            <div className="col-md-3 d-flex align-items-center gap-3">
-                                <Award className="text-primary" size={40} />
-                                <div><h6 className="fw-bold mb-1">Premium Quality</h6><p className="small text-muted mb-0">Highest Grade Materials</p></div>
-                            </div>
-                            <div className="col-md-3 d-flex align-items-center gap-3">
-                                <ShieldCheck className="text-primary" size={40} />
-                                <div><h6 className="fw-bold mb-1">Secure Ordering</h6><p className="small text-muted mb-0">Verified Transactions</p></div>
+                            <div className="col-lg-4 text-center mt-5 mt-lg-0">
+                                <div className="display-1 fw-bold text-primary mb-0">50+</div>
+                                <div className="h5 fw-bold text-uppercase opacity-50 tracking-widest">Global Clients</div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {/* REDESIGNED LOGIN MODAL */}
-                {showLoginModal && (
-                    <div className="login-overlay d-flex align-items-center justify-content-center">
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="glass p-5 shadow-lg text-center"
-                            style={{ maxWidth: '450px', border: '1px solid var(--glass-border)' }}
-                        >
-                            <h2 className="h2 fw-bold mb-2">Join Art Void</h2>
-                            <p className="text-muted mb-5">Access exclusive collections and save your favorites.</p>
-
-                            <button
-                                onClick={async () => {
-                                    const res = await loginWithGoogle();
-                                    if (res.success) setShowLoginModal(false);
-                                }}
-                                className="btn btn-outline-light w-100 py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-3 mb-4"
-                            >
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                                </svg>
-                                Continue with Google
-                            </button>
-
-                            <button onClick={handleGuestAccess} className="btn btn-link text-muted small text-decoration-none">
-                                Explore as Guest
-                            </button>
-                        </Motion.div>
+            {/* FOOTER */}
+            <footer className="py-5 border-top border-white border-opacity-5">
+                <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-muted small">
+                    <div>© {new Date().getFullYear()} ASLAM TK. Digital Architect & Technical Artist.</div>
+                    <div className="d-flex gap-4">
+                        <Link to="/gallery" className="text-decoration-none hover-text-white transition-all">Projects</Link>
+                        <Link to="/shop" className="text-decoration-none hover-text-white transition-all">Studio</Link>
+                        <Link to="/contact" className="text-decoration-none hover-text-white transition-all">Hire</Link>
                     </div>
-                )}
-            </div>
-
-            <style>{`
-                .login-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.9);
-                    backdrop-filter: blur(8px);
-                    z-index: 99999;
-                    padding: 20px;
-                }
-                .hero-section {
-                    padding-top: 80px;
-                }
-                @media (min-width: 992px) {
-                    .col-lg-custom-5 {
-                        flex: 0 0 auto;
-                        width: 20%;
-                    }
-                }
-            `}</style>
-        </>
+                </div>
+            </footer>
+        </div>
     );
 };
 
 export default Home;
-

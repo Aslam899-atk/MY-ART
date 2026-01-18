@@ -1,35 +1,59 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { motion as Motion } from 'framer-motion';
-import { Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X, CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart, Image as ImageIcon } from 'lucide-react';
-// Cloudinary is used instead of Firebase Storage
-// import { storage } from '../firebase';
-// import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X,
+    CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
+    Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
+    ChevronRight, Filter, ExternalLink, MoreVertical, Eye, Download,
+    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3
+} from 'lucide-react';
 
 const Admin = () => {
-    const { products, addProduct, deleteProduct, updateProduct, galleryItems, addGalleryItem, deleteGalleryItem, messages, deleteMessage, orders, deleteOrder, users, isAdmin, setIsAdmin, changePassword, verifyAdminPassword } = useContext(AppContext);
-    const [activeTab, setActiveTab] = useState('products');
+    const {
+        products, addProduct, deleteProduct, updateProduct,
+        galleryItems, addGalleryItem, deleteGalleryItem,
+        messages, deleteMessage,
+        orders, deleteOrder, updateOrderStatus,
+        users, isAdmin, setIsAdmin, changePassword, verifyAdminPassword
+    } = useContext(AppContext);
+
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('shop'); // 'shop' or 'gallery'
     const [editingProduct, setEditingProduct] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Admin Login State (Inline)
+    // Admin Login State
     const [adminLogin, setAdminLogin] = useState({ username: '', password: '' });
     const [adminAuthError, setAdminAuthError] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
 
-    // Shop Form Data
+    // Form Data
     const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '' });
-    // Gallery Form Data
-    const [galleryFormData, setGalleryFormData] = useState({ title: '', image: '', type: 'image' });
-
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [newPass, setNewPass] = useState('');
     const [passUpdateStatus, setPassUpdateStatus] = useState('');
+
     const navigate = useNavigate();
+
+    // Statistics Calculation
+    const stats = useMemo(() => {
+        const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+        const pendingOrders = orders.filter(o => o.status === 'Pending').length;
+        const totalLikes = products.reduce((sum, p) => sum + (p.likes || 0), 0) + galleryItems.reduce((sum, g) => sum + (g.likes || 0), 0);
+
+        return {
+            revenue: totalRevenue,
+            pending: pendingOrders,
+            likes: totalLikes,
+            users: users?.length || 0,
+            growth: '+12.5%' // Hardcoded for aesthetics
+        };
+    }, [orders, products, galleryItems, users]);
 
     const handleAdminLogin = async (e) => {
         e.preventDefault();
@@ -41,52 +65,70 @@ const Admin = () => {
         if (isValid) {
             setIsAdmin(true);
         } else {
-            setAdminAuthError('Invalid Credentials');
+            setAdminAuthError('Invalid Access Key');
         }
     };
 
     if (!isAdmin) {
         return (
-            <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: '80vh', paddingTop: '6rem' }}>
-                <div className="glass p-5 rounded-5 shadow-lg w-100" style={{ maxWidth: '450px' }}>
+            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a' }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass p-5 rounded-5 shadow-lg w-100 border border-secondary border-opacity-10"
+                    style={{ maxWidth: '400px' }}
+                >
                     <div className="text-center mb-5">
                         <div className="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-primary">
                             <Lock size={32} />
                         </div>
-                        <h1 className="h3 fw-bold mb-0">Admin Access</h1>
+                        <h1 className="h3 fw-bold mb-1 text-white">Console Access</h1>
+                        <p className="text-muted small">Enter your credentials to manage Art Void</p>
                     </div>
 
-                    {adminAuthError && <div className="alert alert-danger py-2 small border-0 bg-danger bg-opacity-10 text-danger mb-4">{adminAuthError}</div>}
+                    {adminAuthError && (
+                        <motion.div
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            className="alert alert-danger py-2 small border-0 bg-danger bg-opacity-10 text-danger mb-4 text-center"
+                        >
+                            <AlertCircle size={14} className="me-2" />
+                            {adminAuthError}
+                        </motion.div>
+                    )}
 
                     <form onSubmit={handleAdminLogin} className="d-flex flex-column gap-3">
-                        <div className="d-flex flex-column gap-2">
-                            <label className="small fw-bold text-muted text-uppercase ms-1">Username</label>
+                        <div className="form-group">
+                            <label className="small fw-bold text-muted text-uppercase mb-2 ms-1" style={{ letterSpacing: '0.05em' }}>Username</label>
                             <input
                                 type="text"
                                 required
-                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3"
-                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
+                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                style={{ background: 'rgba(255,255,255,0.03) !important' }}
                                 value={adminLogin.username}
                                 onChange={e => setAdminLogin({ ...adminLogin, username: e.target.value })}
                             />
                         </div>
-                        <div className="d-flex flex-column gap-2">
-                            <label className="small fw-bold text-muted text-uppercase ms-1">Password</label>
+                        <div className="form-group">
+                            <label className="small fw-bold text-muted text-uppercase mb-2 ms-1" style={{ letterSpacing: '0.05em' }}>Password</label>
                             <input
                                 type="password"
                                 required
-                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-3"
-                                style={{ background: 'rgba(0,0,0,0.2) !important', letterSpacing: '0.1em' }}
+                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                style={{ background: 'rgba(255,255,255,0.03) !important', letterSpacing: '0.2em' }}
                                 value={adminLogin.password}
                                 onChange={e => setAdminLogin({ ...adminLogin, password: e.target.value })}
                             />
                         </div>
 
-                        <button type="submit" disabled={isVerifying} className="btn btn-primary w-100 py-3 rounded-3 fw-bold mt-3 shadow">
-                            {isVerifying ? 'Verifying...' : 'Access Dashboard'}
+                        <button type="submit" disabled={isVerifying} className="btn btn-primary w-100 py-3 rounded-4 fw-bold mt-3 shadow-lg transition-all hover-translate-y">
+                            {isVerifying ? (
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            ) : null}
+                            {isVerifying ? 'Authenticating...' : 'Access Dashboard'}
                         </button>
                     </form>
-                </div>
+                </motion.div>
             </div>
         );
     }
@@ -102,11 +144,7 @@ const Admin = () => {
             setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
-                if (uploadType === 'shop') {
-                    setFormData({ ...formData, image: reader.result });
-                } else {
-                    setGalleryFormData({ ...galleryFormData, image: reader.result });
-                }
+                setFormData({ ...formData, image: reader.result });
             };
             reader.readAsDataURL(file);
         }
@@ -118,31 +156,25 @@ const Admin = () => {
         setUploadProgress(0);
 
         try {
-            let imageUrl = uploadType === 'shop' ? formData.image : galleryFormData.image;
+            let imageUrl = formData.image;
 
             if (imageFile) {
-                if (imageFile) {
-                    const formData = new FormData();
-                    formData.append('file', imageFile);
-                    formData.append('upload_preset', 'hnefpiqg'); // Your Cloudinary Upload Preset
-                    formData.append('cloud_name', 'dw7wcsate'); // Your Cloud Name
+                const cloudData = new FormData();
+                cloudData.append('file', imageFile);
+                cloudData.append('upload_preset', 'hnefpiqg');
+                cloudData.append('cloud_name', 'dw7wcsate');
 
-                    // Determine resource type (image or video)
-                    const resourceType = imageFile.type.includes('video') ? 'video' : 'image';
+                const resourceType = imageFile.type.includes('video') ? 'video' : 'image';
+                const response = await fetch(`https://api.cloudinary.com/v1_1/dw7wcsate/${resourceType}/upload`, {
+                    method: 'POST',
+                    body: cloudData
+                });
 
-                    // Cloudinary Upload URL
-                    const response = await fetch(`https://api.cloudinary.com/v1_1/dw7wcsate/${resourceType}/upload`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await response.json();
-
-                    if (data.secure_url) {
-                        imageUrl = data.secure_url;
-                    } else {
-                        throw new Error("Cloudinary upload failed");
-                    }
+                const data = await response.json();
+                if (data.secure_url) {
+                    imageUrl = data.secure_url;
+                } else {
+                    throw new Error("Upload failed");
                 }
             }
 
@@ -150,555 +182,610 @@ const Admin = () => {
                 const productData = {
                     ...formData,
                     image: imageUrl,
-                    price: formData.price ? Number(formData.price) : 0,
+                    price: Number(formData.price) || 0,
                 };
 
                 if (editingProduct) {
-                    await updateProduct({ ...productData, id: editingProduct.id });
+                    await updateProduct({ ...productData, id: editingProduct.id || editingProduct._id });
                 } else {
                     await addProduct(productData);
                 }
             } else {
-                // Gallery Upload
                 await addGalleryItem({
-                    title: '',
+                    title: formData.name || 'Untitled Artwork',
                     url: imageUrl,
                     type: imageFile?.type?.includes('video') ? 'video' : 'image'
                 });
             }
 
             setIsModalOpen(false);
-            setEditingProduct(null);
-            setFormData({ name: '', price: '', image: '', description: '' });
-            setGalleryFormData({ title: '', image: '', type: 'image' });
-            setImageFile(null);
-            setUploadProgress(0);
+            resetForm();
         } catch (error) {
-            console.error("Upload failed:", error);
-            if (error.code === 'storage/retry-limit-exceeded') {
-                alert("Upload took too long! Please check your internet connection and try again.");
-            } else {
-                alert(`Upload failed: ${error.message || "Unknown error"}. Check console for details.`);
-            }
+            console.error(error);
+            alert("Action failed. Please try again.");
         } finally {
             setIsUploading(false);
         }
     };
 
-    const openEdit = (product) => {
-        setUploadType('shop');
-        setEditingProduct(product);
-        setFormData({
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            description: product.description || ''
-        });
-        setIsModalOpen(true);
+    const resetForm = () => {
+        setEditingProduct(null);
+        setFormData({ name: '', price: '', image: '', description: '' });
+        setImageFile(null);
     };
 
-    const handlePassChange = (e) => {
+    const handlePassChange = async (e) => {
         e.preventDefault();
-        changePassword(newPass);
-        setPassUpdateStatus('Password updated successfully!');
+        await changePassword(newPass);
+        setPassUpdateStatus('Credential updated successfully');
         setNewPass('');
         setTimeout(() => setPassUpdateStatus(''), 3000);
     };
 
-    return (
-        <div className="container" style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
-            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-4">
-                <div>
-                    <h1 className="display-4 fw-bold">Admin <span style={{ color: 'var(--primary)' }}>Control</span></h1>
-                    <p className="text-muted mb-0">Manage your inventory, messages and orders from one place.</p>
-                </div>
-                <button onClick={handleLogout} className="btn glass text-danger border-0 px-4 py-2 d-flex align-items-center gap-2 rounded-3 shadow-sm">
-                    <LogOut size={18} /> Logout
-                </button>
-            </div>
+    // Sidebar items
+    const menuItems = [
+        { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+        { id: 'orders', label: 'Orders', icon: ShoppingBag, count: orders.length + messages.filter(m => m.type === 'service').length },
+        { id: 'products', label: 'Inventory', icon: Package, count: products.length },
+        { id: 'gallery', label: 'Gallery', icon: ImageIcon, count: galleryItems.length },
+        { id: 'messages', label: 'Inbox', icon: MessageSquare, count: messages.filter(m => m.type !== 'service').length },
+        { id: 'users', label: 'Users', icon: UsersIcon, count: users?.length || 0 },
+        { id: 'settings', label: 'Settings', icon: Settings },
+    ];
 
-            <div className="row g-3 mb-4">
-                {[
-                    { id: 'products', icon: Package, label: 'Shop Items', count: products.length },
-                    { id: 'gallery', icon: ImageIcon, label: 'Gallery', count: galleryItems.length },
-                    { id: 'messages', icon: MessageSquare, label: 'Inquiries', count: messages.filter(m => m.type !== 'service').length },
-                    { id: 'orders', icon: ShoppingBag, label: 'Orders', count: orders.length + messages.filter(m => m.type === 'service').length },
-                    { id: 'users', icon: User, label: 'Users', count: users?.length || 0 }, // Added Users Tab
-                    { id: 'settings', icon: Settings, label: 'Settings' }
-                ].map(tab => {
-                    const Icon = tab.icon;
-                    return (
-                        <div key={tab.id} className="col-6 col-md-3">
-                            <button
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 rounded-4 border-0 transition-all ${activeTab === tab.id ? 'btn-primary shadow' : 'glass text-white opacity-75'}`}
-                            >
-                                <Icon size={20} />
-                                <span className="d-none d-sm-inline">{tab.label}</span>
-                                {tab.count !== undefined && <span className="badge bg-white text-dark rounded-pill ms-1">{tab.count}</span>}
-                            </button>
+    return (
+        <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
+
+            {/* Desktop Sidebar */}
+            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky top-0" style={{ width: '280px', height: '100vh', zIndex: 100 }}>
+                <div className="p-4 mb-4">
+                    <div className="d-flex align-items-center gap-3">
+                        <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
+                            <ImageIcon size={24} className="text-white" />
                         </div>
+                        <h2 className="h5 fw-bold mb-0 text-white" style={{ letterSpacing: '-0.5px' }}>Art Void <span className="text-primary">Admin</span></h2>
+                    </div>
+                </div>
+
+                <nav className="flex-grow-1 px-3">
+                    <div className="text-muted small fw-bold text-uppercase mb-3 px-3" style={{ fontSize: '0.65rem', letterSpacing: '0.1em' }}>Main Menu</div>
+                    <ul className="list-unstyled d-flex flex-column gap-1">
+                        {menuItems.map(item => {
+                            const Icon = item.icon;
+                            const isActive = activeTab === item.id;
+                            return (
+                                <li key={item.id}>
+                                    <button
+                                        onClick={() => setActiveTab(item.id)}
+                                        className={`btn w-100 text-start d-flex align-items-center justify-content-between px-3 py-2 rounded-3 border-0 transition-all ${isActive ? 'bg-primary text-white shadow-lg shadow-primary-20' : 'text-white-50 hover-bg-white-5'}`}
+                                    >
+                                        <div className="d-flex align-items-center gap-3">
+                                            <Icon size={18} opacity={isActive ? 1 : 0.6} />
+                                            <span className="fw-medium">{item.label}</span>
+                                        </div>
+                                        {item.count > 0 && (
+                                            <span className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-white bg-opacity-10 text-white-50'}`} style={{ fontSize: '0.7rem' }}>
+                                                {item.count}
+                                            </span>
+                                        )}
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
+
+                <div className="p-4 border-top border-secondary border-opacity-10">
+                    <button onClick={handleLogout} className="btn w-100 glass text-danger border-0 py-2 d-flex align-items-center gap-3 justify-content-center rounded-3">
+                        <LogOut size={16} /> <span className="fw-bold small text-uppercase">Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            {/* Mobile Bottom Nav */}
+            <nav className="d-lg-none fixed-bottom glass border-top border-secondary border-opacity-10 py-2 px-3 d-flex justify-content-between align-items-center h-navbar shadow-2xl" style={{ zIndex: 1000 }}>
+                {menuItems.slice(0, 5).map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => setActiveTab(item.id)}
+                            className={`btn border-0 p-2 rounded-3 d-flex flex-column align-items-center gap-1 transition-all ${isActive ? 'text-primary' : 'text-white-50'}`}
+                        >
+                            <Icon size={20} />
+                            <span style={{ fontSize: '0.6rem' }} className="fw-bold text-uppercase">{item.label}</span>
+                        </button>
                     );
                 })}
-            </div>
+            </nav>
 
-            <div className="glass p-4 p-md-5 animate-fade-in border-0 shadow-lg">
-                {activeTab === 'users' && ( // Added Users Tab Content
-                    <div className="table-responsive">
-                        <h3 className="h4 fw-bold mb-4">User Accounts</h3>
-                        <table className="table table-dark table-hover align-middle border-0">
-                            <thead>
-                                <tr className="text-muted border-bottom border-secondary">
-                                    <th className="py-3 px-4 border-0">Name</th>
-                                    <th className="py-3 px-4 border-0">Email / ID</th>
-                                    <th className="py-3 px-4 border-0">Joined</th>
-                                    <th className="py-3 px-4 border-0 text-end">Likes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Array.from(new Map(users?.map(u => [u.email || u.id || u._id, u])).values()).map(u => (
-                                    <tr key={u._id || u.id} className="border-bottom border-secondary border-opacity-10">
-                                        <td className="py-3 px-4 border-0 fw-bold text-white">
-                                            <div className="d-flex align-items-center gap-3">
-                                                {u.avatar ? (
-                                                    <img src={u.avatar} alt="" className="rounded-circle shadow-sm border border-secondary border-opacity-25" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
-                                                ) : (
-                                                    <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-                                                        <User size={20} />
-                                                    </div>
-                                                )}
-                                                <div className="d-flex flex-column">
-                                                    <span className="text-white">{u.username || 'Unnamed User'}</span>
-                                                    {u.googleId && <span className="small text-muted fw-normal" style={{ fontSize: '0.7rem' }}>Google Linked</span>}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="py-3 px-4 border-0">
-                                            {u.email ? (
-                                                <div className="d-flex flex-column">
-                                                    <span className="text-info opacity-75 small d-flex align-items-center gap-1">
-                                                        <Mail size={12} /> {u.email}
-                                                    </span>
-                                                    <span className="small opacity-50" style={{ fontSize: '0.7rem' }}>ID: {u.googleId || u.id || u._id}</span>
-                                                </div>
-                                            ) : (
-                                                <span className="small opacity-50">Local Account</span>
-                                            )}
-                                        </td>
-                                        <td className="py-3 px-4 border-0 text-muted small">
-                                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Join date unknown'}
-                                        </td>
-                                        <td className="py-3 px-4 border-0 text-end">
-                                            <span className="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">
-                                                {(u.likedProducts?.length || 0) + (u.likedGallery?.length || 0)} Total Likes
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!users || users.length === 0) && (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-5 text-muted">No users found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+            {/* Main Content Area */}
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingBottom: '100px !important' }}>
 
-                {activeTab === 'products' && (
-                    <div className="table-responsive">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h3 className="h4 fw-bold mb-0">Shop Inventory</h3>
-                            <button onClick={() => { setIsModalOpen(true); setUploadType('shop'); setEditingProduct(null); setFormData({ name: '', price: '', image: '', description: '' }); }} className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-3 border-0">
-                                <Plus size={18} /> <span className="d-none d-sm-inline">Add Product</span>
-                            </button>
-                        </div>
-                        <table className="table table-dark table-hover align-middle border-0">
-                            <thead>
-                                <tr className="text-muted border-bottom border-secondary">
-                                    <th className="py-3 px-4 border-0">Art</th>
-                                    <th className="py-3 px-4 border-0">Price</th>
-                                    <th className="py-3 px-4 border-0">Likes</th>
-                                    <th className="py-3 px-4 border-0 text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map(p => (
-                                    <tr key={p._id || p.id} className="border-bottom border-secondary border-opacity-10">
-                                        <td className="py-3 px-4 border-0">
-                                            <div className="d-flex align-items-center gap-3">
-                                                <img
-                                                    src={p.image}
-                                                    alt={p.name}
-                                                    className="rounded-2"
-                                                    style={{ width: '45px', height: '45px', objectFit: 'cover' }}
-                                                />
-                                                <span className="fw-medium">{p.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="py-3 px-4 border-0 fw-bold text-primary">₹{p.price}</td>
-                                        <td className="py-3 px-4 border-0">
-                                            <div className="d-flex align-items-center gap-2 text-danger">
-                                                <Heart size={14} fill="var(--accent)" /> {p.likes || 0}
-                                            </div>
-                                        </td>
-                                        <td className="py-3 px-4 border-0 text-end">
-                                            <div className="d-flex gap-2 justify-content-end">
-                                                <button onClick={() => openEdit(p)} className="btn btn-sm glass text-primary border-0 p-2"><Edit3 size={16} /></button>
-                                                <button onClick={() => deleteProduct(p._id || p.id)} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {activeTab === 'gallery' && (
+                {/* Header */}
+                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 pt-lg-0 pt-4">
                     <div>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h3 className="h4 fw-bold mb-0">Gallery Portfolio</h3>
-                            <button onClick={() => { setIsModalOpen(true); setUploadType('gallery'); setGalleryFormData({ title: '', image: '', type: 'image' }); }} className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-3 border-0">
-                                <Plus size={18} /> <span className="d-none d-sm-inline">Add to Gallery</span>
+                        <h1 className="display-6 fw-bold mb-1">
+                            {menuItems.find(m => m.id === activeTab)?.label}
+                        </h1>
+                        <p className="text-muted small mb-0">System configuration and resource management</p>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-3">
+                        {['products', 'gallery'].includes(activeTab) && (
+                            <button
+                                onClick={() => { setUploadType(activeTab === 'products' ? 'shop' : 'gallery'); setIsModalOpen(true); resetForm(); }}
+                                className="btn btn-primary px-4 py-2 rounded-3 fw-bold d-flex align-items-center gap-2 border-0 shadow-lg"
+                            >
+                                <Plus size={18} /> New {activeTab === 'products' ? 'Item' : 'Artwork'}
                             </button>
+                        )}
+                        <div className="d-flex align-items-center gap-2 glass p-2 rounded-3 border-0">
+                            <div className="bg-success rounded-circle shadow-success" style={{ width: '8px', height: '8px' }}></div>
+                            <span className="small text-white-50 fw-bold">System Live</span>
                         </div>
-                        <div className="row g-3">
+                    </div>
+                </header>
+
+                {/* Dashboard Overview */}
+                <AnimatePresence mode="wait">
+                    {activeTab === 'dashboard' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="row g-4"
+                        >
+                            {/* Stat Cards */}
+                            {[
+                                { label: 'Total Revenue', value: `₹${stats.revenue}`, icon: DollarSign, color: 'primary', trend: '+5.4%' },
+                                { label: 'Active Orders', value: stats.pending, icon: ShoppingBag, color: 'success', trend: 'Critical' },
+                                { label: 'Engagement', value: stats.likes, icon: Heart, color: 'danger', trend: '+18%' },
+                                { label: 'Art Collectors', value: stats.users, icon: UsersIcon, color: 'info', trend: stats.growth },
+                            ].map((stat, idx) => (
+                                <div key={idx} className="col-12 col-md-6 col-xl-3">
+                                    <div className="glass p-4 rounded-4 border-0 h-100 transition-all hover-translate-y">
+                                        <div className="d-flex justify-content-between align-items-start mb-3">
+                                            <div className={`bg-${stat.color} bg-opacity-10 p-2 rounded-3 text-${stat.color}`}>
+                                                <stat.icon size={20} />
+                                            </div>
+                                            <span className={`badge bg-${stat.color} bg-opacity-10 text-${stat.color} rounded-pill`} style={{ fontSize: '0.65rem' }}>{stat.trend}</span>
+                                        </div>
+                                        <h3 className="h2 fw-bold mb-0 text-white">{stat.value}</h3>
+                                        <p className="text-muted small mb-0 mt-1">{stat.label}</p>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Recent Orders Chart / Placeholder */}
+                            <div className="col-12 col-xl-8">
+                                <div className="glass p-4 rounded-4 border-0 h-100">
+                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 className="h5 fw-bold mb-0">Order Analytics</h4>
+                                        <button className="btn btn-sm glass border-0 text-white-50"><BarChart3 size={16} /></button>
+                                    </div>
+                                    <div className="bg-dark rounded-4 p-5 d-flex flex-column align-items-center justify-content-center border border-secondary border-opacity-10" style={{ height: '300px' }}>
+                                        <TrendingUp size={48} className="text-primary mb-3 opacity-20" />
+                                        <p className="text-muted small">Sales growth visualizer will appear here as you accumulate more data.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Activity Log */}
+                            <div className="col-12 col-xl-4">
+                                <div className="glass p-4 rounded-4 border-0 h-100">
+                                    <h4 className="h5 fw-bold mb-4">Recent Activity</h4>
+                                    <div className="d-flex flex-column gap-4">
+                                        {[...orders, ...messages].slice(0, 5).map((log, i) => (
+                                            <div key={i} className="d-flex gap-3">
+                                                <div className="mt-1">
+                                                    <div className="bg-primary rounded-circle" style={{ width: '8px', height: '8px' }}></div>
+                                                </div>
+                                                <div>
+                                                    <p className="small mb-0 text-white fw-medium">
+                                                        {log.customer || log.name} {log.productName ? 'placed an order' : 'sent a message'}
+                                                    </p>
+                                                    <span className="text-muted" style={{ fontSize: '0.65rem' }}>{log.date || 'Just now'}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {orders.length === 0 && messages.length === 0 && (
+                                            <div className="text-center py-5 text-muted small">No recent activity</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'orders' && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="d-flex flex-column gap-4"
+                        >
+                            <div className="glass p-2 rounded-3 d-flex align-items-center gap-2 px-3 border-0">
+                                <Search size={18} className="text-muted" />
+                                <input
+                                    type="text"
+                                    placeholder="Search orders, phone or customers..."
+                                    className="form-control bg-transparent border-0 text-white p-2"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="table-responsive">
+                                <table className="table table-dark table-hover align-middle">
+                                    <thead>
+                                        <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20">
+                                            <th className="py-3 px-4 border-0">Resource</th>
+                                            <th className="py-3 px-4 border-0">Customer</th>
+                                            <th className="py-3 px-4 border-0">Contact</th>
+                                            <th className="py-3 px-4 border-0">Status</th>
+                                            <th className="py-3 px-4 border-0 text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[
+                                            ...orders.map(o => ({ ...o, _isOrder: true })),
+                                            ...messages.filter(m => m.type === 'service').map(m => ({
+                                                ...m,
+                                                productName: 'Service Request',
+                                                customer: m.name,
+                                                notes: m.message,
+                                                _isMessage: true,
+                                                type: 'service'
+                                            }))
+                                        ]
+                                            .filter(o =>
+                                                o.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                o.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                o.phone?.includes(searchQuery)
+                                            )
+                                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                                            .map(o => (
+                                                <tr key={o._id || o.id} className="border-bottom border-secondary border-opacity-10">
+                                                    <td className="py-4 px-4 border-0">
+                                                        <div className="d-flex align-items-center gap-3">
+                                                            <div className="position-relative">
+                                                                <img
+                                                                    src={o.image}
+                                                                    className="rounded-3 shadow-sm border border-secondary border-opacity-20"
+                                                                    style={{ width: '45px', height: '45px', objectFit: 'cover' }}
+                                                                    alt=""
+                                                                />
+                                                                <div className={`position-absolute bottom-0 end-0 rounded-circle border border-dark ${o.type === 'service' ? 'bg-info' : 'bg-primary'}`} style={{ width: '10px', height: '10px' }}></div>
+                                                            </div>
+                                                            <div className="d-flex flex-column">
+                                                                <span className="fw-bold text-white small">{o.productName}</span>
+                                                                <span className="text-muted" style={{ fontSize: '0.65rem' }}>ID: {(o._id || o.id).slice(-6).toUpperCase()}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        <div className="d-flex flex-column">
+                                                            <span className="text-white-50 small fw-medium">{o.customer || o.name || 'Anonymous'}</span>
+                                                            <span className="text-muted truncate d-inline-block small" style={{ maxWidth: '150px', fontSize: '0.65rem' }}>{o.address || 'No Address'}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        <div className="d-flex flex-column gap-1">
+                                                            <a href={`tel:${o.phone}`} className="text-primary text-decoration-none small d-flex align-items-center gap-2">
+                                                                <Phone size={12} /> {o.phone || 'N/A'}
+                                                            </a>
+                                                            <span className="text-muted" style={{ fontSize: '0.65rem' }}>{o.date}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        <select
+                                                            value={o.status || 'Pending'}
+                                                            onChange={(e) => o._isOrder && updateOrderStatus(o._id || o.id, e.target.value)}
+                                                            className={`form-select form-select-sm border-0 rounded-pill px-3 py-1 fw-bold ${o.status === 'Completed' ? 'bg-success bg-opacity-10 text-success' :
+                                                                    o.status === 'Shipped' ? 'bg-info bg-opacity-10 text-info' :
+                                                                        'bg-warning bg-opacity-10 text-warning'
+                                                                }`}
+                                                            style={{ width: 'auto', fontSize: '0.65rem' }}
+                                                            disabled={o._isMessage}
+                                                        >
+                                                            <option value="Pending">Pending</option>
+                                                            <option value="Shipped">Shipped</option>
+                                                            <option value="Completed">Completed</option>
+                                                        </select>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0 text-end">
+                                                        <div className="d-flex gap-2 justify-content-end">
+                                                            <button onClick={() => window.open(o.image, '_blank')} className="btn btn-sm glass text-white-50 border-0 p-2"><Eye size={16} /></button>
+                                                            <button
+                                                                onClick={() => o._isMessage ? deleteMessage(o._id || o.id) : deleteOrder(o._id || o.id)}
+                                                                className="btn btn-sm glass text-danger border-0 p-2"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'products' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="row g-4">
+                                {products.map(p => (
+                                    <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
+                                        <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
+                                            <div className="position-relative" style={{ height: '220px' }}>
+                                                <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
+                                                <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 translate-y-20 group-hover-translate-0 opacity-0 group-hover-opacity-100 transition-all">
+                                                    <button onClick={() => {
+                                                        setUploadType('shop');
+                                                        setEditingProduct(p);
+                                                        setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '' });
+                                                        setIsModalOpen(true);
+                                                    }} className="btn btn-sm btn-white rounded-circle shadow p-2"><Edit3 size={16} /></button>
+                                                    <button onClick={() => deleteProduct(p._id || p.id)} className="btn btn-sm btn-danger rounded-circle shadow p-2"><Trash2 size={16} /></button>
+                                                </div>
+                                                <div className="position-absolute bottom-0 start-0 p-3 w-100 bg-gradient-to-t">
+                                                    <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
+                                                </div>
+                                            </div>
+                                            <div className="p-4">
+                                                <h5 className="fw-bold text-white mb-1 truncate">{p.name}</h5>
+                                                <div className="d-flex align-items-center gap-2 text-white-50 small">
+                                                    <Heart size={14} fill="#ff4d4d" className="text-danger" /> {p.likes || 0} Appreciations
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'gallery' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
                             {galleryItems.map(item => (
                                 <div key={item._id || item.id} className="col-6 col-md-3">
-                                    <div className="position-relative group overflow-hidden rounded-3" style={{ height: '200px' }}>
+                                    <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
                                         {item.type === 'video' ? (
-                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted />
+                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop onMouseEnter={e => e.target.play()} onMouseLeave={e => e.target.pause()} />
                                         ) : (
-                                            <img src={item.url} alt={item.title} className="w-100 h-100 object-fit-cover" />
+                                            <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
                                         )}
-                                        <div className="position-absolute top-0 end-0 p-2">
-                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm bg-danger text-white border-0 shadow"><Trash2 size={16} /></button>
-                                        </div>
-                                        <div className="position-absolute bottom-0 start-0 p-2 w-100 bg-dark bg-opacity-50">
-                                            <small className="text-white fw-bold truncate">{item.title || 'Untitled'}</small>
+                                        <div className="position-absolute top-0 end-0 p-2 opacity-0 group-hover-opacity-100 transition-all">
+                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm btn-danger rounded-circle border-0 shadow"><Trash2 size={16} /></button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    </div>
-                )}
+                        </motion.div>
+                    )}
 
-                {activeTab === 'messages' && (
-                    <div className="d-flex flex-column gap-4">
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                            <h3 className="h4 fw-bold mb-0">Inbox</h3>
-                            <div className="text-muted small">{messages.filter(m => m.type !== 'service').length} inquiries total</div>
-                        </div>
-                        <div className="row g-4">
+                    {activeTab === 'messages' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
                             {messages.filter(m => m.type !== 'service').map(m => (
                                 <div key={m._id || m.id} className="col-12">
-                                    <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
-                                        <button onClick={() => deleteMessage(m._id || m.id)} className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"><Trash2 size={18} /></button>
-
-                                        <div className="d-flex flex-column flex-md-row gap-4">
-                                            {m.image && (
-                                                <div className="flex-shrink-0">
-                                                    <img
-                                                        src={m.image}
-                                                        alt="Reference"
-                                                        className="rounded-3 shadow-sm"
-                                                        style={{ width: '150px', height: '150px', objectFit: 'cover', cursor: 'pointer' }}
-                                                        onClick={() => window.open(m.image, '_blank')}
-                                                    />
+                                    <div className="glass p-4 rounded-4 border-0">
+                                        <div className="d-flex justify-content-between align-items-start mb-4">
+                                            <div className="d-flex align-items-center gap-3">
+                                                <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+                                                    <User size={20} />
                                                 </div>
-                                            )}
-                                            <div className="flex-grow-1">
-                                                <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
-                                                    <span className="badge border-0 rounded-pill px-3 py-2 bg-secondary">
-                                                        General Inquiry
-                                                    </span>
+                                                <div>
+                                                    <h6 className="fw-bold mb-0 text-white">{m.name}</h6>
                                                     <span className="text-muted small">{m.date}</span>
                                                 </div>
-
-                                                <div className="row g-3">
-                                                    <div className="col-12 col-md-6">
-                                                        <div className="d-flex align-items-center gap-2 mb-1">
-                                                            <User size={14} className="text-primary" />
-                                                            <span className="fw-bold text-white">{m.name}</span>
-                                                        </div>
-                                                        <div className="d-flex align-items-center gap-2 small text-muted">
-                                                            <Mail size={14} />
-                                                            <a href={`mailto:${m.email}`} className="text-muted text-decoration-none hover-primary">{m.email}</a>
-                                                        </div>
-                                                        {m.phone && (
-                                                            <div className="d-flex align-items-center gap-2 small text-muted mt-1">
-                                                                <Phone size={14} />
-                                                                <a href={`tel:${m.phone}`} className="text-muted text-decoration-none hover-primary">{m.phone}</a>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {m.address && (
-                                                        <div className="col-12 col-md-6">
-                                                            <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Address</div>
-                                                            <div className="small text-white-50">{m.address}</div>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
-                                                        <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-                                                            Message
-                                                        </div>
-                                                        <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
-                                                    </div>
-                                                </div>
                                             </div>
+                                            <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
+                                        </div>
+                                        <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
+                                            <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
+                                        </div>
+                                        <div className="mt-4 d-flex flex-wrap gap-4">
+                                            <a href={`mailto:${m.email}`} className="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-primary transition-all">
+                                                <Mail size={14} className="text-primary" /> {m.email}
+                                            </a>
+                                            {m.phone && (
+                                                <a href={`tel:${m.phone}`} className="text-white-50 text-decoration-none small d-flex align-items-center gap-2 hover-primary transition-all">
+                                                    <Phone size={14} className="text-primary" /> {m.phone}
+                                                </a>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {messages.filter(m => m.type !== 'service').length === 0 && (
-                                <div className="col-12 text-center py-5">
-                                    <div className="text-muted opacity-50 mb-3"><MessageSquare size={64} /></div>
-                                    <div className="h5 text-muted">No inquiries yet.</div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
+                        </motion.div>
+                    )}
 
-                {activeTab === 'orders' && (
-                    <div className="d-flex flex-column gap-4">
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                            <h3 className="h4 fw-bold mb-0">Active Orders</h3>
-                            <div className="text-muted small">
-                                {[...orders, ...messages.filter(msg => msg.type === 'service')].length} items total
-                            </div>
-                        </div>
-                        <div className="row g-4">
-                            {[
-                                ...orders.map(o => ({ ...o, _isOrder: true })),
-                                ...messages.filter(m => m.type === 'service').map(m => ({
-                                    ...m,
-                                    productName: 'Custom Service Request',
-                                    customer: m.name,
-                                    notes: m.message,
-                                    _isMessage: true
-                                }))
-                            ]
-                                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                .map(o => (
-                                    <div key={o._id || o.id} className="col-12">
-                                        <div className="glass p-4 rounded-4 position-relative border-0 shadow-sm">
-                                            <button
-                                                onClick={() => o._isMessage ? deleteMessage(o._id || o.id) : deleteOrder(o._id || o.id)}
-                                                className="btn btn-sm text-danger position-absolute top-0 end-0 m-3 hover-scale"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-
-                                            <div className="d-flex flex-column flex-md-row gap-4">
-                                                {o.image && (
-                                                    <div className="flex-shrink-0">
-                                                        <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.6rem', letterSpacing: '0.05em' }}>
-                                                            {o.type === 'service' ? 'Reference Image' : 'Product Image'}
+                    {activeTab === 'users' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
+                            <table className="table table-dark table-hover align-middle">
+                                <thead>
+                                    <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
+                                        <th className="py-3 px-4 border-0">Identity</th>
+                                        <th className="py-3 px-4 border-0">Platform</th>
+                                        <th className="py-3 px-4 border-0">Engagement</th>
+                                        <th className="py-3 px-4 border-0">Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from(new Map(users?.map(u => [u.email || u.id, u])).values()).map(u => (
+                                        <tr key={u._id || u.id} className="border-bottom border-secondary border-opacity-10">
+                                            <td className="py-4 px-4 border-0">
+                                                <div className="d-flex align-items-center gap-3">
+                                                    {u.avatar ? (
+                                                        <img src={u.avatar} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
+                                                    ) : (
+                                                        <div className="bg-white bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                                                            <User size={20} className="text-white-50" />
                                                         </div>
-                                                        <img
-                                                            src={o.image}
-                                                            alt={o.productName}
-                                                            className="rounded-3 shadow-sm"
-                                                            style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
-                                                            onClick={() => window.open(o.image, '_blank')}
-                                                            title="Click to view full image"
-                                                        />
-                                                    </div>
-                                                )}
-                                                <div className="flex-grow-1">
-                                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <div>
-                                                            <h5 className="fw-bold mb-0 text-primary">{o.productName}</h5>
-                                                            <div className="d-flex align-items-center gap-2 mt-1">
-                                                                <span className={`badge border-0 rounded-pill px-2 py-1 small ${o.type === 'service' ? 'bg-info bg-opacity-25 text-info' : 'bg-success bg-opacity-25 text-success'}`} style={{ fontSize: '0.7rem' }}>
-                                                                    {o.type === 'service' ? 'Custom Request' : 'Product Order'}
-                                                                </span>
-                                                                <span className="text-muted small">Placed on {o.date || 'unknown date'}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="row g-3">
-                                                        <div className="col-12 col-md-6">
-                                                            <div className="d-flex align-items-center gap-2 mb-1">
-                                                                <User size={14} className="text-primary" />
-                                                                <span className="fw-bold text-white">{o.customer || o.name || 'Guest User'}</span>
-                                                            </div>
-                                                            {(o.phone) && (
-                                                                <div className="d-flex align-items-center gap-2 small text-muted">
-                                                                    <Phone size={14} />
-                                                                    <a href={`tel:${o.phone}`} className="text-muted text-decoration-none hover-primary">{o.phone}</a>
-                                                                </div>
-                                                            )}
-                                                            {(o.email) && (
-                                                                <div className="d-flex align-items-center gap-2 small text-muted mt-1">
-                                                                    <Mail size={14} />
-                                                                    <a href={`mailto:${o.email}`} className="text-muted text-decoration-none hover-primary">{o.email}</a>
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="col-12 col-md-6">
-                                                            <div className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>Shipping Address</div>
-                                                            <div className="small text-white-50">{o.address || 'No address provided'}</div>
-                                                        </div>
-
-                                                        {(o.notes || o.message) && (
-                                                            <div className="col-12 mt-3 pt-3 border-top border-secondary border-opacity-10">
-                                                                <div className="small fw-bold text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
-                                                                    {o.type === 'service' ? 'Request Info / Service Details' : 'Design Notes / Comments'}
-                                                                </div>
-                                                                <p className="mb-0 text-white-50 small" style={{ whiteSpace: 'pre-wrap' }}>{o.notes || o.message}</p>
-                                                            </div>
-                                                        )}
+                                                    )}
+                                                    <div className="d-flex flex-column">
+                                                        <span className="text-white fw-bold small">{u.username || 'Art Collector'}</span>
+                                                        <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{u.email || 'Private Account'}</span>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </td>
+                                            <td className="py-4 px-4 border-0">
+                                                <span className={`badge rounded-pill px-3 py-2 ${u.googleId ? 'bg-primary bg-opacity-10 text-primary' : 'bg-secondary bg-opacity-10 text-white-50'}`} style={{ fontSize: '0.65rem' }}>
+                                                    {u.googleId ? 'Google verified' : 'Local system'}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 border-0">
+                                                <div className="d-flex align-items-center gap-2 text-danger small">
+                                                    <Heart size={14} fill="currentColor" /> {(u.likedProducts?.length || 0) + (u.likedGallery?.length || 0)}
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-4 border-0 text-muted small">
+                                                {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
+                            <div className="col-12 col-md-6">
+                                <section className="glass p-5 rounded-4 border-0 shadow-lg">
+                                    <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
+                                        <Lock size={20} className="text-primary" /> Admin Security
+                                    </h4>
+                                    <form onSubmit={handlePassChange}>
+                                        <div className="mb-4">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Set New Access Gateway Key</label>
+                                            <input
+                                                required
+                                                type="password"
+                                                placeholder="••••••••••••"
+                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important', letterSpacing: '0.3em' }}
+                                                value={newPass}
+                                                onChange={e => setNewPass(e.target.value)}
+                                            />
                                         </div>
-                                    </div>
-                                ))}
-                            {[...orders, ...messages.filter(m => m.type === 'service')].length === 0 && (
-                                <div className="col-12 text-center py-5">
-                                    <div className="text-muted opacity-50 mb-3"><ShoppingBag size={64} /></div>
-                                    <div className="h5 text-muted">No orders yet.</div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
+                                        <button type="submit" className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y">Update Credentials</button>
+                                        {passUpdateStatus && (
+                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
+                                                <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
+                                            </motion.div>
+                                        )}
+                                    </form>
+                                </section>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
 
-                {activeTab === 'settings' && (
-                    <div style={{ maxWidth: '500px' }}>
-                        <h3 className="h4 fw-bold mb-2">Admin Settings</h3>
-                        <form onSubmit={handlePassChange} className="glass p-4 border-0 rounded-4">
-                            <label className="small fw-bold text-muted text-uppercase mb-2">New Admin Password</label>
-                            <input
-                                required
-                                type="password"
-                                className="form-control bg-dark border-0 text-white py-3 rounded-3 mb-3"
-                                style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                value={newPass}
-                                onChange={e => setNewPass(e.target.value)}
-                            />
-                            <button type="submit" className="btn btn-primary w-100 py-3 fw-bold border-0 rounded-3">Update Password</button>
-                            {passUpdateStatus && <div className="mt-3 text-success small">{passUpdateStatus}</div>}
-                        </form>
-                    </div>
-                )}
-            </div>
-
+            {/* Modal - Common for Product and Gallery uploads */}
             {isModalOpen && (
-                <div className="d-flex align-items-center justify-content-center px-3 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
-                    <Motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
+                <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1050 }}>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="glass p-4 p-md-5 position-relative w-100 overflow-auto"
-                        style={{ maxWidth: '550px', maxHeight: '90vh' }}
+                        className="glass p-5 rounded-5 border border-secondary border-opacity-10 w-100 shadow-2xl"
+                        style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}
                     >
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+                        <div className="d-flex justify-content-between align-items-center mb-5">
                             <h2 className="h4 fw-bold mb-0">
-                                {uploadType === 'shop'
-                                    ? (editingProduct ? 'Edit Shop Item' : 'Add Shop Item')
-                                    : 'Add to Gallery'}
+                                {uploadType === 'shop' ? (editingProduct ? 'Edit Inventory' : 'Add to Shop') : 'Gallery Upload'}
                             </h2>
-                            <button onClick={() => setIsModalOpen(false)} className="btn text-muted p-0 border-0"><X size={24} /></button>
+                            <button onClick={() => setIsModalOpen(false)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
 
-                            {uploadType === 'shop' ? (
-                                <>
-                                    <div className="d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase">Art Name (H1)</label>
-                                        <input
-                                            required
-                                            placeholder="e.g. Moonlight Sonata"
-                                            className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                            value={formData.name}
-                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div className="d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase">Detail (Paragraph)</label>
-                                        <textarea
-                                            required
-                                            rows="4"
-                                            placeholder="Describe the artwork details..."
-                                            className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                            style={{ background: 'rgba(0,0,0,0.2) !important', resize: 'none' }}
-                                            value={formData.description}
-                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div className="d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase">Price (₹) <span className="text-secondary fw-normal">(Optional)</span></label>
-                                        <input
-                                            type="number"
-                                            placeholder="0.00"
-                                            className="form-control bg-dark border-0 text-white py-3 rounded-3"
-                                            style={{ background: 'rgba(0,0,0,0.2) !important' }}
-                                            value={formData.price}
-                                            onChange={e => setFormData({ ...formData, price: e.target.value })}
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="d-flex flex-column gap-2">
-                                    <div className="alert alert-info border-0 bg-primary bg-opacity-10 text-primary small mt-2">
-                                        Gallery uploads support Images and Videos. No title required.
-                                    </div>
+                            <div className="d-flex flex-column gap-4">
+                                <div>
+                                    <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Artwork Label</label>
+                                    <input
+                                        required
+                                        placeholder="Enter title..."
+                                        className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                        style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    />
                                 </div>
-                            )}
 
-                            <div className="d-flex flex-column gap-2">
-                                <label className="small fw-bold text-muted text-uppercase">Source File</label>
-                                <div className="d-flex flex-column gap-3">
-                                    <label className="btn glass border-0 text-white py-4 rounded-3 d-flex flex-column align-items-center justify-content-center gap-2 border-dashed" style={{ border: '2px dashed rgba(255,255,255,0.1) !important' }}>
-                                        <div className="bg-primary bg-opacity-10 p-2 rounded-circle"><Upload size={24} className="text-primary" /></div>
-                                        <span className="fw-medium">Click to upload Image or Video</span>
-                                        <input type="file" accept="image/*,video/*" onChange={handleImageUpload} className="d-none" />
-                                    </label>
-
-                                    {(uploadType === 'shop' ? formData.image : galleryFormData.image) && (
-                                        <div className="position-relative rounded-3 overflow-hidden" style={{ height: '150px' }}>
-                                            {(uploadType === 'gallery' && galleryFormData.type === 'video') || (imageFile?.type?.includes('video')) ? (
-                                                <video src={uploadType === 'shop' ? formData.image : galleryFormData.image} className="w-100 h-100 object-fit-cover" muted />
-                                            ) : (
-                                                <img src={uploadType === 'shop' ? formData.image : galleryFormData.image} alt="Preview" className="w-100 h-100 object-fit-cover" />
-                                            )}
-                                            <div className="position-absolute top-0 end-0 m-2 d-flex gap-2">
-                                                <div className="badge bg-dark bg-opacity-75 backdrop-blur shadow-sm">Current Preview</div>
-                                                <button type="button" onClick={() => {
-                                                    setImageFile(null);
-                                                    if (uploadType === 'shop') setFormData({ ...formData, image: '' });
-                                                    else setGalleryFormData({ ...galleryFormData, image: '' });
-                                                }} className="btn btn-sm btn-danger rounded-circle shadow-sm p-1"><X size={14} /></button>
+                                {uploadType === 'shop' && (
+                                    <>
+                                        <div>
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Retail Price (₹)</label>
+                                            <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    className="form-control bg-transparent border-0 text-white py-3"
+                                                    value={formData.price}
+                                                    onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                />
                                             </div>
                                         </div>
-                                    )}
+                                        <div>
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Public Description</label>
+                                            <textarea
+                                                required
+                                                rows="3"
+                                                placeholder="Artistic vision, materials, or context..."
+                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important', resize: 'none' }}
+                                                value={formData.description}
+                                                onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                <div>
+                                    <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Visual Resource</label>
+                                    <div className="d-flex flex-column gap-3">
+                                        <label className="d-flex flex-column align-items-center justify-content-center p-5 rounded-5 cursor-pointer transition-all hover-translate-y" style={{ border: '2px dashed rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
+                                            <div className="bg-primary bg-opacity-10 p-3 rounded-pill mb-3 text-primary shadow-lg shadow-primary-10">
+                                                <Upload size={24} />
+                                            </div>
+                                            <span className="fw-bold small text-white-50">Drag & Drop or Multi-Select</span>
+                                            <span className="text-muted extra-small mt-1">Images or MP4 Videos supported</span>
+                                            <input type="file" accept="image/*,video/*" onChange={handleImageUpload} className="d-none" />
+                                        </label>
+
+                                        {formData.image && (
+                                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
+                                                {imageFile?.type?.includes('video') ? (
+                                                    <video src={formData.image} className="w-100 h-100 object-fit-cover" muted />
+                                                ) : (
+                                                    <img src={formData.image} className="w-100 h-100 object-fit-cover" alt="" />
+                                                )}
+                                                <div className="position-absolute top-0 end-0 m-2">
+                                                    <button type="button" onClick={() => resetForm()} className="btn btn-sm btn-danger rounded-circle p-2 shadow-lg"><X size={14} /></button>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            <button type="submit" disabled={isUploading} className="btn btn-primary py-3 rounded-3 fw-bold border-0 mt-2 d-flex align-items-center justify-content-center gap-2 shadow">
+                            <button type="submit" disabled={isUploading} className="btn btn-primary py-3 rounded-4 fw-bold border-0 mt-4 shadow-xl transition-all hover-translate-y">
                                 {isUploading ? (
-                                    <>
-                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                        {imageFile ? `Uploading ${uploadProgress}%` : 'Saving...'}
-                                    </>
+                                    <div className="d-flex align-items-center justify-content-center gap-3">
+                                        <span className="spinner-border spinner-border-sm" role="status"></span>
+                                        <span>Transmitting Data...</span>
+                                    </div>
                                 ) : (
-                                    editingProduct ? 'Update Product' : 'Upload to Collection'
+                                    editingProduct ? 'Commit Changes' : 'Initialize Resource'
                                 )}
                             </button>
                         </form>
-                    </Motion.div>
+                    </motion.div>
                 </div>
             )}
         </div>

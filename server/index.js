@@ -218,6 +218,12 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
     res.json({ message: 'Deleted' });
 }));
 
+app.put('/api/orders/:id/status', asyncHandler(async (req, res) => {
+    const { status } = req.body;
+    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    res.json(updatedOrder);
+}));
+
 // ADMIN AUTH
 app.get('/api/admin/password', asyncHandler(async (req, res) => {
     let setting = await Setting.findOne({ type: 'admin' });

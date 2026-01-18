@@ -23,63 +23,46 @@ const Navbar = () => {
             }}>
             <div className="container-fluid p-0">
                 <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }}>
-                    <img src={`${import.meta.env.BASE_URL}icon.png`} alt="Falcon" style={{ width: '1.2cm', height: '1.2cm', borderRadius: '12px', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
                     <div className="d-flex flex-column">
-                        <span className="text-gradient" style={{ letterSpacing: '1px', lineHeight: '1', fontSize: '1.2rem' }}>
-                            ART VOID
+                        <span className="text-gradient" style={{ letterSpacing: '2px', lineHeight: '1', fontSize: '1.4rem' }}>
+                            ASLAM TK
                         </span>
-                        <span style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: 'bold', letterSpacing: '2px' }}>
-                            STUDIO
+                        <span style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: 'bold', letterSpacing: '3px', textTransform: 'uppercase' }}>
+                            Full-Stack Architect
                         </span>
                     </div>
                 </Link>
 
-                <button className="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style={{ padding: '0.25rem' }}>
-                    <span className="navbar-toggler-icon" style={{ width: '1.2em', height: '1.2em' }}></span>
+                <button className="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <div className="glass p-2 rounded-circle"><Palette size={18} /></div>
                 </button>
 
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-3 mt-2 mt-lg-0">
+                    <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0">
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Home</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/">WORKS</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/gallery" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Gallery</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/gallery">GALLERY</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/shop" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Shop</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/shop">STORE</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-3 py-1 text-white opacity-75 hover-opacity-100 transition-all" to="/contact" style={{ fontSize: '0.85rem', fontWeight: '600', letterSpacing: '0.5px' }}>Contact</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/contact">HIRE</Link>
                         </li>
-
 
                         <li className="nav-item d-none d-lg-block mx-1">
-                            <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.1)' }}></div>
+                            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }}></div>
                         </li>
 
-                        <li className="nav-item d-flex align-items-center gap-3 ps-lg-2">
-                            {isAdmin ? (
-                                <Link to="/admin" className="btn-primary d-inline-flex align-items-center gap-2" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: '20px' }}>
-                                    <LayoutDashboard size={14} /> Admin
-                                </Link>
-                            ) : user ? (
-                                <div className="d-flex align-items-center gap-3">
-                                    <span className="text-white small fw-bold d-none d-md-block">Hi, {user.username}</span>
-                                    <button onClick={logoutUser} className="btn nav-link p-0 border-0" title="Logout" style={{ color: 'var(--text-muted)' }}>
-                                        <LogIn size={18} style={{ transform: 'rotate(180deg)' }} />
-                                    </button>
-                                </div>
-                            ) : (
-                                <Link to="/login" className="nav-link p-0" style={{ color: 'var(--text-muted)' }}>
-                                    <LogIn size={18} />
-                                </Link>
+                        <li className="nav-item d-flex align-items-center gap-3">
+                            <a href="#" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
+                                RESUME
+                            </a>
+                            {isAdmin && (
+                                <Link to="/admin" className="text-white opacity-50 hover-opacity-100"><LayoutDashboard size={18} /></Link>
                             )}
-
-
-                            <button className="btn p-0 border-0 shadow-none" style={{ background: 'transparent', color: 'var(--text-main)', display: 'flex', alignItems: 'center' }}>
-                                <ShoppingCart size={20} />
-                            </button>
                         </li>
                     </ul>
                 </div>
