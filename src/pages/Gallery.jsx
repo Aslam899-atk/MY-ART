@@ -9,7 +9,7 @@ const Gallery = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [filter, setFilter] = useState('All');
 
-    const categories = ['All', 'Pencil Art', 'Oil Painting', 'Calligraphy'];
+    const categories = ['All', 'Pencil Art', 'Calligraphy', 'Ink Art'];
 
     const filteredItems = filter === 'All'
         ? galleryItems

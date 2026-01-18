@@ -28,9 +28,6 @@ const Navbar = () => {
                         <span className="text-gradient" style={{ letterSpacing: '2px', lineHeight: '1', fontSize: '1.4rem' }}>
                             ART VOID
                         </span>
-                        <span style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: 'bold', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                            Authentic Artistic Expression
-                        </span>
                     </div>
                 </Link>
 

@@ -21,13 +21,13 @@ const Home = () => {
             featured: true
         },
         {
-            title: "Oil Painting Series",
-            category: "Canvas • Impressionism",
-            description: "Vibrant oil on canvas works exploring the play of light and shadow in natural landscapes and abstract forms.",
-            tags: ["Oil Paint", "Canvas", "Portraiture", "Fine Art"],
+            title: "Calligraphy",
+            category: "Script • Traditional Art",
+            description: "Intricate calligraphic works exploring the beauty of letterforms and traditional ink techniques.",
+            tags: ["Calligraphy", "Inking", "Script", "Traditional"],
             link: "/gallery",
             github: "https://github.com/Aslam899-atk",
-            image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&w=800&q=80"
         },
         {
             title: "Custom Calligraphy",
@@ -42,8 +42,8 @@ const Home = () => {
 
     const skills = [
         { name: "Pencil Art", icons: [<Palette size={24} />], tech: ["Graphite", "Charcoal", "Hatching", "Realism"] },
-        { name: "Oil & Acrylics", icons: [<ImageIcon size={24} />], tech: ["Impressionism", "Glazing", "Palette Knife", "Canvas"] },
-        { name: "Calligraphy", icons: [<ArrowRight size={24} />], tech: ["Copperplate", "Italic", "Ornamental", "Inking"] },
+        { name: "Detailed Calligraphy", icons: [<ImageIcon size={24} />], tech: ["Copperplate", "Italic", "Inking", "Script"] },
+        { name: "Ink Art", icons: [<ArrowRight size={24} />], tech: ["Stippling", "Cross-hatching", "Inking", "Pen & Ink"] },
         { name: "Digital Art", icons: [<Code2 size={24} />], tech: ["Concept Art", "Illustrations", "Commissions", "Retouching"] }
     ];
 
@@ -70,10 +70,10 @@ const Home = () => {
                                     <span className="small fw-bold letter-spacing-2 opacity-75">OPEN FOR CUSTOM COMMISSIONS</span>
                                 </div>
                                 <h1 className="display-1 fw-bold mb-4 font-heading">
-                                    A Sanctuary for <span className="text-gradient">Authentic</span> Expression.
+                                    Our Creative <span className="text-gradient">Masterpieces</span>.
                                 </h1>
                                 <p className="lead text-muted mb-5 pe-lg-5" style={{ fontSize: '1.25rem', lineHeight: '1.8' }}>
-                                    Welcome to <span className="text-white fw-bold">ART VOID</span>, where we specialize in detailed pencil sketches, traditional oil paintings, and intricate calligraphy crafted with soul.
+                                    Welcome to <span className="text-white fw-bold">ART VOID</span>, where we specialize in detailed pencil sketches and intricate calligraphy crafted with soul.
                                 </p>
                                 <div className="d-flex flex-wrap gap-3">
                                     <Link to="/contact" className="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
@@ -227,7 +227,7 @@ const Home = () => {
             {/* FOOTER */}
             <footer className="py-5 border-top border-white border-opacity-5">
                 <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-muted small">
-                    <div>© {new Date().getFullYear()} ART VOID. Authentic Artistic Expression.</div>
+                    <div>© {new Date().getFullYear()} ART VOID.</div>
                     <div className="d-flex gap-4">
                         <Link to="/gallery" className="text-decoration-none hover-text-white transition-all">Projects</Link>
                         <Link to="/shop" className="text-decoration-none hover-text-white transition-all">Studio</Link>
