@@ -41,7 +41,7 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0">
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/">WORKS</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/">HOME</Link>
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/gallery">GALLERY</Link>
@@ -50,7 +50,7 @@ const Navbar = () => {
                             <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/shop">STORE</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/contact">HIRE</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/contact">CONTACT</Link>
                         </li>
 
                         <li className="nav-item d-none d-lg-block mx-1">
@@ -58,11 +58,25 @@ const Navbar = () => {
                         </li>
 
                         <li className="nav-item d-flex align-items-center gap-3">
-                            <a href="#" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
-                                RESUME
-                            </a>
-                            {isAdmin && (
-                                <Link to="/admin" className="text-white opacity-50 hover-opacity-100"><LayoutDashboard size={18} /></Link>
+                            {user ? (
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="dropdown">
+                                        <button className="btn p-0 border-0 d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+                                            <img src={user.avatar || '/icon.png'} className="rounded-circle border border-secondary border-opacity-25" style={{ width: '32px', height: '32px', objectFit: 'cover' }} alt="" />
+                                            <span className="small text-white fw-bold d-none d-sm-inline opacity-75">{user.username?.split(' ')[0]}</span>
+                                        </button>
+                                        <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end glass border-0 mt-2 p-2 shadow-2xl">
+                                            {isAdmin && (
+                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/admin"><LayoutDashboard size={14} /> Dashboard</Link></li>
+                                            )}
+                                            <li><button onClick={logoutUser} className="dropdown-item rounded-3 small fw-bold py-2 text-danger d-flex align-items-center gap-2"><LogIn size={14} style={{ transform: 'rotate(180deg)' }} /> Logout</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Link to="/contact" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
+                                    LOGIN
+                                </Link>
                             )}
                         </li>
                     </ul>
