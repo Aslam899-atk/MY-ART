@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Github, Linkedin, Mail, ExternalLink, Code2, Sparkles, Terminal, Database, Cpu, ChevronRight, Download } from 'lucide-react';
+import { ArrowRight, Mail, Sparkles, Terminal, ChevronRight, Palette, Image as ImageIcon, Code2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const [isLoaded, setIsLoaded] = useState(false);
-
     useEffect(() => {
-        setIsLoaded(true);
+        // isLoaded was unused, but if we want to trigger something on load we can keep it
+        // or just remove it if not needed. Removing for lint cleanliness.
     }, []);
 
     const projects = [
@@ -228,7 +227,7 @@ const Home = () => {
             {/* FOOTER */}
             <footer className="py-5 border-top border-white border-opacity-5">
                 <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-muted small">
-                    <div>© {new Date().getFullYear()} ASLAM TK. Digital Architect & Technical Artist.</div>
+                    <div>© {new Date().getFullYear()} ART VOID. Authentic Artistic Expression.</div>
                     <div className="d-flex gap-4">
                         <Link to="/gallery" className="text-decoration-none hover-text-white transition-all">Projects</Link>
                         <Link to="/shop" className="text-decoration-none hover-text-white transition-all">Studio</Link>

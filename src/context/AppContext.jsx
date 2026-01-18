@@ -27,7 +27,6 @@ export const AppProvider = ({ children }) => {
         return user ? [...(user.likedProducts || []), ...(user.likedGallery || [])] : [];
     }, [user]);
 
-
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const [isAdmin, setIsAdmin] = useState(() => {
         return localStorage.getItem('art_admin_active') === 'true';
@@ -92,7 +91,7 @@ export const AppProvider = ({ children }) => {
 
     const handleLikeAction = async (type, id) => {
         if (!user) {
-            const res = await loginWithGoogle();
+            await loginWithGoogle();
             return; // Supabase redirect happens here
         }
 
@@ -238,7 +237,6 @@ export const AppProvider = ({ children }) => {
                 await syncUserWithBackend(session.user);
             } else if (event === 'SIGNED_OUT') {
                 setUser(null);
-                setLikedIds([]);
                 localStorage.removeItem('art_user');
             }
         });
@@ -328,7 +326,6 @@ export const AppProvider = ({ children }) => {
             const userData = await res.json();
             setUser(userData);
             localStorage.setItem('art_user', JSON.stringify(userData));
-            setLikedIds([...(userData.likedProducts || []), ...(userData.likedGallery || [])]);
             return { success: true };
         } else {
             return { success: false, message: 'Invalid credentials' };
@@ -354,7 +351,6 @@ export const AppProvider = ({ children }) => {
     const logoutUser = async () => {
         await supabase.auth.signOut();
         setUser(null);
-        setLikedIds([]);
         setIsAdmin(false);
         localStorage.removeItem('art_user');
         localStorage.removeItem('art_admin_active');

@@ -6,7 +6,7 @@ import {
     Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X,
     CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
     Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
-    ChevronRight, Filter, ExternalLink, MoreVertical, Eye, Download,
+    ChevronRight, Filter, ExternalLink, MoreVertical, Eye,
     AlertCircle, TrendingUp, DollarSign, Clock, BarChart3
 } from 'lucide-react';
 
@@ -34,7 +34,6 @@ const Admin = () => {
     const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '' });
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
     const [newPass, setNewPass] = useState('');
     const [passUpdateStatus, setPassUpdateStatus] = useState('');
 
@@ -483,8 +482,8 @@ const Admin = () => {
                                                             value={o.status || 'Pending'}
                                                             onChange={(e) => o._isOrder && updateOrderStatus(o._id || o.id, e.target.value)}
                                                             className={`form-select form-select-sm border-0 rounded-pill px-3 py-1 fw-bold ${o.status === 'Completed' ? 'bg-success bg-opacity-10 text-success' :
-                                                                    o.status === 'Shipped' ? 'bg-info bg-opacity-10 text-info' :
-                                                                        'bg-warning bg-opacity-10 text-warning'
+                                                                o.status === 'Shipped' ? 'bg-info bg-opacity-10 text-info' :
+                                                                    'bg-warning bg-opacity-10 text-warning'
                                                                 }`}
                                                             style={{ width: 'auto', fontSize: '0.65rem' }}
                                                             disabled={o._isMessage}
