@@ -30,13 +30,13 @@ const Home = () => {
             image: "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&w=800&q=80"
         },
         {
-            title: "Custom Calligraphy",
-            category: "Script • Traditional",
-            description: "Handcrafted calligraphic pieces combining traditional techniques with contemporary design aesthetics.",
-            tags: ["Inking", "Handwriting", "Script", "Design"],
+            title: "Painting",
+            category: "Canvas • Traditional",
+            description: "Handcrafted paintings exploring diverse themes with vibrant colors and expressive techniques.",
+            tags: ["Oil Paint", "Acrylic", "Canvas", "Fine Art"],
             link: "/gallery",
             github: "https://github.com/Aslam899-atk",
-            image: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80"
         }
     ];
 
@@ -73,7 +73,7 @@ const Home = () => {
                                     Our Creative <span className="text-gradient">Masterpieces</span>.
                                 </h1>
                                 <p className="lead text-muted mb-5 pe-lg-5" style={{ fontSize: '1.25rem', lineHeight: '1.8' }}>
-                                    Welcome to <span className="text-white fw-bold">ART VOID</span>, where we specialize in detailed pencil sketches and intricate calligraphy crafted with soul.
+                                    Welcome to <span className="text-white fw-bold">ART VOID</span>, where we specialize in detailed pencil sketches and expressive paintings crafted with soul.
                                 </p>
                                 <div className="d-flex flex-wrap gap-3">
                                     <Link to="/contact" className="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
@@ -203,7 +203,7 @@ const Home = () => {
                         <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
                             <div className="col-lg-8">
                                 <h2 className="display-5 fw-bold mb-4">Commission your next <span className="text-gradient">Masterpiece</span>.</h2>
-                                <p className="lead text-muted mb-5">Whether it is a detailed portrait, a landscape, or custom calligraphy, we are dedicated to providing art that resonates with your soul.</p>
+                                <p className="lead text-muted mb-5">Whether it is a detailed portrait, a landscape, or a custom painting, we are dedicated to providing art that resonates with your soul.</p>
                                 <div className="d-flex flex-wrap gap-4">
                                     <Link to="/contact" className="btn btn-primary rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
                                         Send an Inquiry
