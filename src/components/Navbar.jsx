@@ -23,12 +23,13 @@ const Navbar = () => {
             }}>
             <div className="container-fluid p-0">
                 <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }}>
+                    <img src="/icon.png" alt="ART VOID" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
                     <div className="d-flex flex-column">
                         <span className="text-gradient" style={{ letterSpacing: '2px', lineHeight: '1', fontSize: '1.4rem' }}>
-                            ASLAM TK
+                            ART VOID
                         </span>
                         <span style={{ fontSize: '0.6rem', color: 'var(--primary)', fontWeight: 'bold', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                            Full-Stack Architect
+                            Authentic Artistic Expression
                         </span>
                     </div>
                 </Link>

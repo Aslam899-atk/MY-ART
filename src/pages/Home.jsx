@@ -12,40 +12,40 @@ const Home = () => {
 
     const projects = [
         {
-            title: "Art Void Studio",
-            category: "Full-Stack • Creative E-commerce",
-            description: "A premium art commerce platform featuring real-time curation, secure authentication via Supabase, and high-performance image delivery.",
-            tags: ["React", "Supabase", "Framer Motion", "Render"],
+            title: "Pencil Sketch Collection",
+            category: "Traditional Art • Realism",
+            description: "A deep dive into hyper-realistic portraits and architectural sketches using premium graphite and charcoal. Each piece captures intricate details and emotional depth on fine-grain paper.",
+            tags: ["Graphite", "Charcoal", "Realism", "Portraits"],
             link: "/gallery",
             github: "https://github.com/Aslam899-atk/MY-ART",
-            image: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&w=800&q=80",
+            image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80",
             featured: true
         },
         {
-            title: "Al-Bayan Library",
-            category: "Management System",
-            description: "Enterprise-grade library management system with advanced search indexing, member tracking, and automated fine calculation.",
-            tags: ["Node.js", "MongoDB", "Express", "Bootstrap"],
-            link: "#",
+            title: "Oil Painting Series",
+            category: "Canvas • Impressionism",
+            description: "Vibrant oil on canvas works exploring the play of light and shadow in natural landscapes and abstract forms.",
+            tags: ["Oil Paint", "Canvas", "Portraiture", "Fine Art"],
+            link: "/gallery",
             github: "https://github.com/Aslam899-atk",
-            image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80"
         },
         {
-            title: "Harmonic Music Hub",
-            category: "Streaming Application",
-            description: "Sleek music player with cloud synchronization, dynamic playlist generation, and reactive UI elements.",
-            tags: ["React", "Firebase", "Web Audio API"],
-            link: "#",
+            title: "Custom Calligraphy",
+            category: "Script • Traditional",
+            description: "Handcrafted calligraphic pieces combining traditional techniques with contemporary design aesthetics.",
+            tags: ["Inking", "Handwriting", "Script", "Design"],
+            link: "/gallery",
             github: "https://github.com/Aslam899-atk",
-            image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80"
+            image: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?auto=format&fit=crop&w=800&q=80"
         }
     ];
 
     const skills = [
-        { name: "Frontend", icons: [<Code2 size={24} />], tech: ["React", "Next.js", "Framer Motion", "Tailwind"] },
-        { name: "Backend", icons: [<Database size={24} />], tech: ["Node.js", "Express", "MongoDB", "Supabase"] },
-        { name: "DevOps", icons: [<Terminal size={24} />], tech: ["Git", "Vercel", "Render", "Firebase"] },
-        { name: "Hardware", icons: [<Cpu size={24} />], tech: ["Embedded C", "Arduino", "IoT Protocols"] }
+        { name: "Pencil Art", icons: [<Palette size={24} />], tech: ["Graphite", "Charcoal", "Hatching", "Realism"] },
+        { name: "Oil & Acrylics", icons: [<ImageIcon size={24} />], tech: ["Impressionism", "Glazing", "Palette Knife", "Canvas"] },
+        { name: "Calligraphy", icons: [<ArrowRight size={24} />], tech: ["Copperplate", "Italic", "Ornamental", "Inking"] },
+        { name: "Digital Art", icons: [<Code2 size={24} />], tech: ["Concept Art", "Illustrations", "Commissions", "Retouching"] }
     ];
 
     return (
@@ -68,21 +68,21 @@ const Home = () => {
                             >
                                 <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass mb-4 border-0">
                                     <Sparkles size={16} className="text-primary" />
-                                    <span className="small fw-bold letter-spacing-2 opacity-75">AVAILABLE FOR NEW PROJECTS</span>
+                                    <span className="small fw-bold letter-spacing-2 opacity-75">OPEN FOR CUSTOM COMMISSIONS</span>
                                 </div>
                                 <h1 className="display-1 fw-bold mb-4 font-heading">
-                                    Architecting <span className="text-gradient">Digital</span> Experiences.
+                                    A Sanctuary for <span className="text-gradient">Authentic</span> Expression.
                                 </h1>
                                 <p className="lead text-muted mb-5 pe-lg-5" style={{ fontSize: '1.25rem', lineHeight: '1.8' }}>
-                                    I am <span className="text-white fw-bold">Aslam TK</span>, a Full-Stack Developer specializing in high-performance web applications with a focus on immersive UI and creative technical solutions.
+                                    Welcome to <span className="text-white fw-bold">ART VOID</span>, where we specialize in detailed pencil sketches, traditional oil paintings, and intricate calligraphy crafted with soul.
                                 </p>
                                 <div className="d-flex flex-wrap gap-3">
                                     <Link to="/contact" className="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
-                                        Hire Me <ArrowRight size={20} className="ms-2" />
+                                        Commission Artwork <ArrowRight size={20} className="ms-2" />
                                     </Link>
-                                    <button className="btn glass btn-lg rounded-pill px-5 py-3 fw-bold border-0 text-white">
-                                        View Works
-                                    </button>
+                                    <Link to="/gallery" className="btn glass btn-lg rounded-pill px-5 py-3 fw-bold border-0 text-white">
+                                        Explore Gallery
+                                    </Link>
                                 </div>
                             </Motion.div>
                         </div>
@@ -93,26 +93,25 @@ const Home = () => {
                                 transition={{ duration: 1, delay: 0.2 }}
                                 className="position-relative"
                             >
-                                <div className="glass rounded-4 p-4 border-0 rotate-3 shadow-2xl overflow-hidden position-relative">
-                                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-br from-primary to-transparent opacity-10"></div>
-                                    <pre className="m-0 small text-primary opacity-75 font-code">
-                                        <code>{`const developer = {
-  name: 'Aslam TK',
-  role: 'Full Stack Architect',
-  skills: ['React', 'Node', 'Cloud'],
-  vision: 'Build clean, scalable art',
-  available: true
-};
-
-function buildMasterpiece(idea) {
-  return assemble(idea).polish();
-}`}</code>
-                                    </pre>
+                                <div className="glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden position-relative">
+                                    <img
+                                        src="/banner.png"
+                                        alt="ART VOID Masterpiece"
+                                        className="w-100 rounded-4 shadow-lg"
+                                        style={{ objectFit: 'cover', height: '400px' }}
+                                    />
+                                    <div className="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-to-t from-dark text-white">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <Sparkles size={14} className="text-primary" />
+                                            <span className="extra-small fw-bold text-uppercase tracking-widest">Featured Artwork</span>
+                                        </div>
+                                        <h5 className="fw-bold mb-0">The Creative Sanctuary</h5>
+                                    </div>
                                 </div>
                                 <div className="position-absolute -bottom-10 -start-10 glass p-3 rounded-4 border-0 -rotate-6 shadow-xl">
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bg-success rounded-circle" style={{ width: 12, height: 12 }}></div>
-                                        <span className="small fw-bold">99.9% Up-time Solutions</span>
+                                        <span className="small fw-bold">Accepting Orders Worldwide</span>
                                     </div>
                                 </div>
                             </Motion.div>
@@ -125,8 +124,8 @@ function buildMasterpiece(idea) {
             <section className="py-10 position-relative">
                 <div className="container">
                     <header className="mb-10">
-                        <div className="text-primary fw-bold small text-uppercase mb-2 tracking-widest">Case Studies</div>
-                        <h2 className="display-4 fw-bold mb-0">Featured <span className="text-gradient">Creations</span></h2>
+                        <div className="text-primary fw-bold small text-uppercase mb-2 tracking-widest">Masterpieces</div>
+                        <h2 className="display-4 fw-bold mb-0">Artistic <span className="text-gradient">Collections</span></h2>
                     </header>
 
                     <div className="row g-5">
@@ -155,12 +154,9 @@ function buildMasterpiece(idea) {
                                                     ))}
                                                 </div>
                                                 <div className="d-flex gap-4 align-items-center">
-                                                    <Link to={project.link} className="text-white text-decoration-none fw-bold hover-text-primary d-flex align-items-center gap-2">
-                                                        Live Demo <ExternalLink size={16} />
+                                                    <Link to="/gallery" className="text-white text-decoration-none fw-bold hover-text-primary d-flex align-items-center gap-2">
+                                                        View Items <ChevronRight size={16} />
                                                     </Link>
-                                                    <a href={project.github} target="_blank" className="text-muted text-decoration-none fw-bold hover-text-white d-flex align-items-center gap-2">
-                                                        Source <Github size={16} />
-                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -176,8 +172,8 @@ function buildMasterpiece(idea) {
             <section className="py-10 bg-white bg-opacity-5">
                 <div className="container text-center">
                     <header className="mb-10 mx-auto" style={{ maxWidth: '600px' }}>
-                        <h2 className="display-4 fw-bold mb-4">Technical <span className="text-gradient">Stack</span></h2>
-                        <p className="text-muted">A comprehensive toolkit optimized for modern web performance and creative flexibility.</p>
+                        <h2 className="display-4 fw-bold mb-4">Artistic <span className="text-gradient">Mediums</span></h2>
+                        <p className="text-muted">Specialized techniques honed to bring imagination to life on paper and canvas.</p>
                     </header>
 
                     <div className="row g-4">
@@ -207,16 +203,16 @@ function buildMasterpiece(idea) {
                     <div className="glass p-5 p-lg-10 rounded-5 border-0 position-relative overflow-hidden">
                         <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
                             <div className="col-lg-8">
-                                <h2 className="display-5 fw-bold mb-4">Let's build the next big thing <span className="text-gradient">together</span>.</h2>
-                                <p className="lead text-muted mb-5">Currently open to freelance opportunities and full-time positions where I can bridge the gap between engineering and art.</p>
+                                <h2 className="display-5 fw-bold mb-4">Commission your next <span className="text-gradient">Masterpiece</span>.</h2>
+                                <p className="lead text-muted mb-5">Whether it is a detailed portrait, a landscape, or custom calligraphy, we are dedicated to providing art that resonates with your soul.</p>
                                 <div className="d-flex flex-wrap gap-4">
-                                    <a href="mailto:aslamtk@example.com" className="btn btn-primary rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
-                                        Drop an Email
-                                    </a>
+                                    <Link to="/contact" className="btn btn-primary rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
+                                        Send an Inquiry
+                                    </Link>
                                     <div className="d-flex gap-3 align-items-center">
-                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Github size={24} /></a>
-                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Linkedin size={24} /></a>
-                                        <a href="#" className="text-white opacity-50 hover-opacity-100 transition-all"><Mail size={24} /></a>
+                                        <a href="https://t.me/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all"><Terminal size={24} /></a>
+                                        <a href="https://www.instagram.com/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all"><ImageIcon size={24} /></a>
+                                        <a href="mailto:aslamtk35@gmail.com" className="text-white opacity-50 hover-opacity-100 transition-all"><Mail size={24} /></a>
                                     </div>
                                 </div>
                             </div>
