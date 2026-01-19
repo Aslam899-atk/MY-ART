@@ -27,7 +27,7 @@ const Home = () => {
             tags: ["Calligraphy", "Inking", "Script", "Traditional"],
             link: "/gallery",
             github: "https://github.com/Aslam899-atk",
-            image: "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&w=800&q=80"
+            image: "https://i.pinimg.com/originals/5b/3b/25/5b3b257121b5268013241276741f5109.jpg"
         },
         {
             title: "Painting",

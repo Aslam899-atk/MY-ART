@@ -71,7 +71,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <Link to="/contact" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
+                                <Link to="/login" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
                                     LOGIN
                                 </Link>
                             )}

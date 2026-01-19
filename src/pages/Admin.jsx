@@ -13,7 +13,7 @@ import {
 const Admin = () => {
     const {
         products, addProduct, deleteProduct, updateProduct,
-        galleryItems, addGalleryItem, deleteGalleryItem,
+        galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem,
         messages, deleteMessage,
         orders, deleteOrder, updateOrderStatus,
         users, isAdmin, setIsAdmin, changePassword, verifyAdminPassword
@@ -23,6 +23,7 @@ const Admin = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('shop'); // 'shop' or 'gallery'
     const [editingProduct, setEditingProduct] = useState(null);
+    const [editingGalleryItem, setEditingGalleryItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Admin Login State
@@ -190,11 +191,17 @@ const Admin = () => {
                     await addProduct(productData);
                 }
             } else {
-                await addGalleryItem({
+                const galleryData = {
                     title: formData.name || 'Untitled Artwork',
                     url: imageUrl,
-                    type: imageFile?.type?.includes('video') ? 'video' : 'image'
-                });
+                    type: (imageFile?.type?.includes('video') || formData.image?.includes('.mp4')) ? 'video' : 'image'
+                };
+
+                if (editingGalleryItem) {
+                    await updateGalleryItem({ ...galleryData, id: editingGalleryItem.id || editingGalleryItem._id });
+                } else {
+                    await addGalleryItem(galleryData);
+                }
             }
 
             setIsModalOpen(false);
@@ -209,6 +216,7 @@ const Admin = () => {
 
     const resetForm = () => {
         setEditingProduct(null);
+        setEditingGalleryItem(null);
         setFormData({ name: '', price: '', image: '', description: '' });
         setImageFile(null);
     };
@@ -556,8 +564,14 @@ const Admin = () => {
                                         ) : (
                                             <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
                                         )}
-                                        <div className="position-absolute top-0 end-0 p-2 opacity-0 group-hover-opacity-100 transition-all">
-                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm btn-danger rounded-circle border-0 shadow"><Trash2 size={16} /></button>
+                                        <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 opacity-0 group-hover-opacity-100 transition-all">
+                                            <button onClick={() => {
+                                                setUploadType('gallery');
+                                                setEditingGalleryItem(item);
+                                                setFormData({ name: item.title, price: '', image: item.url, description: '' });
+                                                setIsModalOpen(true);
+                                            }} className="btn btn-sm btn-white rounded-circle shadow p-2"><Edit3 size={16} /></button>
+                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm btn-danger rounded-circle shadow p-2"><Trash2 size={16} /></button>
                                         </div>
                                     </div>
                                 </div>
@@ -695,7 +709,7 @@ const Admin = () => {
                     >
                         <div className="d-flex justify-content-between align-items-center mb-5">
                             <h2 className="h4 fw-bold mb-0">
-                                {uploadType === 'shop' ? (editingProduct ? 'Edit Inventory' : 'Add to Shop') : 'Gallery Upload'}
+                                {uploadType === 'shop' ? (editingProduct ? 'Edit Inventory' : 'Add to Shop') : (editingGalleryItem ? 'Edit Artwork' : 'Gallery Upload')}
                             </h2>
                             <button onClick={() => setIsModalOpen(false)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
                         </div>
@@ -780,7 +794,7 @@ const Admin = () => {
                                         <span>Transmitting Data...</span>
                                     </div>
                                 ) : (
-                                    editingProduct ? 'Commit Changes' : 'Initialize Resource'
+                                    (editingProduct || editingGalleryItem) ? 'Commit Changes' : 'Initialize Resource'
                                 )}
                             </button>
                         </form>

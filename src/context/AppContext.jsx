@@ -161,6 +161,19 @@ export const AppProvider = ({ children }) => {
         setGalleryItems((prev) => prev.filter((g) => (g._id || g.id) !== id));
     };
 
+    const updateGalleryItem = async (item) => {
+        const { id, ...rest } = item;
+        const res = await fetch(`${API_URL}/gallery/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(rest)
+        });
+        if (res.ok) {
+            const updated = await res.json();
+            setGalleryItems((prev) => prev.map((g) => ((g._id || g.id) === id ? updated : g)));
+        }
+    };
+
     const toggleGalleryLike = (id) => handleLikeAction('gallery', id);
 
     // ---------- Message CRUD ----------
@@ -220,13 +233,20 @@ export const AppProvider = ({ children }) => {
     useEffect(() => {
         // 1. Initial Session Check
         const checkInitialSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await syncUserWithBackend(session.user);
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) console.error("Supabase Session Error:", error);
+
+                if (session) {
+                    console.log("Supabase session found, syncing...");
+                    await syncUserWithBackend(session.user);
+                }
+            } catch (err) {
+                console.error("Initial Session Check Failed:", err);
+            } finally {
+                await fetchData();
+                setIsLoadingAuth(false);
             }
-            // After checking session AND fetching initial data, we are done loading
-            await fetchData();
-            setIsLoadingAuth(false);
         };
 
         checkInitialSession();
@@ -259,8 +279,12 @@ export const AppProvider = ({ children }) => {
 
             if (res.ok) {
                 const data = await res.json();
+                console.log("Backend sync successful:", data.username);
                 setUser(data);
                 localStorage.setItem('art_user', JSON.stringify(data));
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                console.error("Backend Sync Failed:", res.status, errorData);
             }
         } catch (e) {
             console.error("Backend Sync Error:", e);
@@ -368,7 +392,7 @@ export const AppProvider = ({ children }) => {
     return (
         <AppContext.Provider value={{
             products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
-            galleryItems, addGalleryItem, deleteGalleryItem, toggleGalleryLike,
+            galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike,
             messages, addMessage, deleteMessage,
             orders, addOrder, deleteOrder, updateOrderStatus,
             users,
