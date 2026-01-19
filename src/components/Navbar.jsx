@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, LogIn, LayoutDashboard, Palette } from 'lucide-react';
+import { ShoppingCart, LogIn, LayoutDashboard, Menu } from 'lucide-react';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
@@ -33,7 +33,7 @@ const Navbar = () => {
                 </Link>
 
                 <button className="navbar-toggler border-0 shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <div className="glass p-2 rounded-circle"><Palette size={18} /></div>
+                    <div className="glass p-2 rounded-circle"><Menu size={18} /></div>
                 </button>
 
                 <div className="collapse navbar-collapse" id="navbarNav">
