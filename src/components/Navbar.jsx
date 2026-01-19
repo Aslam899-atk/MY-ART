@@ -8,19 +8,7 @@ const Navbar = () => {
     const { isAdmin, user, logoutUser } = useContext(AppContext);
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark fixed-top mx-auto mt-3 px-3"
-            style={{
-                width: 'calc(100% - 4cm)',
-                borderRadius: '32px',
-                background: 'rgba(15, 23, 42, 0.75)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                padding: '0.4rem 1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                left: '50%',
-                transform: 'translateX(-50%)'
-            }}>
+        <nav className="navbar navbar-expand-lg navbar-dark fixed-top mx-auto mt-3 px-3 navbar-floating">
             <div className="container-fluid p-0">
                 <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }}>
                     <img src="/icon.png" alt="ART VOID" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
