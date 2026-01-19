@@ -147,13 +147,13 @@ const Contact = () => {
                                         onClick={() => setMsgType('inquiry')}
                                         className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'inquiry' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
                                     >
-                                        General Inquiry
+                                        Message
                                     </button>
                                     <button
                                         onClick={() => setMsgType('service')}
                                         className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'service' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
                                     >
-                                        Commission/Order
+                                        Order Request
                                     </button>
                                 </div>
 

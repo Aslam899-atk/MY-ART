@@ -7,7 +7,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-    origin: '*', // Allow all origins for now (or specify 'https://aslam899-atk.github.io')
+    origin: '*', // Allow all origins for now (or specify 'https://art-void.vercel.app')
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -164,6 +164,11 @@ app.post('/api/gallery', asyncHandler(async (req, res) => {
 app.delete('/api/gallery/:id', asyncHandler(async (req, res) => {
     await Gallery.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
+}));
+
+app.put('/api/gallery/:id', asyncHandler(async (req, res) => {
+    const updatedItem = await Gallery.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedItem);
 }));
 
 app.put('/api/gallery/:id/like', asyncHandler(async (req, res) => {
