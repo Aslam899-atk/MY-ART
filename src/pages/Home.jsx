@@ -168,7 +168,7 @@ const Home = () => {
             </section>
 
             {/* SKILLS MATRIX */}
-            <section className="py-10 bg-white bg-opacity-5">
+            <section className="py-10" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
                 <div className="container text-center">
                     <header className="mb-10 mx-auto" style={{ maxWidth: '600px' }}>
                         <h2 className="display-4 fw-bold mb-4">Artistic <span className="text-gradient">Mediums</span></h2>
