@@ -224,17 +224,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="py-5 border-top border-white border-opacity-5">
-                <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-muted small">
-                    <div>© {new Date().getFullYear()} ART VOID.</div>
-                    <div className="d-flex gap-4">
-                        <Link to="/gallery" className="text-decoration-none hover-text-white transition-all">Projects</Link>
-                        <Link to="/shop" className="text-decoration-none hover-text-white transition-all">Studio</Link>
-                        <Link to="/contact" className="text-decoration-none hover-text-white transition-all">Hire</Link>
-                    </div>
-                </div>
-            </footer>
+
         </div>
     );
 };

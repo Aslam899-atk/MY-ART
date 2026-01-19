@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider, AppContext } from './context/AppContext';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Gallery from './pages/Gallery';
@@ -73,9 +74,7 @@ function AppContent() {
 
         </Routes>
 
-        <footer style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', borderTop: '1px solid var(--glass-border)', marginTop: '4rem' }}>
-          &copy; 2024 ART VOID Studio. All rights reserved.
-        </footer>
+        <Footer />
       </div>
     </Router>
   );
