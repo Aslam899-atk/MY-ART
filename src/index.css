@@ -376,3 +376,8 @@ a {
     transform: none;
   }
 }
+
+.flex-md-row {
+  flex-direction: row !important;
+  margin-top: 75px;
+}
