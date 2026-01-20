@@ -8,19 +8,32 @@ const Footer = () => {
     if (location.pathname.startsWith('/admin')) return null;
 
     return (
-        <footer className="py-5 mt-auto border-top" style={{ borderColor: 'rgba(255,255,255,0.05)', backgroundColor: 'var(--bg-dark)' }}>
-            <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-muted small">
-                <div className="d-flex align-items-center gap-2">
-                    <span className="fw-bold text-white tracking-widest text-uppercase" style={{ fontSize: '0.8rem' }}>Art Void</span>
-                    <span className="opacity-50">© {new Date().getFullYear()}</span>
+        <footer className="site-footer">
+            <div className="footer-container">
+
+                <div className="footer-brand">
+                    <h2>ART VOID</h2>
+                    <p>Exploring digital art, minimal design and creative voids where imagination begins.</p>
                 </div>
 
-                <div className="d-flex gap-4">
-                    <Link to="/gallery" className="text-decoration-none hover-text-white transition-all">Gallery</Link>
-                    <Link to="/shop" className="text-decoration-none hover-text-white transition-all">Shop</Link>
-                    <Link to="/contact" className="text-decoration-none hover-text-white transition-all">Contact</Link>
-                    <Link to="/login" className="text-decoration-none hover-text-white transition-all">Login</Link>
+                <div className="footer-links">
+                    <h4>Navigate</h4>
+                    <Link to="/">Home</Link>
+                    <Link to="/gallery">Gallery</Link>
+                    <Link to="/shop">Shop</Link>
+                    <Link to="/contact">Contact</Link>
                 </div>
+
+                <div className="footer-social">
+                    <h4>Follow</h4>
+                    <a href="https://www.instagram.com/aslamtk35" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer">Telegram</a>
+                </div>
+
+            </div>
+
+            <div className="footer-bottom">
+                © {new Date().getFullYear()} ART VOID • Designed with passion
             </div>
         </footer>
     );
