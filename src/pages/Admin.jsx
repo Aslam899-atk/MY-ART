@@ -257,7 +257,7 @@ const Admin = () => {
         <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
 
             {/* Desktop Sidebar */}
-            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm" style={{ width: '280px', height: 'calc(100vh - 5rem)', zIndex: 1010, top: '5rem', overflowY: 'auto' }}>
+            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm" style={{ width: '280px', zIndex: 1010, top: '5rem' }}>
                 <div className="p-4 mb-4">
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
