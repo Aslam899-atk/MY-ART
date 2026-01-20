@@ -257,7 +257,7 @@ const Admin = () => {
         <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
 
             {/* Desktop Sidebar */}
-            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky" style={{ width: '280px', height: '100vh', zIndex: 100, top: '10rem', paddingTop: '2rem' }}>
+            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm" style={{ width: '280px', height: 'calc(100vh - 5rem)', zIndex: 1010, top: '5rem', overflowY: 'auto' }}>
                 <div className="p-4 mb-4" style={{ marginTop: '75px' }}>
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
@@ -321,10 +321,10 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '14rem', paddingBottom: '100px', marginTop: '75px' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '1rem', paddingBottom: '100px' }}>
 
                 {/* Header */}
-                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5">
+                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 sticky-top py-4 px-lg-0" style={{ top: '5rem', background: '#050505', zIndex: 1000 }}>
                     <div>
                         <h1 className="display-6 fw-bold mb-1">
                             {menuItems.find(m => m.id === activeTab)?.label}
