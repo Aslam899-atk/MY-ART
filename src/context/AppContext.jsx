@@ -58,6 +58,33 @@ export const AppProvider = ({ children }) => {
         }
     }, [API_URL]);
 
+    const syncUserWithBackend = useCallback(async (googleUser) => {
+        try {
+            const res = await fetch(`${API_URL}/users/google-auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: googleUser.email,
+                    name: googleUser.user_metadata?.full_name || googleUser.email.split('@')[0],
+                    googleId: googleUser.id,
+                    avatar: googleUser.user_metadata?.avatar_url
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Backend sync successful:", data.username);
+                setUser(data);
+                localStorage.setItem('art_user', JSON.stringify(data));
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                console.error("Backend Sync Failed:", res.status, errorData);
+            }
+        } catch (e) {
+            console.error("Backend Sync Error:", e);
+        }
+    }, [API_URL]);
+
     // ---------- Product CRUD ----------
     const addProduct = async (product) => {
         const res = await fetch(`${API_URL}/products`, {
@@ -264,32 +291,7 @@ export const AppProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, [fetchData, syncUserWithBackend]);
 
-    const syncUserWithBackend = useCallback(async (googleUser) => {
-        try {
-            const res = await fetch(`${API_URL}/users/google-auth`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: googleUser.email,
-                    name: googleUser.user_metadata?.full_name || googleUser.email.split('@')[0],
-                    googleId: googleUser.id,
-                    avatar: googleUser.user_metadata?.avatar_url
-                })
-            });
 
-            if (res.ok) {
-                const data = await res.json();
-                console.log("Backend sync successful:", data.username);
-                setUser(data);
-                localStorage.setItem('art_user', JSON.stringify(data));
-            } else {
-                const errorData = await res.json().catch(() => ({}));
-                console.error("Backend Sync Failed:", res.status, errorData);
-            }
-        } catch (e) {
-            console.error("Backend Sync Error:", e);
-        }
-    }, [API_URL]);
 
 
     // --- SETTINGS & AUTH ---
