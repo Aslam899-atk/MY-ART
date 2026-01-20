@@ -51,8 +51,7 @@ const Home = () => {
         <div className="portfolio-root bg-dark text-white overflow-hidden">
             {/* Background Glows */}
             <div className="position-fixed top-0 start-0 w-100 h-100 pointer-events-none" style={{ zIndex: 0 }}>
-                <div className="position-absolute top-10 start-10 bg-primary opacity-10 rounded-circle blur-3xl" style={{ width: '40vw', height: '40vw' }}></div>
-                <div className="position-absolute bottom-10 end-10 bg-accent opacity-5 rounded-circle blur-3xl" style={{ width: '30vw', height: '30vw' }}></div>
+                <div className="position-absolute bottom-10 end-10 bg-accent opacity-10 rounded-circle blur-3xl" style={{ width: '30vw', height: '30vw' }}></div>
             </div>
 
             {/* HERO SECTION */}
