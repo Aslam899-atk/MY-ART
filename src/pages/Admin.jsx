@@ -1,7 +1,7 @@
 import React, { useContext, useState, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X,
     CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
@@ -27,6 +27,7 @@ const Admin = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Admin Login State
+    const [_uploadProgress, setUploadProgress] = useState(0);
     const [adminLogin, setAdminLogin] = useState({ username: '', password: '' });
     const [adminAuthError, setAdminAuthError] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
@@ -72,7 +73,7 @@ const Admin = () => {
     if (!isAdmin) {
         return (
             <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a' }}>
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="glass p-5 rounded-5 shadow-lg w-100 border border-secondary border-opacity-10"
@@ -87,14 +88,14 @@ const Admin = () => {
                     </div>
 
                     {adminAuthError && (
-                        <motion.div
+                        <Motion.div
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             className="alert alert-danger py-2 small border-0 bg-danger bg-opacity-10 text-danger mb-4 text-center"
                         >
                             <AlertCircle size={14} className="me-2" />
                             {adminAuthError}
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     <form onSubmit={handleAdminLogin} className="d-flex flex-column gap-3">
@@ -128,7 +129,7 @@ const Admin = () => {
                             {isVerifying ? 'Authenticating...' : 'Access Dashboard'}
                         </button>
                     </form>
-                </motion.div>
+                </Motion.div>
             </div>
         );
     }
@@ -347,7 +348,7 @@ const Admin = () => {
                 {/* Dashboard Overview */}
                 <AnimatePresence mode="wait">
                     {activeTab === 'dashboard' && (
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
@@ -412,11 +413,11 @@ const Admin = () => {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'orders' && (
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="d-flex flex-column gap-4"
@@ -526,11 +527,11 @@ const Admin = () => {
                                     </tbody>
                                 </table>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'products' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                             <div className="row g-4">
                                 {products.map(p => (
                                     <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
@@ -560,11 +561,11 @@ const Admin = () => {
                                     </div>
                                 ))}
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'gallery' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
                             {galleryItems.map(item => (
                                 <div key={item._id || item.id} className="col-6 col-md-3">
                                     <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
@@ -585,11 +586,11 @@ const Admin = () => {
                                     </div>
                                 </div>
                             ))}
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'messages' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
                             {messages.filter(m => m.type !== 'service').map(m => (
                                 <div key={m._id || m.id} className="col-12">
                                     <div className="glass p-4 rounded-4 border-0">
@@ -621,11 +622,11 @@ const Admin = () => {
                                     </div>
                                 </div>
                             ))}
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'users' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
                             <table className="table table-dark table-hover align-middle">
                                 <thead>
                                     <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
@@ -670,11 +671,11 @@ const Admin = () => {
                                     ))}
                                 </tbody>
                             </table>
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {activeTab === 'settings' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
                             <div className="col-12 col-md-6">
                                 <section className="glass p-5 rounded-4 border-0 shadow-lg">
                                     <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
@@ -695,14 +696,14 @@ const Admin = () => {
                                         </div>
                                         <button type="submit" className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y">Update Credentials</button>
                                         {passUpdateStatus && (
-                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
+                                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
                                                 <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
-                                            </motion.div>
+                                            </Motion.div>
                                         )}
                                     </form>
                                 </section>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     )}
                 </AnimatePresence>
             </main>
@@ -710,7 +711,7 @@ const Admin = () => {
             {/* Modal - Common for Product and Gallery uploads */}
             {isModalOpen && (
                 <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1050 }}>
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         className="glass p-5 rounded-5 border border-secondary border-opacity-10 w-100 shadow-2xl"
@@ -781,7 +782,7 @@ const Admin = () => {
                                         </label>
 
                                         {formData.image && (
-                                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
+                                            <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
                                                 {imageFile?.type?.includes('video') ? (
                                                     <video src={formData.image} className="w-100 h-100 object-fit-cover" muted />
                                                 ) : (
@@ -790,7 +791,7 @@ const Admin = () => {
                                                 <div className="position-absolute top-0 end-0 m-2">
                                                     <button type="button" onClick={() => resetForm()} className="btn btn-sm btn-danger rounded-circle p-2 shadow-lg"><X size={14} /></button>
                                                 </div>
-                                            </motion.div>
+                                            </Motion.div>
                                         )}
                                     </div>
                                 </div>
@@ -807,7 +808,7 @@ const Admin = () => {
                                 )}
                             </button>
                         </form>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </div>

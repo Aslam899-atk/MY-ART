@@ -79,7 +79,7 @@ const Gallery = () => {
             {/* Gallery Grid */}
             <div className="row g-4">
                 <AnimatePresence mode="popLayout">
-                    {filteredItems.map((item, index) => (
+                    {filteredItems.map((item) => (
                         <div key={item._id || item.id} className="col-12 col-md-6 col-lg-4">
                             <Motion.div
                                 layout

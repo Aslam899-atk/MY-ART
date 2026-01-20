@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Mail, Sparkles, Terminal, ChevronRight, Palette, Image as ImageIcon, Code2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

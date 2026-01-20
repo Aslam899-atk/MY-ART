@@ -262,9 +262,9 @@ export const AppProvider = ({ children }) => {
         });
 
         return () => subscription.unsubscribe();
-    }, [fetchData]);
+    }, [fetchData, syncUserWithBackend]);
 
-    const syncUserWithBackend = async (googleUser) => {
+    const syncUserWithBackend = useCallback(async (googleUser) => {
         try {
             const res = await fetch(`${API_URL}/users/google-auth`, {
                 method: 'POST',
@@ -289,7 +289,7 @@ export const AppProvider = ({ children }) => {
         } catch (e) {
             console.error("Backend Sync Error:", e);
         }
-    };
+    }, [API_URL]);
 
 
     // --- SETTINGS & AUTH ---
