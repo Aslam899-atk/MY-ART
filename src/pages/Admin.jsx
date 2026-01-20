@@ -72,7 +72,7 @@ const Admin = () => {
 
     if (!isAdmin) {
         return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a' }}>
+            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '6rem' }}>
                 <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -321,7 +321,7 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingBottom: '100px !important' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '7.5rem', paddingBottom: '100px !important' }}>
 
                 {/* Header */}
                 <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 pt-lg-0 pt-4">

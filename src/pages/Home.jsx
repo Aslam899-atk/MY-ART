@@ -92,24 +92,39 @@ const Home = () => {
                                 transition={{ duration: 1, delay: 0.2 }}
                                 className="position-relative"
                             >
-                                <div className="glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden position-relative">
-                                    <img
-                                        src="/banner.png"
-                                        alt="ART VOID Masterpiece"
-                                        className="w-100 rounded-4 shadow-lg"
-                                        style={{ objectFit: 'cover', height: '400px' }}
-                                    />
-                                    <div className="position-absolute bottom-0 start-0 w-100 p-4 bg-gradient-to-t from-dark text-white">
-                                        <div className="d-flex align-items-center gap-2 mb-1">
-                                            <Sparkles size={14} className="text-primary" />
-                                            <span className="extra-small fw-bold text-uppercase tracking-widest">Featured Artwork</span>
-                                        </div>
-                                        <h5 className="fw-bold mb-0">The Creative Sanctuary</h5>
+                                <div id="heroCarousel" className="carousel slide carousel-fade" data-bs-ride="carousel">
+                                    <div className="carousel-inner glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden">
+                                        {projects.map((project, index) => (
+                                            <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`} data-bs-interval="3000">
+                                                <img
+                                                    src={project.image}
+                                                    className="d-block w-100 rounded-4"
+                                                    alt={project.title}
+                                                    style={{ objectFit: 'cover', height: '400px' }}
+                                                />
+                                                <div className="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
+                                                    <div className="d-flex align-items-center gap-2 mb-1 justify-content-center">
+                                                        <Sparkles size={14} className="text-primary" />
+                                                        <span className="extra-small fw-bold text-uppercase tracking-widest">Featured Collection</span>
+                                                    </div>
+                                                    <h5 className="fw-bold mb-0">{project.title}</h5>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
+                                    <button className="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span className="visually-hidden">Previous</span>
+                                    </button>
+                                    <button className="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span className="visually-hidden">Next</span>
+                                    </button>
                                 </div>
-                                <div className="position-absolute -bottom-10 -start-10 glass p-3 rounded-4 border-0 -rotate-6 shadow-xl">
+
+                                <div className="position-absolute -bottom-10 -start-10 glass p-3 rounded-4 border-0 -rotate-6 shadow-xl" style={{ zIndex: 10 }}>
                                     <div className="d-flex align-items-center gap-3">
-                                        <div className="bg-success rounded-circle" style={{ width: 12, height: 12 }}></div>
+                                        <div className="bg-success rounded-circle animate-pulse" style={{ width: 12, height: 12 }}></div>
                                         <span className="small fw-bold">Accepting Orders Worldwide</span>
                                     </div>
                                 </div>
@@ -180,7 +195,7 @@ const Home = () => {
                             <div key={idx} className="col-md-6 col-lg-3">
                                 <Motion.div
                                     whileHover={{ scale: 1.05 }}
-                                    className="glass p-5 rounded-4 h-100 border-0"
+                                    className="card glass p-5 rounded-4 h-100 border-0"
                                 >
                                     <div className="text-primary mb-4 d-flex justify-content-center">{skill.icons}</div>
                                     <h4 className="fw-bold mb-3">{skill.name}</h4>
@@ -192,6 +207,55 @@ const Home = () => {
                                 </Motion.div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ SECTION */}
+            <section className="py-10">
+                <div className="container">
+                    <header className="mb-8 text-center">
+                        <h2 className="display-4 fw-bold mb-4">Common <span className="text-gradient">Inquiries</span></h2>
+                        <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>Everything you need to know about our process, services, and handcrafted art.</p>
+                    </header>
+
+                    <div className="accordion accordion-flush glass p-2 rounded-5 border-0 overflow-hidden shadow-2xl mx-auto" id="faqAccordion" style={{ maxWidth: '800px' }}>
+                        <div className="accordion-item bg-transparent border-bottom border-secondary border-opacity-10">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed bg-transparent text-white fw-bold py-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    How do I request a custom commission?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div className="accordion-body text-white-50">
+                                    You can start by clicking the "Commission Artwork" button in the hero section or visit our Contact page. Provide details about the subject, size, and your preferred medium, and we'll get back to you with a quote.
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion-item bg-transparent border-bottom border-secondary border-opacity-10">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed bg-transparent text-white fw-bold py-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    What mediums do you specialize in?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div className="accordion-body text-white-50">
+                                    We specialize in detailed pencil sketches (graphite and charcoal), professional calligraphy, expressive paintings (oil and acrylic), and precise ink art.
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion-item bg-transparent border-0">
+                            <h2 className="accordion-header">
+                                <button className="accordion-button collapsed bg-transparent text-white fw-bold py-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                    Do you ship internationally?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div className="accordion-body text-white-50">
+                                    Yes, we ship our artworks worldwide. Each piece is safely packaged in protective tubes or boxes to ensure it reaches you in pristine condition, regardless of the distance.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
