@@ -44,6 +44,9 @@ const gallerySchema = new mongoose.Schema({
     title: String,
     url: String, // Cloudinary URL
     type: String, // 'image' or 'video'
+    category: String, // Added
+    medium: String,   // Added
+    description: String, // Added
     likes: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);

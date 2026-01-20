@@ -33,7 +33,7 @@ const Admin = () => {
     const [isVerifying, setIsVerifying] = useState(false);
 
     // Form Data
-    const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '' });
+    const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '', category: '', medium: '' });
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [newPass, setNewPass] = useState('');
@@ -204,7 +204,10 @@ const Admin = () => {
                 const galleryData = {
                     title: formData.name || 'Untitled Artwork',
                     url: imageUrl,
-                    type: itemType
+                    type: itemType,
+                    category: formData.category || 'Artwork',
+                    medium: formData.medium || 'Handcrafted',
+                    description: formData.description || ''
                 };
 
                 if (editingGalleryItem) {
@@ -227,7 +230,7 @@ const Admin = () => {
     const resetForm = () => {
         setEditingProduct(null);
         setEditingGalleryItem(null);
-        setFormData({ name: '', price: '', image: '', description: '' });
+        setFormData({ name: '', price: '', image: '', description: '', category: '', medium: '' });
         setImageFile(null);
     };
 
@@ -538,16 +541,20 @@ const Admin = () => {
                                         <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
                                             <div className="position-relative" style={{ height: '220px' }}>
                                                 <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
-                                                <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 translate-y-20 group-hover-translate-0 opacity-0 group-hover-opacity-100 transition-all">
+                                                <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
                                                     <button onClick={() => {
                                                         setUploadType('shop');
                                                         setEditingProduct(p);
-                                                        setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '' });
+                                                        setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '', category: '', medium: '' });
                                                         setIsModalOpen(true);
-                                                    }} className="btn btn-sm btn-white rounded-circle shadow p-2"><Edit3 size={16} /></button>
-                                                    <button onClick={() => deleteProduct(p._id || p.id)} className="btn btn-sm btn-danger rounded-circle shadow p-2"><Trash2 size={16} /></button>
+                                                    }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                                    <button onClick={() => {
+                                                        if (window.confirm(`Are you sure you want to delete "${p.name}"?`)) {
+                                                            deleteProduct(p._id || p.id);
+                                                        }
+                                                    }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
                                                 </div>
-                                                <div className="position-absolute bottom-0 start-0 p-3 w-100 bg-gradient-to-t">
+                                                <div className="position-absolute bottom-0 start-0 p-3 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
                                                     <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
                                                 </div>
                                             </div>
@@ -574,14 +581,25 @@ const Admin = () => {
                                         ) : (
                                             <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
                                         )}
-                                        <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 opacity-0 group-hover-opacity-100 transition-all">
+                                        <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 transition-all">
                                             <button onClick={() => {
                                                 setUploadType('gallery');
                                                 setEditingGalleryItem(item);
-                                                setFormData({ name: item.title, price: '', image: item.url, description: '' });
+                                                setFormData({
+                                                    name: item.title,
+                                                    price: '',
+                                                    image: item.url,
+                                                    description: item.description || '',
+                                                    category: item.category || 'Artwork',
+                                                    medium: item.medium || 'Handcrafted'
+                                                });
                                                 setIsModalOpen(true);
-                                            }} className="btn btn-sm btn-white rounded-circle shadow p-2"><Edit3 size={16} /></button>
-                                            <button onClick={() => deleteGalleryItem(item._id || item.id)} className="btn btn-sm btn-danger rounded-circle shadow p-2"><Trash2 size={16} /></button>
+                                            }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                            <button onClick={() => {
+                                                if (window.confirm(`Are you sure you want to delete this artwork?`)) {
+                                                    deleteGalleryItem(item._id || item.id);
+                                                }
+                                            }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
                                         </div>
                                     </div>
                                 </div>
@@ -739,6 +757,38 @@ const Admin = () => {
                                     />
                                 </div>
 
+                                {uploadType === 'gallery' && (
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-6">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Category</label>
+                                            <select
+                                                required
+                                                className="form-select bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                                value={formData.category}
+                                                onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                            >
+                                                <option value="">Select Category</option>
+                                                <option value="Pencil Art">Pencil Art</option>
+                                                <option value="Painting">Painting</option>
+                                                <option value="Ink Art">Ink Art</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-12 col-md-6">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Medium</label>
+                                            <input
+                                                required
+                                                placeholder="e.g. Graphite on Paper"
+                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                                value={formData.medium}
+                                                onChange={e => setFormData({ ...formData, medium: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
                                 {uploadType === 'shop' && (
                                     <>
                                         <div>
@@ -757,7 +807,7 @@ const Admin = () => {
                                         <div>
                                             <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Public Description</label>
                                             <textarea
-                                                required
+                                                required={uploadType === 'shop'}
                                                 rows="3"
                                                 placeholder="Artistic vision, materials, or context..."
                                                 className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
@@ -783,8 +833,8 @@ const Admin = () => {
 
                                         {formData.image && (
                                             <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
-                                                {imageFile?.type?.includes('video') ? (
-                                                    <video src={formData.image} className="w-100 h-100 object-fit-cover" muted />
+                                                {(imageFile?.type?.includes('video') || (editingGalleryItem?.type === 'video')) ? (
+                                                    <video src={formData.image} className="w-100 h-100 object-fit-cover" muted controls />
                                                 ) : (
                                                     <img src={formData.image} className="w-100 h-100 object-fit-cover" alt="" />
                                                 )}
