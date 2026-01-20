@@ -72,7 +72,7 @@ const Admin = () => {
 
     if (!isAdmin) {
         return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '10rem' }}>
+            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '12rem' }}>
                 <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -257,7 +257,7 @@ const Admin = () => {
         <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
 
             {/* Desktop Sidebar */}
-            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky" style={{ width: '280px', height: '100vh', zIndex: 100, top: '5rem', paddingTop: '4rem' }}>
+            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky" style={{ width: '280px', height: '100vh', zIndex: 100, top: '8rem', paddingTop: '2rem' }}>
                 <div className="p-4 mb-4">
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
@@ -321,10 +321,10 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '10rem', paddingBottom: '100px !important' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '12rem', paddingBottom: '100px !important' }}>
 
                 {/* Header */}
-                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 pt-lg-0 pt-4">
+                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5">
                     <div>
                         <h1 className="display-6 fw-bold mb-1">
                             {menuItems.find(m => m.id === activeTab)?.label}
