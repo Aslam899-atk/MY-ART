@@ -191,10 +191,19 @@ const Admin = () => {
                     await addProduct(productData);
                 }
             } else {
+                let itemType = 'image';
+                if (imageFile) {
+                    itemType = imageFile.type.includes('video') ? 'video' : 'image';
+                } else if (editingGalleryItem) {
+                    itemType = editingGalleryItem.type;
+                } else if (formData.image?.includes('.mp4')) {
+                    itemType = 'video';
+                }
+
                 const galleryData = {
                     title: formData.name || 'Untitled Artwork',
                     url: imageUrl,
-                    type: (imageFile?.type?.includes('video') || formData.image?.includes('.mp4')) ? 'video' : 'image'
+                    type: itemType
                 };
 
                 if (editingGalleryItem) {
