@@ -258,7 +258,7 @@ const Admin = () => {
 
             {/* Desktop Sidebar */}
             <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm" style={{ width: '280px', height: 'calc(100vh - 5rem)', zIndex: 1010, top: '5rem', overflowY: 'auto' }}>
-                <div className="p-4 mb-4" style={{ marginTop: '75px' }}>
+                <div className="p-4 mb-4">
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
                             <ImageIcon size={24} className="text-white" />
@@ -321,7 +321,7 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '1rem', paddingBottom: '100px' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '10rem', paddingBottom: '100px' }}>
 
                 {/* Header */}
                 <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 sticky-top py-4 px-lg-0" style={{ top: '5rem', background: '#050505', zIndex: 1000 }}>
