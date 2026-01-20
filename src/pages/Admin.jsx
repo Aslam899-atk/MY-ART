@@ -321,7 +321,7 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '14rem', paddingBottom: '100px' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '14rem', paddingBottom: '100px', marginTop: '75px' }}>
 
                 {/* Header */}
                 <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5">
