@@ -258,7 +258,7 @@ const Admin = () => {
 
             {/* Desktop Sidebar */}
             <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky" style={{ width: '280px', height: '100vh', zIndex: 100, top: '10rem', paddingTop: '2rem' }}>
-                <div className="p-4 mb-4">
+                <div className="p-4 mb-4" style={{ marginTop: '75px' }}>
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
                             <ImageIcon size={24} className="text-white" />
