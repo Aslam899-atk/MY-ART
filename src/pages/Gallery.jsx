@@ -96,11 +96,8 @@ const Gallery = () => {
                                         className="w-100 h-100 object-fit-cover"
                                         muted
                                         loop
-                                        onMouseOver={e => e.target.play()}
-                                        onMouseOut={e => {
-                                            e.target.pause();
-                                            e.target.currentTime = 0;
-                                        }}
+                                        autoPlay
+                                        playsInline
                                     />
                                 ) : (
                                     <LazyImage
@@ -144,7 +141,7 @@ const Gallery = () => {
                                 </div>
 
                                 {item.type === 'video' && (
-                                    <div className="position-absolute top-50 start-50 translate-middle pointer-events-none">
+                                    <div className="position-absolute top-50 start-50 translate-middle pointer-events-none group-hover-opacity-0 transition-all">
                                         <div className="glass rounded-circle p-3">
                                             <Play fill="white" className="text-white" size={24} />
                                         </div>

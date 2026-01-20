@@ -177,6 +177,10 @@ a {
   transform: scale(1.1);
 }
 
+.group:hover .group-hover-opacity-0 {
+  opacity: 0;
+}
+
 .duration-700 {
   transition-duration: 700ms;
 }
@@ -366,7 +370,7 @@ a {
     gap: 40px;
     text-align: center;
   }
-  
+
   .footer-links a:hover,
   .footer-social a:hover {
     transform: none;

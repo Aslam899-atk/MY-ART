@@ -577,7 +577,7 @@ const Admin = () => {
                                 <div key={item._id || item.id} className="col-6 col-md-3">
                                     <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
                                         {item.type === 'video' ? (
-                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop onMouseEnter={e => e.target.play()} onMouseLeave={e => e.target.pause()} />
+                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
                                         ) : (
                                             <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
                                         )}
@@ -834,7 +834,7 @@ const Admin = () => {
                                         {formData.image && (
                                             <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
                                                 {(imageFile?.type?.includes('video') || (editingGalleryItem?.type === 'video')) ? (
-                                                    <video src={formData.image} className="w-100 h-100 object-fit-cover" muted controls />
+                                                    <video src={formData.image} className="w-100 h-100 object-fit-cover" muted controls autoPlay loop playsInline />
                                                 ) : (
                                                     <img src={formData.image} className="w-100 h-100 object-fit-cover" alt="" />
                                                 )}
