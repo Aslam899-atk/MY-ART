@@ -33,7 +33,7 @@ const Gallery = () => {
     };
 
     return (
-        <div className="container" style={{ paddingTop: '14rem', paddingBottom: '6rem' }}>
+        <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
             {/* Header */}
             <header className="mb-5 text-center">
                 <Motion.div

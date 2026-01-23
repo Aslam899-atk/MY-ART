@@ -72,7 +72,7 @@ const Admin = () => {
 
     if (!isAdmin) {
         return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '16rem', paddingBottom: '2rem' }}>
+            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '14rem', paddingBottom: '2rem' }}>
                 <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
