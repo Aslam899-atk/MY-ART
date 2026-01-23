@@ -72,7 +72,7 @@ const Admin = () => {
 
     if (!isAdmin) {
         return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '16rem', paddingBottom: '2rem' }}>
+            <div className="min-vh-100 d-flex justify-content-center px-3" style={{ background: '#0a0a0a', paddingTop: '10rem', paddingBottom: '2rem' }}>
                 <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -257,7 +257,7 @@ const Admin = () => {
         <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
 
             {/* Desktop Sidebar */}
-            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm" style={{ width: '280px', zIndex: 1010, top: '10rem', overflow: 'visible' }}>
+            <aside className="d-none d-lg-flex flex-column glass border-0 border-end border-secondary border-opacity-10 position-sticky shadow-sm sidebar-hide-scrollbar" style={{ width: '280px', zIndex: 1010, top: '8rem', overflowY: 'auto', height: 'calc(100vh - 8rem)' }}>
                 <div className="p-4 mb-4">
                     <div className="d-flex align-items-center gap-3">
                         <div className="bg-primary rounded-3 p-2 shadow-lg shadow-primary-50">
@@ -321,10 +321,10 @@ const Admin = () => {
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '16rem', paddingBottom: '100px' }}>
+            <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '12rem', paddingBottom: '100px' }}>
 
                 {/* Header */}
-                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 sticky-top py-4 px-lg-0" style={{ top: '10rem', background: '#050505', zIndex: 1000 }}>
+                <header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 sticky-top py-4 px-4 px-lg-0" style={{ top: '8rem', background: 'rgba(5, 5, 5, 0.8)', backdropFilter: 'blur(10px)', zIndex: 1000 }}>
                     <div>
                         <h1 className="display-6 fw-bold mb-1">
                             {menuItems.find(m => m.id === activeTab)?.label}
@@ -464,7 +464,7 @@ const Admin = () => {
                                                 o.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                                 o.phone?.includes(searchQuery)
                                             )
-                                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                                            .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
                                             .map(o => (
                                                 <tr key={o._id || o.id} className="border-bottom border-secondary border-opacity-10">
                                                     <td className="py-4 px-4 border-0">

@@ -305,6 +305,15 @@ a {
   border-radius: 10px;
 }
 
+.sidebar-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar-hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Footer Styles */
 .site-footer {
   background-color: #050505;
