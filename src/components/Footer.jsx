@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Instagram, Send } from 'lucide-react';
 
 const Footer = () => {
     const location = useLocation();
@@ -33,8 +34,12 @@ const Footer = () => {
                             <h4 className="small fw-bold text-uppercase tracking-widest text-primary mb-4">Engagement</h4>
                             <p className="small text-muted mb-4 text-center text-md-start">Join our creative journey and stay updated with my latest works and experiments.</p>
                             <div className="d-flex gap-3 justify-content-center justify-content-md-start">
-                                <a href="https://www.instagram.com/aslamtk35" target="_blank" rel="noopener noreferrer" className="btn glass rounded-circle p-2 text-white border-0"><span className="small">IG</span></a>
-                                <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer" className="btn glass rounded-circle p-2 text-white border-0"><span className="small">TG</span></a>
+                                <a href="https://www.instagram.com/aslamtk35" target="_blank" rel="noopener noreferrer" className="btn glass rounded-circle p-2 text-white border-0" aria-label="Instagram">
+                                    <Instagram size={18} />
+                                </a>
+                                <a href="https://t.me/aslamtk35" target="_blank" rel="noopener noreferrer" className="btn glass rounded-circle p-2 text-white border-0" aria-label="Telegram">
+                                    <Send size={18} />
+                                </a>
                             </div>
                         </div>
                     </div>

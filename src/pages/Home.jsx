@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useMemo } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { ArrowRight, Mail, Sparkles, Terminal, ChevronRight, Palette, Image as ImageIcon, Code2 } from 'lucide-react';
+import { ArrowRight, Mail, Sparkles, Send, ChevronRight, Palette, Instagram, Code2, PenTool, Brush } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 
@@ -49,9 +49,9 @@ const Home = () => {
 
     const skills = [
         { name: "Pencil Drawing", icons: [<Palette size={24} />], tech: ["Graphite", "Charcoal", "Hatching", "Realism"] },
-        { name: "Calligraphy", icons: [<ImageIcon size={24} />], tech: ["Copperplate", "Italic", "Inking", "Script"] },
-        { name: "Painting", icons: [<ArrowRight size={24} />], tech: ["Oil Paint", "Acrylic", "Canvas", "Fine Art"] },
-        { name: "Other Mediums", icons: [<Code2 size={24} />], tech: ["Ink Art", "Digital Art", "Mixed Media", "Custom"] }
+        { name: "Calligraphy", icons: [<PenTool size={24} />], tech: ["Copperplate", "Italic", "Inking", "Script"] },
+        { name: "Painting", icons: [<Brush size={24} />], tech: ["Oil Paint", "Acrylic", "Canvas", "Fine Art"] },
+        { name: "Other Mediums", icons: [<Sparkles size={24} />], tech: ["Ink Art", "Digital Art", "Mixed Media", "Custom"] }
     ];
 
     return (
@@ -279,9 +279,9 @@ const Home = () => {
                                         Send an Inquiry
                                     </Link>
                                     <div className="d-flex gap-3 align-items-center">
-                                        <a href="https://t.me/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all"><Terminal size={24} /></a>
-                                        <a href="https://www.instagram.com/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all"><ImageIcon size={24} /></a>
-                                        <a href="mailto:aslamtk35@gmail.com" className="text-white opacity-50 hover-opacity-100 transition-all"><Mail size={24} /></a>
+                                        <a href="https://t.me/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Telegram"><Send size={24} /></a>
+                                        <a href="https://www.instagram.com/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Instagram"><Instagram size={24} /></a>
+                                        <a href="mailto:aslamtk35@gmail.com" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Email"><Mail size={24} /></a>
                                     </div>
                                 </div>
                             </div>
