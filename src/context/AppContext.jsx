@@ -119,54 +119,31 @@ export const AppProvider = ({ children }) => {
     const handleLikeAction = async (type, id) => {
         if (!user) {
             await loginWithGoogle();
-            return; // Supabase redirect happens here
+            return;
         }
 
-        const currentUser = user;
-        if (!currentUser) return;
+        const userId = user._id || user.id;
+        const endpoint = type === 'product' ? 'products' : 'gallery';
 
-        const isProduct = type === 'product';
-        const listKey = isProduct ? 'likedProducts' : 'likedGallery';
-        const currentList = currentUser[listKey] || [];
-        const isLiked = currentList.includes(id);
+        try {
+            const res = await fetch(`${API_URL}/${endpoint}/${id}/like`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            });
 
-        // 1. Update Item Count
-        const endpoint = isProduct ? 'products' : 'gallery';
-        await fetch(`${API_URL}/${endpoint}/${id}/like`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ increment: !isLiked })
-        });
-        // We optimistically updated UI? No, we wait for fetchData maybe.
-        // But let's proceed to update user immediately.
+            if (res.ok) {
+                const data = await res.json();
+                // Update local user state immediately
+                setUser(data.user);
+                localStorage.setItem('art_user', JSON.stringify(data.user));
 
-        // 2. Update User List
-        let newList;
-        if (isLiked) {
-            newList = currentList.filter(itemId => itemId !== id);
-        } else {
-            newList = [...currentList, id];
+                // Refresh data to show updated like counts
+                fetchData();
+            }
+        } catch (error) {
+            console.error("Like Action Error:", error);
         }
-
-        const userUpdateBody = {
-            [listKey]: newList
-        };
-
-        // Reuse the update user endpoint logic (we need to make sure we have one or adding it inline)
-        const userId = currentUser.id || currentUser._id;
-        const userRes = await fetch(`${API_URL}/users/${userId}/likes`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userUpdateBody)
-        });
-
-        if (userRes.ok) {
-            const updatedUser = await userRes.json();
-            setUser(updatedUser);
-            localStorage.setItem('art_user', JSON.stringify(updatedUser));
-        }
-
-        fetchData();
     };
 
     const toggleLike = (id) => handleLikeAction('product', id);

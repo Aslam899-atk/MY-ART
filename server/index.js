@@ -141,15 +141,28 @@ app.put('/api/products/:id', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
-    const { increment } = req.body;
-    const product = await Product.findById(req.params.id);
-    if (product) {
-        product.likes += increment ? 1 : -1;
-        await product.save();
-        res.json(product);
+    const { userId } = req.body;
+    const { id } = req.params;
+
+    const user = await User.findById(userId);
+    const product = await Product.findById(id);
+
+    if (!user || !product) return res.status(404).json({ error: 'User or Product not found' });
+
+    const isLiked = user.likedProducts.includes(id);
+
+    if (isLiked) {
+        // Unlike
+        user.likedProducts = user.likedProducts.filter(pId => pId !== id);
+        product.likes = Math.max(0, (product.likes || 0) - 1);
     } else {
-        res.status(404).json({ error: 'Not found' });
+        // Like
+        user.likedProducts.push(id);
+        product.likes = (product.likes || 0) + 1;
     }
+
+    await Promise.all([user.save(), product.save()]);
+    res.json({ user, item: product });
 }));
 
 // GALLERY
@@ -175,15 +188,28 @@ app.put('/api/gallery/:id', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/gallery/:id/like', asyncHandler(async (req, res) => {
-    const { increment } = req.body;
-    const item = await Gallery.findById(req.params.id);
-    if (item) {
-        item.likes += increment ? 1 : -1;
-        await item.save();
-        res.json(item);
+    const { userId } = req.body;
+    const { id } = req.params;
+
+    const user = await User.findById(userId);
+    const item = await Gallery.findById(id);
+
+    if (!user || !item) return res.status(404).json({ error: 'User or Artwork not found' });
+
+    const isLiked = user.likedGallery.includes(id);
+
+    if (isLiked) {
+        // Unlike
+        user.likedGallery = user.likedGallery.filter(gId => gId !== id);
+        item.likes = Math.max(0, (item.likes || 0) - 1);
     } else {
-        res.status(404).json({ error: 'Not found' });
+        // Like
+        user.likedGallery.push(id);
+        item.likes = (item.likes || 0) + 1;
     }
+
+    await Promise.all([user.save(), item.save()]);
+    res.json({ user, item });
 }));
 
 // MESSAGES

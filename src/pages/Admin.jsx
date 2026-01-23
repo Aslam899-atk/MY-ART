@@ -601,6 +601,15 @@ const Admin = () => {
                                                 }
                                             }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
                                         </div>
+                                        <div className="position-absolute bottom-0 start-0 p-2 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <span className="text-white-50 small truncate" style={{ maxWidth: '70%', fontSize: '0.65rem' }}>{item.title}</span>
+                                                <div className="d-flex align-items-center gap-1 text-danger" style={{ fontSize: '0.65rem' }}>
+                                                    <Heart size={10} fill="currentColor" />
+                                                    <span className="fw-bold text-white">{item.likes || 0}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
