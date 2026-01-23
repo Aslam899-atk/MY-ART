@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Mail, Sparkles, Terminal, ChevronRight, Palette, Image as ImageIcon, Code2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
 
 const Home = () => {
-    useEffect(() => {
-        // isLoaded was unused, but if we want to trigger something on load we can keep it
-        // or just remove it if not needed. Removing for lint cleanliness.
-    }, []);
+    const { galleryItems } = useContext(AppContext);
+
+    const featuredGallery = useMemo(() => {
+        return [...galleryItems]
+            .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+            .slice(0, 5);
+    }, [galleryItems]);
+
+
 
     const projects = [
+
         {
             title: "Pencil Sketch Collection",
             category: "Traditional Art • Realism",
@@ -41,10 +48,10 @@ const Home = () => {
     ];
 
     const skills = [
-        { name: "Pencil Art", icons: [<Palette size={24} />], tech: ["Graphite", "Charcoal", "Hatching", "Realism"] },
-        { name: "Detailed Calligraphy", icons: [<ImageIcon size={24} />], tech: ["Copperplate", "Italic", "Inking", "Script"] },
-        { name: "Ink Art", icons: [<ArrowRight size={24} />], tech: ["Stippling", "Cross-hatching", "Inking", "Pen & Ink"] },
-        { name: "Digital Art", icons: [<Code2 size={24} />], tech: ["Concept Art", "Illustrations", "Commissions", "Retouching"] }
+        { name: "Pencil Drawing", icons: [<Palette size={24} />], tech: ["Graphite", "Charcoal", "Hatching", "Realism"] },
+        { name: "Calligraphy", icons: [<ImageIcon size={24} />], tech: ["Copperplate", "Italic", "Inking", "Script"] },
+        { name: "Painting", icons: [<ArrowRight size={24} />], tech: ["Oil Paint", "Acrylic", "Canvas", "Fine Art"] },
+        { name: "Other Mediums", icons: [<Code2 size={24} />], tech: ["Ink Art", "Digital Art", "Mixed Media", "Custom"] }
     ];
 
     return (
@@ -93,12 +100,12 @@ const Home = () => {
                             >
                                 <div id="heroCarousel" className="carousel slide carousel-fade" data-bs-ride="carousel">
                                     <div className="carousel-inner glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden">
-                                        {projects.map((project, index) => (
+                                        {(featuredGallery.length > 0 ? featuredGallery : projects).map((item, index) => (
                                             <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`} data-bs-interval="3000">
                                                 <img
-                                                    src={project.image}
+                                                    src={item.url || item.image}
                                                     className="d-block w-100 rounded-4"
-                                                    alt={project.title}
+                                                    alt={item.title}
                                                     style={{ objectFit: 'cover', height: '400px' }}
                                                 />
                                                 <div className="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
@@ -106,7 +113,7 @@ const Home = () => {
                                                         <Sparkles size={14} className="text-primary" />
                                                         <span className="extra-small fw-bold text-uppercase tracking-widest">Featured Collection</span>
                                                     </div>
-                                                    <h5 className="fw-bold mb-0">{project.title}</h5>
+                                                    <h5 className="fw-bold mb-0">{item.title}</h5>
                                                 </div>
                                             </div>
                                         ))}

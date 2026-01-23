@@ -205,7 +205,7 @@ const Admin = () => {
                     title: formData.name || 'Untitled Artwork',
                     url: imageUrl,
                     type: itemType,
-                    category: formData.category || 'Artwork',
+                    category: formData.category || 'Other',
                     medium: formData.medium || 'Handcrafted',
                     description: formData.description || ''
                 };
@@ -590,7 +590,7 @@ const Admin = () => {
                                                     price: '',
                                                     image: item.url,
                                                     description: item.description || '',
-                                                    category: item.category || 'Artwork',
+                                                    category: item.category || 'Other',
                                                     medium: item.medium || 'Handcrafted'
                                                 });
                                                 setIsModalOpen(true);
@@ -768,10 +768,9 @@ const Admin = () => {
                                                 value={formData.category}
                                                 onChange={e => setFormData({ ...formData, category: e.target.value })}
                                             >
-                                                <option value="">Select Category</option>
-                                                <option value="Pencil Art">Pencil Art</option>
                                                 <option value="Painting">Painting</option>
-                                                <option value="Ink Art">Ink Art</option>
+                                                <option value="Pencil Drawing">Pencil Drawing</option>
+                                                <option value="Calligraphy">Calligraphy</option>
                                                 <option value="Other">Other</option>
                                             </select>
                                         </div>
