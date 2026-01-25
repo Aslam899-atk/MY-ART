@@ -6,7 +6,7 @@ import { AppContext } from '../context/AppContext';
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
     if (!item) return null;
 
-    const { addGalleryComment, user } = useContext(AppContext);
+    const { addGalleryComment, user, users } = useContext(AppContext);
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -143,10 +143,10 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                 <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{item.title || 'Untitled Masterpiece'}</h2>
                                 <div className="d-flex align-items-center gap-3 text-muted small mb-4 pb-4 border-bottom border-white border-opacity-10">
                                     <div className="d-flex align-items-center gap-1">
-                                        <User size={14} /> <span>By Aslam</span>
+                                        <User size={14} /> <span>By {users?.find(u => (u._id || u.id) === item.creatorId)?.username || 'Admin'}</span>
                                     </div>
                                     <div className="d-flex align-items-center gap-1">
-                                        <Calendar size={14} /> <span>Jan 2024</span>
+                                        <Calendar size={14} /> <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently'}</span>
                                     </div>
                                 </div>
                             </motion.div>
