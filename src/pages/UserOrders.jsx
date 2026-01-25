@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import { ShoppingBag, Clock, CheckCircle, AlertCircle, Phone } from 'lucide-react';
 
 const UserOrders = () => {
-    const { orders, user } = useContext(AppContext);
+    const { orders, user, users } = useContext(AppContext);
 
     const myOrders = orders.filter(o => o.customerId === (user?._id || user?.id));
 
@@ -22,7 +22,10 @@ const UserOrders = () => {
                                 <img src={order.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
                                 <div className="flex-grow-1">
                                     <div className="d-flex justify-content-between align-items-start">
-                                        <h4 className="fw-bold mb-1">{order.productName}</h4>
+                                        <div>
+                                            <h4 className="fw-bold mb-0">{order.productName}</h4>
+                                            <div className="extra-small text-primary fw-bold mb-2">Artist: {users.find(u => u._id === order.creatorId)?.username || 'Admin'}</div>
+                                        </div>
                                         <span className={`badge rounded-pill ${order.status === 'Approved' ? 'bg-success' : 'bg-warning'} px-3 py-1 small`}>
                                             {order.status}
                                         </span>

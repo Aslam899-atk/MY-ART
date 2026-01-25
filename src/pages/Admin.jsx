@@ -476,8 +476,13 @@ const Admin = () => {
                                         {orders.map(o => (
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
                                                 <td className="py-4 px-4 border-0 small">
-                                                    <div className="fw-bold text-white">{o.productName}</div>
-                                                    <div className="extra-small opacity-50">{o.date}</div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <img src={o.image} className="rounded-2 shadow-sm" style={{ width: '40px', height: '40px', objectFit: 'cover' }} alt="" />
+                                                        <div>
+                                                            <div className="fw-bold text-white">{o.productName}</div>
+                                                            <div className="extra-small opacity-50">{o.date}</div>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="py-4 px-4 border-0 small">
                                                     {users.find(u => u._id === o.creatorId)?.username || 'Admin'}
