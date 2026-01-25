@@ -92,7 +92,7 @@ const Shop = () => {
                                     src={product.image}
                                     alt={product.name}
                                     className="w-100 h-100 transition-all hover-zoom"
-                                    onClick={() => setSelectedProduct(product)}
+                                    onClick={() => { setSelectedProduct(product); setShowOrderForm(true); }}
                                     style={{ objectFit: 'cover', cursor: 'pointer' }}
                                 />
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
@@ -117,7 +117,7 @@ const Shop = () => {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => setSelectedProduct(product)}
+                                    onClick={() => { setSelectedProduct(product); setShowOrderForm(true); }}
                                     className="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-3 border-0 mt-auto"
                                 >
                                     <ShoppingBag size={18} /> Order Now
@@ -128,26 +128,7 @@ const Shop = () => {
                 ))}
             </div>
 
-            {/* Premium Product Preview */}
-            <ItemPreview
-                item={selectedProduct}
-                isOpen={!!selectedProduct && !showOrderForm && !showInquiryForm}
-                onClose={() => setSelectedProduct(null)}
-                isLiked={selectedProduct && likedIds.includes(selectedProduct._id || selectedProduct.id)}
-                toggleLike={() => toggleLike(selectedProduct?._id || selectedProduct?.id)}
-                onOrder={() => setShowOrderForm(true)}
-                onInquire={() => setShowInquiryForm(true)}
-                onNext={() => {
-                    const currentIndex = filteredProducts.findIndex(p => (p._id || p.id) === (selectedProduct?._id || selectedProduct?.id));
-                    const nextIndex = (currentIndex + 1) % filteredProducts.length;
-                    setSelectedProduct(filteredProducts[nextIndex]);
-                }}
-                onPrev={() => {
-                    const currentIndex = filteredProducts.findIndex(p => (p._id || p.id) === (selectedProduct?._id || selectedProduct?.id));
-                    const prevIndex = (currentIndex - 1 + filteredProducts.length) % filteredProducts.length;
-                    setSelectedProduct(filteredProducts[prevIndex]);
-                }}
-            />
+            {/* Removed ItemPreview from Shop to go direct-to-order as requested */}
 
             <AnimatePresence>
                 {selectedProduct && showOrderForm && (
