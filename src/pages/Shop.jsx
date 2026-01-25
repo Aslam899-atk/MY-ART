@@ -6,7 +6,7 @@ import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search }
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
-    const { products, addOrder, toggleLike, likedIds } = useContext(AppContext);
+    const { products, addOrder, toggleLike, likedIds, user } = useContext(AppContext);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showOrderForm, setShowOrderForm] = useState(false);
     const [orderForm, setOrderForm] = useState({ name: '', phone: '', email: '', address: '' });

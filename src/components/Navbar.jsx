@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, LogIn, LayoutDashboard, Menu } from 'lucide-react';
+import { ShoppingCart, LogIn, LayoutDashboard, Menu, ShoppingBag } from 'lucide-react';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
