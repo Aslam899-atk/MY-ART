@@ -4,12 +4,16 @@ import { AppProvider, AppContext } from './context/AppContext';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import LoginPopup from './components/LoginPopup';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
+import RequestAccess from './pages/RequestAccess';
+import Dashboard from './pages/Dashboard';
+import UserOrders from './pages/UserOrders';
 import SupabaseHelp from './pages/SupabaseHelp';
 
 
@@ -62,6 +66,7 @@ function AppContent() {
   return (
     <Router>
       <div className="app">
+        <LoginPopup />
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -71,6 +76,9 @@ function AppContent() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/request-access" element={<RequestAccess />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/orders" element={<UserOrders />} />
 
         </Routes>
 

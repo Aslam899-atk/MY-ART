@@ -3,9 +3,11 @@ import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Mail, Sparkles, Send, ChevronRight, Palette, Instagram, Code2, PenTool, Brush } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import ItemPreview from '../components/ItemPreview';
 
 const Home = () => {
-    const { galleryItems } = useContext(AppContext);
+    const { galleryItems, toggleGalleryLike, likedIds } = useContext(AppContext);
+    const [selectedItem, setSelectedItem] = React.useState(null);
 
     const featuredGallery = useMemo(() => {
         return [...galleryItems]
@@ -101,7 +103,13 @@ const Home = () => {
                                 <div id="heroCarousel" className="carousel slide carousel-fade" data-bs-ride="carousel">
                                     <div className="carousel-inner glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden">
                                         {(featuredGallery.length > 0 ? featuredGallery : projects).map((item, index) => (
-                                            <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`} data-bs-interval="3000">
+                                            <div
+                                                key={index}
+                                                className={`carousel-item ${index === 0 ? 'active' : ''}`}
+                                                data-bs-interval="3000"
+                                                onClick={() => setSelectedItem(item)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
                                                 <img
                                                     src={item.url || item.image}
                                                     className="d-block w-100 rounded-4"
@@ -295,6 +303,26 @@ const Home = () => {
             </section>
 
 
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={selectedItem}
+                isOpen={!!selectedItem}
+                onClose={() => setSelectedItem(null)}
+                isLiked={selectedItem && likedIds.includes(selectedItem._id || selectedItem.id)}
+                toggleLike={() => toggleGalleryLike(selectedItem?._id || selectedItem?.id)}
+                onNext={() => {
+                    const items = featuredGallery.length > 0 ? featuredGallery : projects;
+                    const currentIndex = items.findIndex(i => (i._id || i.id || i.title) === (selectedItem?._id || selectedItem?.id || selectedItem?.title));
+                    const nextIndex = (currentIndex + 1) % items.length;
+                    setSelectedItem(items[nextIndex]);
+                }}
+                onPrev={() => {
+                    const items = featuredGallery.length > 0 ? featuredGallery : projects;
+                    const currentIndex = items.findIndex(i => (i._id || i.id || i.title) === (selectedItem?._id || selectedItem?.id || selectedItem?.title));
+                    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+                    setSelectedItem(items[prevIndex]);
+                }}
+            />
         </div>
     );
 };

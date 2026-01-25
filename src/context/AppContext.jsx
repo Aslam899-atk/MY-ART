@@ -40,9 +40,12 @@ export const AppProvider = ({ children }) => {
     // --- FETCH DATA ---
     const fetchData = useCallback(async () => {
         try {
+            const canSeeAll = isAdmin || (user && user.role === 'emblos');
+            const query = canSeeAll ? '?all=true' : '';
+
             const [prodRes, galRes, msgRes, ordRes, usersRes] = await Promise.all([
-                fetch(`${API_URL}/products`),
-                fetch(`${API_URL}/gallery`),
+                fetch(`${API_URL}/products${query}`),
+                fetch(`${API_URL}/gallery${query}`),
                 fetch(`${API_URL}/messages`),
                 fetch(`${API_URL}/orders`),
                 fetch(`${API_URL}/users`)
@@ -56,7 +59,7 @@ export const AppProvider = ({ children }) => {
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-    }, [API_URL]);
+    }, [API_URL, isAdmin, user]);
 
     const syncUserWithBackend = useCallback(async (googleUser) => {
         try {
@@ -85,12 +88,66 @@ export const AppProvider = ({ children }) => {
         }
     }, [API_URL]);
 
+    // --- EMBLOS ACTIONS ---
+    const requestEmblosAccess = async (data) => {
+        if (!user) return;
+        const res = await fetch(`${API_URL}/users/${user._id || user.id}/request-emblos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) {
+            const updatedUser = await res.json();
+            setUser(updatedUser);
+            localStorage.setItem('art_user', JSON.stringify(updatedUser));
+            fetchData();
+        }
+    };
+
+    const updateEmblosStatus = async (userId, data) => {
+        const res = await fetch(`${API_URL}/users/${userId}/emblos-status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) {
+            fetchData();
+        }
+    };
+
+    // --- ORDER ACTIONS ---
+    const submitOrderPrice = async (orderId, price) => {
+        const res = await fetch(`${API_URL}/orders/${orderId}/price`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ price })
+        });
+        if (res.ok) fetchData();
+    };
+
+    const approveOrderPrice = async (orderId) => {
+        const res = await fetch(`${API_URL}/orders/${orderId}/approve-price`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (res.ok) fetchData();
+    };
+
+    const sendInternalMessage = async (data) => {
+        const res = await fetch(`${API_URL}/messages/internal`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) fetchData();
+    };
+
     // ---------- Product CRUD ----------
     const addProduct = async (product) => {
         const res = await fetch(`${API_URL}/products`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(product)
+            body: JSON.stringify({ ...product, creatorId: user?._id || user?.id })
         });
         if (res.ok) {
             const newProd = await res.json();
@@ -152,7 +209,7 @@ export const AppProvider = ({ children }) => {
         const res = await fetch(`${API_URL}/gallery`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(item)
+            body: JSON.stringify({ ...item, creatorId: user?._id || user?.id })
         });
         if (res.ok) {
             const newItem = await res.json();
@@ -203,7 +260,13 @@ export const AppProvider = ({ children }) => {
         const res = await fetch(`${API_URL}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(order)
+            body: JSON.stringify({
+                ...order,
+                customerId: user?._id || user?.id,
+                customer: user?.username,
+                email: user?.email,
+                status: 'Pending Price' // Default for new orders
+            })
         });
         if (res.ok) {
             const newOrder = await res.json();
@@ -372,9 +435,9 @@ export const AppProvider = ({ children }) => {
         <AppContext.Provider value={{
             products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
             galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike,
-            messages, addMessage, deleteMessage,
-            orders, addOrder, deleteOrder, updateOrderStatus,
-            users,
+            messages, addMessage, deleteMessage, sendInternalMessage,
+            orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice,
+            users, requestEmblosAccess, updateEmblosStatus,
             isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth,
             user, loginUser, registerUser, logoutUser

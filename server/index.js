@@ -35,6 +35,8 @@ const productSchema = new mongoose.Schema({
     image: String, // Cloudinary URL
     description: String,
     likes: { type: Number, default: 0 },
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    status: { type: String, default: 'pending' }, // 'pending', 'active', 'frozen'
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
 const Product = mongoose.model('Product', productSchema);
@@ -44,10 +46,12 @@ const gallerySchema = new mongoose.Schema({
     title: String,
     url: String, // Cloudinary URL
     type: String, // 'image' or 'video'
-    category: String, // Added
-    medium: String,   // Added
-    description: String, // Added
+    category: String,
+    medium: String,
+    description: String,
     likes: { type: Number, default: 0 },
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    status: { type: String, default: 'pending' }, // 'pending', 'active', 'frozen'
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
 const Gallery = mongoose.model('Gallery', gallerySchema);
@@ -60,7 +64,10 @@ const messageSchema = new mongoose.Schema({
     address: String,
     message: String,
     image: String, // Base64 or URL
-    type: { type: String, default: 'inquiry' }, // 'inquiry' or 'service'
+    type: { type: String, default: 'inquiry' }, // 'inquiry', 'service', 'internal'
+    senderId: String,
+    receiverId: String,
+    isInternal: { type: Boolean, default: false },
     date: String,
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
@@ -69,15 +76,18 @@ const Message = mongoose.model('Message', messageSchema);
 // 4. Orders
 const orderSchema = new mongoose.Schema({
     productName: String,
+    productId: String,
     price: Number,
-    image: String, // Product Image URL
+    priceGiven: { type: Boolean, default: false },
     customer: String,
+    customerId: String,
+    creatorId: String, // Emblos ID
     phone: String,
     email: String,
     address: String,
-    notes: String, // Added for custom requests
-    type: { type: String, default: 'product' }, // 'product' or 'service'
-    status: { type: String, default: 'Pending' },
+    notes: String,
+    type: { type: String, default: 'product' },
+    status: { type: String, default: 'Pending Price' }, // 'Pending Price', 'Price Submitted', 'Approved', 'Cancelled'
     date: String,
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
@@ -94,12 +104,22 @@ const Setting = mongoose.model('Setting', settingSchema);
 // 6. User (For Likes & Accounts)
 const userSchema = new mongoose.Schema({
     username: String,
-    email: { type: String, unique: true, sparse: true }, // Added for Google Auth
-    password: String, // In real app, hash this!
+    email: { type: String, unique: true, sparse: true },
+    password: String,
+    phone: String,
+    role: { type: String, default: 'user' }, // 'user', 'emblos'
+    isFrozen: { type: Boolean, default: false },
     likedProducts: [String],
     likedGallery: [String],
-    googleId: String, // Store the Supabase/Google ID
-    avatar: String, // Added for profile pic
+    googleId: String,
+    avatar: String,
+    emblosAccess: {
+        status: { type: String, default: 'none' }, // 'none', 'pending', 'active'
+        plan: String, // '1', '3', '6'
+        message: String,
+        startDate: Date,
+        endDate: Date
+    },
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
 const User = mongoose.model('User', userSchema);
@@ -120,12 +140,26 @@ app.get('/api/users', asyncHandler(async (req, res) => {
 
 // ACTIONS
 app.get('/api/products', asyncHandler(async (req, res) => {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const filter = req.query.all === 'true' ? {} : { status: 'active' };
+    const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
 }));
 
 app.post('/api/products', asyncHandler(async (req, res) => {
-    const newProduct = new Product(req.body);
+    const { creatorId } = req.body;
+    let initialStatus = 'pending';
+
+    if (creatorId) {
+        const user = await User.findById(creatorId);
+        if (user && user.role === 'emblos' && !user.isFrozen) {
+            initialStatus = 'active';
+        }
+    }
+
+    const newProduct = new Product({
+        ...req.body,
+        status: initialStatus
+    });
     await newProduct.save();
     res.json(newProduct);
 }));
@@ -167,12 +201,26 @@ app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
 
 // GALLERY
 app.get('/api/gallery', asyncHandler(async (req, res) => {
-    const items = await Gallery.find().sort({ createdAt: -1 });
+    const filter = req.query.all === 'true' ? {} : { status: 'active' };
+    const items = await Gallery.find(filter).sort({ createdAt: -1 });
     res.json(items);
 }));
 
 app.post('/api/gallery', asyncHandler(async (req, res) => {
-    const newItem = new Gallery(req.body);
+    const { creatorId } = req.body;
+    let initialStatus = 'pending';
+
+    if (creatorId) {
+        const user = await User.findById(creatorId);
+        if (user && user.role === 'emblos' && !user.isFrozen) {
+            initialStatus = 'active';
+        }
+    }
+
+    const newItem = new Gallery({
+        ...req.body,
+        status: initialStatus
+    });
     await newItem.save();
     res.json(newItem);
 }));
@@ -230,6 +278,93 @@ app.post('/api/messages', asyncHandler(async (req, res) => {
 app.delete('/api/messages/:id', asyncHandler(async (req, res) => {
     await Message.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
+}));
+
+// --- EMBLOS ACCESS ROUTES ---
+app.post('/api/users/:id/request-emblos', asyncHandler(async (req, res) => {
+    const { plan, message, phone } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.phone = phone;
+    user.emblosAccess = {
+        status: 'pending',
+        plan,
+        message,
+        startDate: null,
+        endDate: null
+    };
+    await user.save();
+    res.json(user);
+}));
+
+app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
+    const { status, plan, months, password } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (status === 'active') {
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + parseInt(months || plan || 1));
+
+        user.emblosAccess.status = 'active';
+        user.emblosAccess.startDate = startDate;
+        user.emblosAccess.endDate = endDate;
+        user.role = 'emblos';
+        user.isFrozen = false;
+
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+    } else if (status === 'frozen') {
+        user.isFrozen = true;
+    } else if (status === 'unfreeze') {
+        user.isFrozen = false;
+    } else {
+        user.emblosAccess.status = status;
+    }
+
+    await user.save();
+
+    // Update all their items status based on frozen state
+    const itemStatus = user.isFrozen ? 'frozen' : 'active';
+    await Promise.all([
+        Product.updateMany({ creatorId: user._id }, { status: itemStatus }),
+        Gallery.updateMany({ creatorId: user._id }, { status: itemStatus })
+    ]);
+
+    res.json(user);
+}));
+
+// --- ORDER PRICE ROUTES ---
+app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
+    const { price } = req.body;
+    const order = await Order.findByIdAndUpdate(req.params.id, {
+        price,
+        priceGiven: true,
+        status: 'Price Submitted'
+    }, { new: true });
+    res.json(order);
+}));
+
+app.put('/api/orders/:id/approve-price', asyncHandler(async (req, res) => {
+    const order = await Order.findByIdAndUpdate(req.params.id, {
+        status: 'Approved'
+    }, { new: true });
+    res.json(order);
+}));
+
+// --- INTERNAL MESSAGING ---
+app.post('/api/messages/internal', asyncHandler(async (req, res) => {
+    const newMsg = new Message({
+        ...req.body,
+        isInternal: true,
+        type: 'internal',
+        date: new Date().toLocaleDateString()
+    });
+    await newMsg.save();
+    res.json(newMsg);
 }));
 
 // ORDERS

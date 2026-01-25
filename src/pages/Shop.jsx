@@ -1,12 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
+import ItemPreview from '../components/ItemPreview';
 import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
     const { products, addOrder, toggleLike, likedIds } = useContext(AppContext);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [showOrderForm, setShowOrderForm] = useState(false);
     const [orderForm, setOrderForm] = useState({ name: '', phone: '', email: '', address: '' });
     const [isSuccess, setIsSuccess] = useState(false);
 
@@ -86,7 +88,8 @@ const Shop = () => {
                                     src={product.image}
                                     alt={product.name}
                                     className="w-100 h-100 transition-all hover-zoom"
-                                    style={{ objectFit: 'cover' }}
+                                    onClick={() => setSelectedProduct(product)}
+                                    style={{ objectFit: 'cover', cursor: 'pointer' }}
                                 />
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                                     <span className="badge glass text-white border-0 shadow-sm">₹{product.price}</span>
@@ -121,9 +124,29 @@ const Shop = () => {
                 ))}
             </div>
 
+            {/* Premium Product Preview */}
+            <ItemPreview
+                item={selectedProduct}
+                isOpen={!!selectedProduct && !showOrderForm}
+                onClose={() => setSelectedProduct(null)}
+                isLiked={selectedProduct && likedIds.includes(selectedProduct._id || selectedProduct.id)}
+                toggleLike={() => toggleLike(selectedProduct?._id || selectedProduct?.id)}
+                onOrder={() => setShowOrderForm(true)}
+                onNext={() => {
+                    const currentIndex = filteredProducts.findIndex(p => (p._id || p.id) === (selectedProduct?._id || selectedProduct?.id));
+                    const nextIndex = (currentIndex + 1) % filteredProducts.length;
+                    setSelectedProduct(filteredProducts[nextIndex]);
+                }}
+                onPrev={() => {
+                    const currentIndex = filteredProducts.findIndex(p => (p._id || p.id) === (selectedProduct?._id || selectedProduct?.id));
+                    const prevIndex = (currentIndex - 1 + filteredProducts.length) % filteredProducts.length;
+                    setSelectedProduct(filteredProducts[prevIndex]);
+                }}
+            />
+
             <AnimatePresence>
-                {selectedProduct && (
-                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000, overflowY: 'auto' }}>
+                {selectedProduct && showOrderForm && (
+                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.95)', zIndex: 11000, overflowY: 'auto', backdropFilter: 'blur(10px)' }}>
                         <Motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -131,12 +154,20 @@ const Shop = () => {
                             className="glass p-4 p-md-5 position-relative w-100 my-auto"
                             style={{ maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}
                         >
+                            <button
+                                onClick={() => setShowOrderForm(false)}
+                                className="position-absolute top-0 end-0 m-4 btn text-muted p-0 border-0"
+                            >
+                                <X size={24} />
+                            </button>
+
                             {!isSuccess ? (
                                 <>
-                                    <div className="d-flex justify-content-between align-items-center mb-4">
-                                        <h2 className="h3 fw-bold mb-0">Complete Your <span style={{ color: 'var(--primary)' }}>Order</span></h2>
-                                        <button onClick={() => setSelectedProduct(null)} className="btn text-muted p-0 border-0"><X size={24} /></button>
+                                    <div className="mb-4 text-center">
+                                        <h2 className="h3 fw-bold mb-0">Complete Your <span className="text-primary">Order</span></h2>
+                                        <p className="text-muted small">You are ordering: <strong>{selectedProduct.name}</strong></p>
                                     </div>
+
 
                                     <div className="d-flex gap-3 align-items-start p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
                                         <div className="flex-shrink-0">

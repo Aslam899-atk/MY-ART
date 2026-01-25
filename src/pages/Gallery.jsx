@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
+import ItemPreview from '../components/ItemPreview';
 import { Heart, Search, Share2, ZoomIn, X, Play, Filter } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -153,40 +154,24 @@ const Gallery = () => {
                 </AnimatePresence>
             </div>
 
-            {/* Lightbox */}
-            <AnimatePresence>
-                {selectedItem && selectedItem.type !== 'video' && (
-                    <Motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4 backdrop-blur-md"
-                        style={{ background: 'rgba(0,0,0,0.95)', zIndex: 3000 }}
-                        onClick={() => setSelectedItem(null)}
-                    >
-                        <button className="position-absolute top-0 end-0 m-4 btn text-white border-0 p-2 glass" onClick={() => setSelectedItem(null)}>
-                            <X size={32} />
-                        </button>
-                        <Motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            className="bg-dark p-2 rounded-4 shadow-2xl"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <img
-                                src={selectedItem.url}
-                                alt={selectedItem.title}
-                                className="img-fluid rounded-3"
-                                style={{ maxHeight: '80vh', maxWidth: '100%' }}
-                            />
-                            <div className="p-4 text-center">
-                                <h3 className="h4 fw-bold">{selectedItem.title}</h3>
-                                <p className="text-muted mb-0">{selectedItem.description || 'Professional Handcrafted Artwork'}</p>
-                            </div>
-                        </Motion.div>
-                    </Motion.div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={selectedItem}
+                isOpen={!!selectedItem}
+                onClose={() => setSelectedItem(null)}
+                isLiked={selectedItem && likedIds.includes(selectedItem._id || selectedItem.id)}
+                toggleLike={() => toggleGalleryLike(selectedItem?._id || selectedItem?.id)}
+                onNext={() => {
+                    const currentIndex = filteredItems.findIndex(i => (i._id || i.id) === (selectedItem?._id || selectedItem?.id));
+                    const nextIndex = (currentIndex + 1) % filteredItems.length;
+                    setSelectedItem(filteredItems[nextIndex]);
+                }}
+                onPrev={() => {
+                    const currentIndex = filteredItems.findIndex(i => (i._id || i.id) === (selectedItem?._id || selectedItem?.id));
+                    const prevIndex = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
+                    setSelectedItem(filteredItems[prevIndex]);
+                }}
+            />
         </div>
     );
 };
