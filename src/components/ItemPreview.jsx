@@ -141,14 +141,16 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     )}
                                 </div>
                                 <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{item.title || 'Untitled Masterpiece'}</h2>
-                                <div className="d-flex align-items-center gap-3 text-muted small mb-4 pb-4 border-bottom border-white border-opacity-10">
-                                    <div className="d-flex align-items-center gap-1">
-                                        <User size={14} /> <span>By {users?.find(u => (u._id || u.id) === item.creatorId)?.username || 'Admin'}</span>
+                                {item.price && (
+                                    <div className="d-flex align-items-center gap-3 text-muted small mb-4 pb-4 border-bottom border-white border-opacity-10">
+                                        <div className="d-flex align-items-center gap-1">
+                                            <User size={14} /> <span>By {users?.find(u => (u._id || u.id) === item.creatorId)?.username || 'Admin'}</span>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-1">
+                                            <Calendar size={14} /> <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently'}</span>
+                                        </div>
                                     </div>
-                                    <div className="d-flex align-items-center gap-1">
-                                        <Calendar size={14} /> <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently'}</span>
-                                    </div>
-                                </div>
+                                )}
                             </motion.div>
 
                             <motion.div
