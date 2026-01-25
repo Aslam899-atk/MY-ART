@@ -30,7 +30,7 @@ const Contact = () => {
                 email: formData.email,
                 phone: formData.phone,
                 address: formData.address,
-                notes: 'Commission request from contact page',
+                notes: `Custom Commission Request: ${formData.image ? 'Referenced Image included.' : 'No reference image.'}`,
                 image: formData.image,
                 type: 'service',
                 price: 0

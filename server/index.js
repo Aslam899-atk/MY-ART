@@ -425,6 +425,15 @@ app.put('/api/orders/:id/approve-price', asyncHandler(async (req, res) => {
     res.json(order);
 }));
 
+app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
+    const { creatorId } = req.body;
+    const order = await Order.findByIdAndUpdate(req.params.id, {
+        creatorId,
+        status: 'Pending Price'
+    }, { new: true });
+    res.json(order);
+}));
+
 // --- INTERNAL MESSAGING ---
 app.post('/api/messages/internal', asyncHandler(async (req, res) => {
     const newMsg = new Message({

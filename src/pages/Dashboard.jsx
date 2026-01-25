@@ -15,7 +15,8 @@ import {
     X,
     User,
     Upload,
-    Package
+    Package,
+    ClipboardList
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
 
@@ -60,6 +61,7 @@ const Dashboard = () => {
     const myProducts = products.filter(p => p.creatorId === (user?._id || user?.id));
     const myGallery = galleryItems.filter(g => g.creatorId === (user?._id || user?.id));
     const myOrders = orders.filter(o => o.creatorId === (user?._id || user?.id));
+    const publicTasks = orders.filter(o => o.type === 'service' && !o.creatorId);
     const myMessages = messages.filter(m => m.receiverId === (user?._id || user?.id));
 
     const isFrozen = user?.isFrozen;
@@ -69,6 +71,19 @@ const Dashboard = () => {
         if (!price) return;
         await submitOrderPrice(orderId, price);
         setPriceInput({ ...priceInput, [orderId]: '' });
+    };
+
+    const handleClaimTask = async (orderId) => {
+        if (isFrozen) return alert("Account frozen.");
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/orders/${orderId}/claim`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ creatorId: user?._id || user?.id })
+        });
+        if (res.ok) {
+            alert("Task Claimed! Check your 'Orders' tab to set the price.");
+            window.location.reload();
+        }
     };
 
     const handleImageUpload = (e) => {
@@ -289,6 +304,10 @@ const Dashboard = () => {
                                 <span className="badge bg-danger ms-auto">{myOrders.filter(o => o.status === 'Pending Price').length}</span>
                             }
                         </button>
+                        <button onClick={() => setActiveTab('tasks')} className={`btn w-100 text-start rounded-3 py-3 mb-2 d-flex align-items-center gap-3 ${activeTab === 'tasks' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                            <ClipboardList size={18} /> Task Center
+                            {publicTasks.length > 0 && <span className="badge bg-primary ms-auto">{publicTasks.length}</span>}
+                        </button>
                         <button onClick={() => setActiveTab('messages')} className={`btn w-100 text-start rounded-3 py-3 d-flex align-items-center gap-3 ${activeTab === 'messages' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
                             <MessageSquare size={18} /> Admin Inbox
                         </button>
@@ -468,9 +487,51 @@ const Dashboard = () => {
                             {myMessages.length === 0 && (
                                 <div className="text-center py-5 text-white opacity-30 border border-white border-opacity-5 rounded-4">
                                     <MessageSquare size={48} className="mb-3 opacity-20" />
-                                    <div>No messages from admin yet</div>
+                                    <div>No messages yet</div>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {activeTab === 'tasks' && (
+                        <div className="glass p-4 rounded-4">
+                            <h5 className="fw-bold mb-4">Task Center (Public Requests)</h5>
+                            <p className="text-muted small mb-4">These are custom requests from the contact page. Any artist can claim these to start a commission.</p>
+                            <div className="table-responsive">
+                                <table className="table table-dark table-hover align-middle border-0">
+                                    <thead>
+                                        <tr className="text-muted small uppercase">
+                                            <th className="border-0">Reference Image</th>
+                                            <th className="border-0">Request</th>
+                                            <th className="border-0">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {publicTasks.map(task => (
+                                            <tr key={task._id} className="border-bottom border-white border-opacity-5">
+                                                <td className="py-3 border-0">
+                                                    {task.image ? (
+                                                        <img src={task.image} className="rounded-3 shadow-sm" style={{ width: '80px', height: '80px', objectFit: 'cover' }} alt="" />
+                                                    ) : (
+                                                        <div className="glass rounded-3 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}><ImageIcon size={20} className="opacity-20" /></div>
+                                                    )}
+                                                </td>
+                                                <td className="border-0">
+                                                    <div className="fw-bold small">{task.productName}</div>
+                                                    <div className="extra-small opacity-50 mb-2">{task.date}</div>
+                                                    <div className="small opacity-75">{task.notes}</div>
+                                                </td>
+                                                <td className="border-0">
+                                                    <button onClick={() => handleClaimTask(task._id)} className="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-glow border-0">Claim Task</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {publicTasks.length === 0 && (
+                                            <tr><td colSpan="3" className="text-center py-5 border-0 text-white opacity-30">No public requests available</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>
