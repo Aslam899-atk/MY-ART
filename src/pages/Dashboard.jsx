@@ -1,5 +1,6 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Image as ImageIcon,
@@ -9,7 +10,10 @@ import {
     CheckCircle,
     Clock,
     DollarSign,
-    ExternalLink
+    ExternalLink,
+    Plus,
+    X,
+    User
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
 
@@ -23,10 +27,19 @@ const Dashboard = () => {
         submitOrderPrice,
         sendInternalMessage,
         addProduct,
-        addGalleryItem
+        addGalleryItem,
+        isLoadingAuth
     } = useContext(AppContext);
 
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
+
+    // Protection & Init
+    useEffect(() => {
+        if (!isLoadingAuth && (!user || user.role !== 'emblos')) {
+            navigate('/');
+        }
+    }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadFormData, setUploadFormData] = useState({
