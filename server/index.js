@@ -453,12 +453,19 @@ app.get('/api/orders', asyncHandler(async (req, res) => {
 }));
 
 app.post('/api/orders', asyncHandler(async (req, res) => {
+    const status = req.body.type === 'service' ? 'Pending Price' : 'Approved';
     const newOrder = new Order({
         ...req.body,
+        status,
         date: new Date().toLocaleDateString()
     });
     await newOrder.save();
     res.json(newOrder);
+}));
+
+app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
+    await Order.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted' });
 }));
 
 app.delete('/api/orders/:id', asyncHandler(async (req, res) => {

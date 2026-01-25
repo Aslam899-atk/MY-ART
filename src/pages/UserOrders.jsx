@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { ShoppingBag, Clock, CheckCircle, AlertCircle, Phone } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle, Trash2 } from 'lucide-react';
 
 const UserOrders = () => {
-    const { orders, user, users } = useContext(AppContext);
+    const { orders, user, users, deleteOrder } = useContext(AppContext);
 
     const myOrders = orders.filter(o => o.customerId === (user?._id || user?.id));
 
@@ -24,7 +24,7 @@ const UserOrders = () => {
                                     <div className="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h4 className="fw-bold mb-0">{order.productName}</h4>
-                                            <div className="extra-small text-primary fw-bold mb-2">Artist: {users.find(u => u._id === order.creatorId)?.username || 'Admin'}</div>
+                                            <div className="extra-small text-primary fw-bold mb-2">Artist: {users.find(u => u._id === order.creatorId)?.username || 'Art Void'}</div>
                                         </div>
                                         <span className={`badge rounded-pill ${order.status === 'Approved' ? 'bg-success' : 'bg-warning'} px-3 py-1 small`}>
                                             {order.status}
@@ -32,7 +32,7 @@ const UserOrders = () => {
                                     </div>
                                     <div className="small text-white opacity-50 mb-3">{order.date}</div>
 
-                                    {order.price ? (
+                                    {order.price > 0 ? (
                                         <div className="h4 fw-bold text-primary mb-3">₹{order.price}</div>
                                     ) : (
                                         <div className="text-warning small italic mb-3 d-flex align-items-center gap-2">
@@ -40,16 +40,23 @@ const UserOrders = () => {
                                         </div>
                                     )}
 
-                                    {order.status !== 'Approved' && (
-                                        <div className="alert bg-white bg-opacity-5 border-0 small text-white-50 p-2 mb-0">
-                                            The creator will contact you to agree on the price.
-                                        </div>
-                                    )}
-                                    {order.status === 'Approved' && (
-                                        <div className="text-success small fw-bold d-flex align-items-center gap-2 mt-2">
-                                            <CheckCircle size={16} /> Order Finalized
-                                        </div>
-                                    )}
+                                    <div className="d-flex justify-content-between align-items-center mt-auto">
+                                        {order.status === 'Approved' ? (
+                                            <div className="text-success small fw-bold d-flex align-items-center gap-2">
+                                                <CheckCircle size={16} /> Order Finalized
+                                            </div>
+                                        ) : (
+                                            <div className="small text-white-50">Custom Request</div>
+                                        )}
+
+                                        <button
+                                            onClick={() => { if (window.confirm('Are you sure?')) deleteOrder(order._id || order.id); }}
+                                            className="btn btn-sm text-danger opacity-50 hover-opacity-100 p-0 border-0"
+                                            title="Delete/Cancel Order"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
