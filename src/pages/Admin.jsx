@@ -617,7 +617,12 @@ const Admin = () => {
                                             <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
                                         </div>
                                         <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
-                                            <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
+                                            <div className="d-flex flex-column gap-3">
+                                                {m.image && (
+                                                    <img src={m.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                                )}
+                                                <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
+                                            </div>
                                         </div>
                                         <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
                                             <span>Email: {m.email}</span>

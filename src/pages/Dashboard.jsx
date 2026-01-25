@@ -60,7 +60,7 @@ const Dashboard = () => {
     const myProducts = products.filter(p => p.creatorId === (user?._id || user?.id));
     const myGallery = galleryItems.filter(g => g.creatorId === (user?._id || user?.id));
     const myOrders = orders.filter(o => o.creatorId === (user?._id || user?.id));
-    const myMessages = messages.filter(m => m.receiverId === (user?._id || user?.id) && m.isInternal);
+    const myMessages = messages.filter(m => m.receiverId === (user?._id || user?.id));
 
     const isFrozen = user?.isFrozen;
 
@@ -444,15 +444,25 @@ const Dashboard = () => {
                         <div className="glass p-4 rounded-4">
                             <h5 className="fw-bold mb-4">Messages from Admin</h5>
                             {myMessages.map(msg => (
-                                <div key={msg._id} className="glass p-4 rounded-4 mb-3 border-0 bg-opacity-10 position-relative">
+                                <div key={msg._id} className={`glass p-4 rounded-4 mb-3 border-0 bg-opacity-10 position-relative ${msg.isInternal ? 'border-start border-primary border-4' : ''}`}>
                                     <div className="d-flex justify-content-between align-items-center mb-3">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="p-2 bg-primary bg-opacity-20 rounded-circle"><User size={16} /></div>
-                                            <span className="fw-bold">Admin</span>
+                                            <div className={`p-2 ${msg.isInternal ? 'bg-primary' : 'bg-success'} bg-opacity-20 rounded-circle`}>
+                                                {msg.isInternal ? <User size={16} className="text-primary" /> : <MessageSquare size={16} className="text-success" />}
+                                            </div>
+                                            <div>
+                                                <span className="fw-bold">{msg.isInternal ? 'Admin' : (msg.name || 'Customer')}</span>
+                                                {!msg.isInternal && <div className="extra-small text-muted">{msg.email} | {msg.phone}</div>}
+                                            </div>
                                         </div>
                                         <span className="extra-small opacity-50">{msg.date}</span>
                                     </div>
-                                    <p className="mb-0 small">{msg.message}</p>
+                                    <div className="d-flex gap-3">
+                                        {msg.image && (
+                                            <img src={msg.image} className="rounded-3 shadow-sm" style={{ width: '60px', height: '60px', objectFit: 'cover' }} alt="" />
+                                        )}
+                                        <p className="mb-0 small flex-grow-1">{msg.message}</p>
+                                    </div>
                                 </div>
                             ))}
                             {myMessages.length === 0 && (

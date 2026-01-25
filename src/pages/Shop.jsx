@@ -6,10 +6,12 @@ import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search }
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
-    const { products, addOrder, toggleLike, likedIds, user } = useContext(AppContext);
+    const { products, addOrder, toggleLike, likedIds, user, addMessage } = useContext(AppContext);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showOrderForm, setShowOrderForm] = useState(false);
+    const [showInquiryForm, setShowInquiryForm] = useState(false);
     const [orderForm, setOrderForm] = useState({ name: '', phone: '', email: '', address: '' });
+    const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', email: '' });
     const [isSuccess, setIsSuccess] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -129,11 +131,12 @@ const Shop = () => {
             {/* Premium Product Preview */}
             <ItemPreview
                 item={selectedProduct}
-                isOpen={!!selectedProduct && !showOrderForm}
+                isOpen={!!selectedProduct && !showOrderForm && !showInquiryForm}
                 onClose={() => setSelectedProduct(null)}
                 isLiked={selectedProduct && likedIds.includes(selectedProduct._id || selectedProduct.id)}
                 toggleLike={() => toggleLike(selectedProduct?._id || selectedProduct?.id)}
                 onOrder={() => setShowOrderForm(true)}
+                onInquire={() => setShowInquiryForm(true)}
                 onNext={() => {
                     const currentIndex = filteredProducts.findIndex(p => (p._id || p.id) === (selectedProduct?._id || selectedProduct?.id));
                     const nextIndex = (currentIndex + 1) % filteredProducts.length;
@@ -223,6 +226,92 @@ const Shop = () => {
                                     <div className="text-success mb-4"><CheckCircle size={80} /></div>
                                     <h2 className="h2 fw-bold mb-3">Order Received!</h2>
                                     <p className="lead text-muted">We have received your order for <strong className="text-white">{selectedProduct.name}</strong>. We will contact you soon!</p>
+                                </div>
+                            )}
+                        </Motion.div>
+                    </div>
+                )}
+
+                {selectedProduct && showInquiryForm && (
+                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.95)', zIndex: 11000, overflowY: 'auto', backdropFilter: 'blur(10px)' }}>
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="glass p-4 p-md-5 position-relative w-100 my-auto"
+                            style={{ maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}
+                        >
+                            <button
+                                onClick={() => setShowInquiryForm(false)}
+                                className="position-absolute top-0 end-0 m-4 btn text-muted p-0 border-0"
+                            >
+                                <X size={24} />
+                            </button>
+
+                            {!isSuccess ? (
+                                <>
+                                    <div className="mb-4 text-center">
+                                        <h2 className="h3 fw-bold mb-0">Ask about <span className="text-primary">Product</span></h2>
+                                        <p className="text-muted small">Artwork: <strong>{selectedProduct.name}</strong></p>
+                                    </div>
+
+                                    <div className="d-flex gap-3 align-items-start p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                        <div className="flex-shrink-0">
+                                            <img
+                                                src={selectedProduct.image}
+                                                alt={selectedProduct.name}
+                                                className="rounded-3"
+                                                style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold fs-5">{selectedProduct.name}</div>
+                                            <div className="text-primary small fw-bold">Price: ₹{selectedProduct.price}</div>
+                                        </div>
+                                    </div>
+
+                                    <form onSubmit={(e) => {
+                                        e.preventDefault();
+                                        addMessage({
+                                            name: inquiryForm.name,
+                                            phone: inquiryForm.phone,
+                                            email: inquiryForm.email,
+                                            message: `Inquiry about shop product: "${selectedProduct.name}"`,
+                                            receiverId: selectedProduct.creatorId,
+                                            image: selectedProduct.image,
+                                            type: 'inquiry'
+                                        });
+                                        setIsSuccess(true);
+                                        setTimeout(() => {
+                                            setIsSuccess(false);
+                                            setShowInquiryForm(false);
+                                            setSelectedProduct(null);
+                                            setInquiryForm({ name: '', phone: '', email: '' });
+                                        }, 3000);
+                                    }} className="d-flex flex-column gap-3">
+                                        <div className="alert alert-info border-0 bg-primary bg-opacity-10 text-primary small mb-0">
+                                            The artist will receive your contact details and message.
+                                        </div>
+                                        <div className="position-relative">
+                                            <User size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required placeholder="Full Name" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.name} onChange={e => setInquiryForm({ ...inquiryForm, name: e.target.value })} />
+                                        </div>
+                                        <div className="position-relative">
+                                            <Phone size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required placeholder="Phone Number" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.phone} onChange={e => setInquiryForm({ ...inquiryForm, phone: e.target.value })} />
+                                        </div>
+                                        <div className="position-relative">
+                                            <Mail size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
+                                            <input required type="email" placeholder="Gmail Address" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.email} onChange={e => setInquiryForm({ ...inquiryForm, email: e.target.value })} />
+                                        </div>
+                                        <button type="submit" className="btn btn-primary py-3 fw-bold border-0 rounded-3 mt-2">Send Message</button>
+                                    </form>
+                                </>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <div className="text-success mb-4"><CheckCircle size={80} /></div>
+                                    <h2 className="h2 fw-bold mb-3">Inquiry Sent!</h2>
+                                    <p className="lead text-muted"> The artist has received your message about <strong className="text-white">{selectedProduct.name}</strong>.</p>
                                 </div>
                             )}
                         </Motion.div>

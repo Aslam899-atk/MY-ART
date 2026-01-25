@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
-const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder }) => {
+const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
     if (!item) return null;
 
     const { addGalleryComment, user } = useContext(AppContext);
@@ -242,13 +242,22 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                         <Share2 size={20} />
                                     </button>
                                 </div>
-                                {onOrder && (
+                                {onOrder ? (
                                     <button
                                         onClick={() => onOrder(item)}
                                         className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 d-flex align-items-center justify-content-center gap-2 shadow-glow hover-scale"
                                     >
                                         <ShoppingBag size={20} /> Request Order
                                     </button>
+                                ) : (
+                                    onInquire && (
+                                        <button
+                                            onClick={() => onInquire(item)}
+                                            className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 d-flex align-items-center justify-content-center gap-2 shadow-glow hover-scale"
+                                        >
+                                            <Send size={20} /> Send Inquiry
+                                        </button>
+                                    )
                                 )}
                             </motion.div>
                         </div>
