@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft } from 'lucide-react';
+import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
 
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder }) => {
     if (!item) return null;
+
+    const { addGalleryComment, user } = useContext(AppContext);
+    const [commentText, setCommentText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -20,6 +25,17 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
             alert('URL copied to clipboard!');
             navigator.clipboard.writeText(window.location.href);
         }
+    };
+
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!commentText.trim()) return;
+        setIsSubmitting(true);
+        const res = await addGalleryComment(item._id || item.id, commentText);
+        if (res?.success) {
+            setCommentText('');
+        }
+        setIsSubmitting(false);
     };
 
     return (
@@ -159,6 +175,49 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                             <div className="small fw-bold text-success text-truncate">{item.price ? 'Available' : 'Portfolio'}</div>
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* Comments Section */}
+                                <div className="mt-4 pt-4 border-top border-white border-opacity-10">
+                                    <h5 className="small text-uppercase tracking-widest text-primary fw-bold mb-3 d-flex align-items-center gap-2">
+                                        <MessageSquare size={16} /> Community Comments
+                                    </h5>
+
+                                    <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
+                                        {item.comments && item.comments.length > 0 ? (
+                                            item.comments.map((comment, idx) => (
+                                                <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5">
+                                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                                        <span className="fw-bold extra-small text-primary">{comment.username}</span>
+                                                        <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
+                                                    </div>
+                                                    <p className="extra-small mb-0 text-white-50">{comment.text}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-4 opacity-30 small italic">No comments yet. Be the first!</div>
+                                        )}
+                                    </div>
+
+                                    {/* Comment form */}
+                                    <form onSubmit={handleCommentSubmit} className="position-relative mt-2">
+                                        <input
+                                            type="text"
+                                            placeholder={user ? "Write a comment..." : "Login to comment"}
+                                            disabled={!user || isSubmitting}
+                                            className="form-control glass border-0 text-white extra-small py-3 ps-3 pe-5 rounded-pill"
+                                            value={commentText}
+                                            onChange={(e) => setCommentText(e.target.value)}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={!user || isSubmitting || !commentText.trim()}
+                                            className="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-1 p-2 rounded-circle border-0 d-flex align-items-center justify-content-center"
+                                            style={{ width: '32px', height: '32px' }}
+                                        >
+                                            <Send size={14} />
+                                        </button>
+                                    </form>
                                 </div>
                             </motion.div>
 

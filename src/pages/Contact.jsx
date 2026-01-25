@@ -5,7 +5,7 @@ import { motion as Motion } from 'framer-motion';
 
 const Contact = () => {
     const [msgType, setMsgType] = useState('inquiry'); // 'inquiry' or 'service'
-    const [formData, setFormData] = useState({ name: '', email: '', message: '', image: '', phone: '', address: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', image: '', phone: '', address: '' });
     const { addMessage, addOrder } = useContext(AppContext);
     const [submitted, setSubmitted] = useState(false);
 
@@ -30,7 +30,7 @@ const Contact = () => {
                 email: formData.email,
                 phone: formData.phone,
                 address: formData.address,
-                notes: formData.message,
+                notes: 'Commission request from contact page',
                 image: formData.image,
                 type: 'service',
                 price: 0
@@ -39,13 +39,13 @@ const Contact = () => {
             addMessage({
                 name: formData.name,
                 email: formData.email,
-                message: formData.message,
+                message: 'No message provided (Inquiry from contact page)',
                 type: 'inquiry'
             });
         }
 
         setSubmitted(true);
-        setFormData({ name: '', email: '', message: '', image: '', phone: '', address: '' });
+        setFormData({ name: '', email: '', image: '', phone: '', address: '' });
         setTimeout(() => setSubmitted(false), 5000);
     };
 
@@ -210,18 +210,7 @@ const Contact = () => {
                                         </>
                                     )}
 
-                                    <div className="col-12 d-flex flex-column gap-2">
-                                        <label className="small fw-bold text-muted text-uppercase letter-spacing-1">Your Message</label>
-                                        <textarea
-                                            required
-                                            rows="5"
-                                            placeholder={msgType === 'service' ? "Tell us about your custom commission idea..." : "How can we help you today?"}
-                                            className="form-control bg-dark border-0 text-white py-3 rounded-3 shadow-none"
-                                            style={{ background: 'rgba(255,255,255,0.03)', resize: 'none' }}
-                                            value={formData.message}
-                                            onChange={e => setFormData({ ...formData, message: e.target.value })}
-                                        />
-                                    </div>
+
 
                                     {msgType === 'service' && (
                                         <div className="col-12 d-flex flex-column gap-2">

@@ -50,6 +50,11 @@ const gallerySchema = new mongoose.Schema({
     medium: String,
     description: String,
     likes: { type: Number, default: 0 },
+    comments: [{
+        username: String,
+        text: String,
+        date: { type: Date, default: Date.now }
+    }],
     creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, default: 'pending' }, // 'pending', 'active', 'frozen'
     createdAt: { type: Date, default: Date.now }
@@ -313,6 +318,16 @@ app.put('/api/gallery/:id/like', asyncHandler(async (req, res) => {
 
     await Promise.all([user.save(), item.save()]);
     res.json({ user, item });
+}));
+
+app.put('/api/gallery/:id/comment', asyncHandler(async (req, res) => {
+    const { username, text } = req.body;
+    const item = await Gallery.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: 'Artwork not found' });
+
+    item.comments.push({ username, text });
+    await item.save();
+    res.json(item);
 }));
 
 // MESSAGES
