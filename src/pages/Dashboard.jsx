@@ -291,24 +291,24 @@ const Dashboard = () => {
             <div className="row g-4">
                 {/* Sidebar Navigation */}
                 <div className="col-lg-3">
-                    <div className="glass p-3 rounded-4 border border-white border-opacity-10 position-sticky" style={{ top: '100px' }}>
-                        <button onClick={() => setActiveTab('overview')} className={`btn w-100 text-start rounded-3 py-3 mb-2 d-flex align-items-center gap-3 ${activeTab === 'overview' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                    <div className="glass p-3 rounded-4 border border-white border-opacity-10 position-sticky d-flex flex-lg-column gap-2 overflow-x-auto overflow-lg-visible no-scrollbar" style={{ top: '100px', zIndex: 100 }}>
+                        <button onClick={() => setActiveTab('overview')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'overview' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <LayoutDashboard size={18} /> Overview
                         </button>
-                        <button onClick={() => setActiveTab('inventory')} className={`btn w-100 text-start rounded-3 py-3 mb-2 d-flex align-items-center gap-3 ${activeTab === 'inventory' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                        <button onClick={() => setActiveTab('inventory')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'inventory' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <ImageIcon size={18} /> My Artworks
                         </button>
-                        <button onClick={() => setActiveTab('orders')} className={`btn w-100 text-start rounded-3 py-3 mb-2 d-flex align-items-center gap-3 ${activeTab === 'orders' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                        <button onClick={() => setActiveTab('orders')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'orders' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <ShoppingBag size={18} /> Orders
                             {myOrders.filter(o => o.status === 'Pending Price').length > 0 &&
                                 <span className="badge bg-danger ms-auto">{myOrders.filter(o => o.status === 'Pending Price').length}</span>
                             }
                         </button>
-                        <button onClick={() => setActiveTab('tasks')} className={`btn w-100 text-start rounded-3 py-3 mb-2 d-flex align-items-center gap-3 ${activeTab === 'tasks' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                        <button onClick={() => setActiveTab('tasks')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'tasks' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <ClipboardList size={18} /> Task Center
                             {publicTasks.length > 0 && <span className="badge bg-primary ms-auto">{publicTasks.length}</span>}
                         </button>
-                        <button onClick={() => setActiveTab('messages')} className={`btn w-100 text-start rounded-3 py-3 d-flex align-items-center gap-3 ${activeTab === 'messages' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'}`}>
+                        <button onClick={() => setActiveTab('messages')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'messages' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <MessageSquare size={18} /> Admin Inbox
                         </button>
                     </div>
