@@ -263,7 +263,8 @@ const Admin = () => {
         { id: 'products', label: 'Inventory', icon: Package, count: products.length },
         { id: 'gallery', label: 'Gallery', icon: ImageIcon, count: galleryItems.length },
         { id: 'messages', label: 'Inbox', icon: MessageSquare, count: messages.filter(m => !m.isInternal).length },
-        { id: 'users', label: 'Users', icon: UsersIcon, count: users?.length || 0 },
+        { id: 'emblos', label: 'Artists (Emblos)', icon: Brush, count: users?.filter(u => u.role === 'emblos').length || 0 },
+        { id: 'collectors', label: 'Art Collectors', icon: UsersIcon, count: users?.filter(u => u.role !== 'emblos').length || 0 },
         { id: 'settings', label: 'Settings', icon: Settings },
     ];
 
@@ -634,7 +635,7 @@ const Admin = () => {
                         </Motion.div>
                     )}
 
-                    {activeTab === 'users' && (
+                    {(activeTab === 'emblos' || activeTab === 'collectors') && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
                             <table className="table table-dark table-hover align-middle">
                                 <thead>
@@ -646,7 +647,7 @@ const Admin = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users?.map(u => (
+                                    {users?.filter(u => activeTab === 'emblos' ? u.role === 'emblos' : u.role !== 'emblos').map(u => (
                                         <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
                                             <td className="py-4 px-4 border-0">
                                                 <div className="d-flex align-items-center gap-3">
@@ -682,6 +683,9 @@ const Admin = () => {
                                             </td>
                                         </tr>
                                     ))}
+                                    {users?.filter(u => activeTab === 'emblos' ? u.role === 'emblos' : u.role !== 'emblos').length === 0 && (
+                                        <tr><td colSpan="4" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
+                                    )}
                                 </tbody>
                             </table>
                         </Motion.div>
