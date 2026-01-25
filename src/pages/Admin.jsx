@@ -392,460 +392,459 @@ const Admin = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Motion.div>
-                )}
+                        </Motion.div>
+                    )}
 
-                {activeTab === 'requests' && (
-                    <Motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="glass p-4 rounded-4 border-0"
-                    >
-                        <h5 className="fw-bold mb-4">Pending Emblos Requests</h5>
-                        <div className="table-responsive">
-                            <table className="table table-dark table-hover align-middle">
-                                <thead>
-                                    <tr className="text-muted small uppercase">
-                                        <th className="border-0">User</th>
-                                        <th className="border-0">Plan</th>
-                                        <th className="border-0">Message</th>
-                                        <th className="border-0 text-end">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users?.filter(u => u.emblosAccess?.status === 'pending').map(u => (
-                                        <tr key={u._id} className="border-bottom border-white border-opacity-5">
-                                            <td className="border-0 py-3">
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
-                                                    <div>
-                                                        <div className="fw-bold small">{u.username}</div>
-                                                        <div className="extra-small opacity-50">{u.email}</div>
-                                                        <div className="extra-small opacity-50 text-primary">{u.phone}</div>
+                    {activeTab === 'requests' && (
+                        <Motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="glass p-4 rounded-4 border-0"
+                        >
+                            <h5 className="fw-bold mb-4">Pending Emblos Requests</h5>
+                            <div className="table-responsive">
+                                <table className="table table-dark table-hover align-middle">
+                                    <thead>
+                                        <tr className="text-muted small uppercase">
+                                            <th className="border-0">User</th>
+                                            <th className="border-0">Plan</th>
+                                            <th className="border-0">Message</th>
+                                            <th className="border-0 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {users?.filter(u => u.emblosAccess?.status === 'pending').map(u => (
+                                            <tr key={u._id} className="border-bottom border-white border-opacity-5">
+                                                <td className="border-0 py-3">
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
+                                                        <div>
+                                                            <div className="fw-bold small">{u.username}</div>
+                                                            <div className="extra-small opacity-50">{u.email}</div>
+                                                            <div className="extra-small opacity-50 text-primary">{u.phone}</div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="border-0">
-                                                <span className="badge bg-primary bg-opacity-10 text-primary">{u.emblosAccess?.plan} Month(s)</span>
-                                            </td>
-                                            <td className="border-0 small opacity-70">
-                                                {u.emblosAccess?.message || 'No message'}
-                                            </td>
-                                            <td className="border-0 text-end">
-                                                <div className="d-flex gap-2 justify-content-end">
-                                                    <select className="form-select form-select-sm glass border-0 w-auto" value={planMonths} onChange={(e) => setPlanMonths(e.target.value)}>
-                                                        <option value="1">1 Mo</option>
-                                                        <option value="3">3 Mo</option>
-                                                        <option value="6">6 Mo</option>
-                                                    </select>
-                                                    <button onClick={() => updateEmblosStatus(u._id, { status: 'active', months: planMonths })} className="btn btn-success btn-sm rounded-pill px-3 fw-bold">Accept</button>
-                                                    <button onClick={() => updateEmblosStatus(u._id, { status: 'none' })} className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Reject</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {users?.filter(u => u.emblosAccess?.status === 'pending').length === 0 && (
-                                        <tr><td colSpan="4" className="text-center py-5 opacity-30">No pending requests</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Motion.div>
-                )}
+                                                </td>
+                                                <td className="border-0">
+                                                    <span className="badge bg-primary bg-opacity-10 text-primary">{u.emblosAccess?.plan} Month(s)</span>
+                                                </td>
+                                                <td className="border-0 small opacity-70">
+                                                    {u.emblosAccess?.message || 'No message'}
+                                                </td>
+                                                <td className="border-0 text-end">
+                                                    <div className="d-flex gap-2 justify-content-end">
+                                                        <select className="form-select form-select-sm glass border-0 w-auto" value={planMonths} onChange={(e) => setPlanMonths(e.target.value)}>
+                                                            <option value="1">1 Mo</option>
+                                                            <option value="3">3 Mo</option>
+                                                            <option value="6">6 Mo</option>
+                                                        </select>
+                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'active', months: planMonths })} className="btn btn-success btn-sm rounded-pill px-3 fw-bold">Accept</button>
+                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'none' })} className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Reject</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {users?.filter(u => u.emblosAccess?.status === 'pending').length === 0 && (
+                                            <tr><td colSpan="4" className="text-center py-5 opacity-30">No pending requests</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Motion.div>
+                    )}
 
-                {activeTab === 'orders' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="d-flex flex-column gap-4">
-                        <div className="table-responsive">
-                            <table className="table table-dark table-hover align-middle">
-                                <thead>
-                                    <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20 uppercase small">
-                                        <th className="py-3 px-4 border-0">Item</th>
-                                        <th className="py-3 px-4 border-0">Creator (Emblos)</th>
-                                        <th className="py-3 px-4 border-0">Customer</th>
-                                        <th className="py-3 px-4 border-0">Price</th>
-                                        <th className="py-3 px-4 border-0">Status</th>
-                                        <th className="py-3 px-4 border-0 text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orders.map(o => (
-                                        <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
-                                            <td className="py-4 px-4 border-0 small">
-                                                <div className="fw-bold text-white">{o.productName}</div>
-                                                <div className="extra-small opacity-50">{o.date}</div>
-                                            </td>
-                                            <td className="py-4 px-4 border-0 small">
-                                                {users.find(u => u._id === o.creatorId)?.username || 'Admin'}
-                                            </td>
-                                            <td className="py-4 px-4 border-0">
-                                                <div className="d-flex flex-column">
-                                                    <span className="text-white-50 small fw-medium">{o.customer || 'Guest'}</span>
-                                                    <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{o.phone}</span>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-4 border-0">
-                                                {o.price ? <span className="text-primary fw-bold">₹{o.price}</span> : <span className="text-warning small italic">Waiting for Emblos</span>}
-                                            </td>
-                                            <td className="py-4 px-4 border-0">
-                                                <span className={`badge rounded-pill px-3 py-1 ${o.status === 'Approved' ? 'bg-success' : 'bg-warning'} bg-opacity-10 text-${o.status === 'Approved' ? 'success' : 'warning'}`}>
-                                                    {o.status}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-4 border-0 text-end">
-                                                <div className="d-flex gap-2 justify-content-end">
-                                                    {o.status === 'Price Submitted' && (
-                                                        <button onClick={() => approveOrderPrice(o._id)} className="btn btn-sm btn-primary rounded-pill px-3">Approve Price</button>
-                                                    )}
-                                                    <button onClick={() => { if (window.confirm('Delete order?')) deleteOrder(o._id) }} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
-                                                </div>
-                                            </td>
+                    {activeTab === 'orders' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="d-flex flex-column gap-4">
+                            <div className="table-responsive">
+                                <table className="table table-dark table-hover align-middle">
+                                    <thead>
+                                        <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20 uppercase small">
+                                            <th className="py-3 px-4 border-0">Item</th>
+                                            <th className="py-3 px-4 border-0">Creator (Emblos)</th>
+                                            <th className="py-3 px-4 border-0">Customer</th>
+                                            <th className="py-3 px-4 border-0">Price</th>
+                                            <th className="py-3 px-4 border-0">Status</th>
+                                            <th className="py-3 px-4 border-0 text-end">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Motion.div>
-                )}
+                                    </thead>
+                                    <tbody>
+                                        {orders.map(o => (
+                                            <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
+                                                <td className="py-4 px-4 border-0 small">
+                                                    <div className="fw-bold text-white">{o.productName}</div>
+                                                    <div className="extra-small opacity-50">{o.date}</div>
+                                                </td>
+                                                <td className="py-4 px-4 border-0 small">
+                                                    {users.find(u => u._id === o.creatorId)?.username || 'Admin'}
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    <div className="d-flex flex-column">
+                                                        <span className="text-white-50 small fw-medium">{o.customer || 'Guest'}</span>
+                                                        <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{o.phone}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    {o.price ? <span className="text-primary fw-bold">₹{o.price}</span> : <span className="text-warning small italic">Waiting for Emblos</span>}
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    <span className={`badge rounded-pill px-3 py-1 ${o.status === 'Approved' ? 'bg-success' : 'bg-warning'} bg-opacity-10 text-${o.status === 'Approved' ? 'success' : 'warning'}`}>
+                                                        {o.status}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 border-0 text-end">
+                                                    <div className="d-flex gap-2 justify-content-end">
+                                                        {o.status === 'Price Submitted' && (
+                                                            <button onClick={() => approveOrderPrice(o._id)} className="btn btn-sm btn-primary rounded-pill px-3">Approve Price</button>
+                                                        )}
+                                                        <button onClick={() => { if (window.confirm('Delete order?')) deleteOrder(o._id) }} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Motion.div>
+                    )}
 
-                {activeTab === 'products' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <div className="row g-4">
-                            {products.map(p => (
-                                <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
-                                    <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
-                                        <div className="position-relative" style={{ height: '220px' }}>
-                                            <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
-                                            <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
-                                                <button onClick={() => {
-                                                    setUploadType('shop');
-                                                    setEditingProduct(p);
-                                                    setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '', category: '', medium: '' });
-                                                    setIsModalOpen(true);
-                                                }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
-                                                <button onClick={() => {
-                                                    if (window.confirm(`Are you sure you want to delete "${p.name}"?`)) {
-                                                        deleteProduct(p._id || p.id);
-                                                    }
-                                                }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                    {activeTab === 'products' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <div className="row g-4">
+                                {products.map(p => (
+                                    <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
+                                        <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
+                                            <div className="position-relative" style={{ height: '220px' }}>
+                                                <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
+                                                <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
+                                                    <button onClick={() => {
+                                                        setUploadType('shop');
+                                                        setEditingProduct(p);
+                                                        setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '', category: '', medium: '' });
+                                                        setIsModalOpen(true);
+                                                    }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                                    <button onClick={() => {
+                                                        if (window.confirm(`Are you sure you want to delete "${p.name}"?`)) {
+                                                            deleteProduct(p._id || p.id);
+                                                        }
+                                                    }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                                                </div>
+                                                <div className="position-absolute top-0 start-0 p-3">
+                                                    <div className={`badge ${p.status === 'active' ? 'bg-success' : (p.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`}>{p.status}</div>
+                                                </div>
+                                                <div className="position-absolute bottom-0 start-0 p-3 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                                                    <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
+                                                </div>
                                             </div>
-                                            <div className="position-absolute top-0 start-0 p-3">
-                                                <div className={`badge ${p.status === 'active' ? 'bg-success' : (p.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`}>{p.status}</div>
-                                            </div>
-                                            <div className="position-absolute bottom-0 start-0 p-3 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
-                                                <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
+                                            <div className="p-4">
+                                                <h5 className="fw-bold text-white mb-1 truncate">{p.name}</h5>
+                                                <div className="d-flex align-items-center gap-2 text-white-50 small">
+                                                    <User size={12} /> {users.find(u => u._id === p.creatorId)?.username || 'Admin'}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-4">
-                                            <h5 className="fw-bold text-white mb-1 truncate">{p.name}</h5>
-                                            <div className="d-flex align-items-center gap-2 text-white-50 small">
-                                                <User size={12} /> {users.find(u => u._id === p.creatorId)?.username || 'Admin'}
+                                    </div>
+                                ))}
+                            </div>
+                        </Motion.div>
+                    )}
+
+                    {activeTab === 'gallery' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
+                            {galleryItems.map(item => (
+                                <div key={item._id || item.id} className="col-6 col-md-3">
+                                    <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
+                                        {item.type === 'video' ? (
+                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
+                                        ) : (
+                                            <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
+                                        )}
+                                        <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 transition-all">
+                                            <button onClick={() => {
+                                                setUploadType('gallery');
+                                                setEditingGalleryItem(item);
+                                                setFormData({
+                                                    name: item.title,
+                                                    price: '',
+                                                    image: item.url,
+                                                    description: item.description || '',
+                                                    category: item.category || 'Other',
+                                                    medium: item.medium || 'Handcrafted'
+                                                });
+                                                setIsModalOpen(true);
+                                            }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                            <button onClick={() => { if (window.confirm(`Are you sure you want to delete this artwork?`)) deleteGalleryItem(item._id || item.id); }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                                        </div>
+                                        <div className="position-absolute top-0 start-0 p-2">
+                                            <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`} style={{ fontSize: '0.6rem' }}>{item.status}</div>
+                                        </div>
+                                        <div className="position-absolute bottom-0 start-0 p-2 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <span className="text-white-50 small truncate" style={{ maxWidth: '70%', fontSize: '0.65rem' }}>{item.title}</span>
+                                                <div className="d-flex align-items-center gap-1 text-danger" style={{ fontSize: '0.65rem' }}>
+                                                    <Heart size={10} fill="currentColor" /> <span className="fw-bold text-white">{item.likes || 0}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    </Motion.div>
-                )}
+                        </Motion.div>
+                    )}
 
-                {activeTab === 'gallery' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
-                        {galleryItems.map(item => (
-                            <div key={item._id || item.id} className="col-6 col-md-3">
-                                <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
-                                    {item.type === 'video' ? (
-                                        <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
-                                    ) : (
-                                        <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
-                                    )}
-                                    <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 transition-all">
-                                        <button onClick={() => {
-                                            setUploadType('gallery');
-                                            setEditingGalleryItem(item);
-                                            setFormData({
-                                                name: item.title,
-                                                price: '',
-                                                image: item.url,
-                                                description: item.description || '',
-                                                category: item.category || 'Other',
-                                                medium: item.medium || 'Handcrafted'
-                                            });
-                                            setIsModalOpen(true);
-                                        }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
-                                        <button onClick={() => { if (window.confirm(`Are you sure you want to delete this artwork?`)) deleteGalleryItem(item._id || item.id); }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
-                                    </div>
-                                    <div className="position-absolute top-0 start-0 p-2">
-                                        <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`} style={{ fontSize: '0.6rem' }}>{item.status}</div>
-                                    </div>
-                                    <div className="position-absolute bottom-0 start-0 p-2 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
-                                        <div className="d-flex align-items-center justify-content-between">
-                                            <span className="text-white-50 small truncate" style={{ maxWidth: '70%', fontSize: '0.65rem' }}>{item.title}</span>
-                                            <div className="d-flex align-items-center gap-1 text-danger" style={{ fontSize: '0.65rem' }}>
-                                                <Heart size={10} fill="currentColor" /> <span className="fw-bold text-white">{item.likes || 0}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </Motion.div>
-                )}
-
-                {activeTab === 'messages' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
-                        {messages.filter(m => !m.isInternal).map(m => (
-                            <div key={m._id || m.id} className="col-12">
-                                <div className="glass p-4 rounded-4 border-0">
-                                    <div className="d-flex justify-content-between align-items-start mb-4">
-                                        <div className="d-flex align-items-center gap-3">
-                                            <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary"><User size={20} /></div>
-                                            <div>
-                                                <h6 className="fw-bold mb-0 text-white">{m.name}</h6>
-                                                <span className="text-muted small">{m.date}</span>
-                                            </div>
-                                        </div>
-                                        <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
-                                    </div>
-                                    <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
-                                        <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
-                                    </div>
-                                    <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
-                                        <span>Email: {m.email}</span>
-                                        <span>Phone: {m.phone}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </Motion.div>
-                )}
-
-                {activeTab === 'users' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
-                        <table className="table table-dark table-hover align-middle">
-                            <thead>
-                                <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
-                                    <th className="py-3 px-4 border-0">Identity</th>
-                                    <th className="py-3 px-4 border-0">Role</th>
-                                    <th className="py-3 px-4 border-0">Status</th>
-                                    <th className="py-3 px-4 border-0 text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users?.map(u => (
-                                    <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
-                                        <td className="py-4 px-4 border-0">
+                    {activeTab === 'messages' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
+                            {messages.filter(m => !m.isInternal).map(m => (
+                                <div key={m._id || m.id} className="col-12">
+                                    <div className="glass p-4 rounded-4 border-0">
+                                        <div className="d-flex justify-content-between align-items-start mb-4">
                                             <div className="d-flex align-items-center gap-3">
-                                                <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
-                                                <div className="d-flex flex-column">
-                                                    <span className="text-white fw-bold small">{u.username}</span>
-                                                    <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{u.email}</span>
+                                                <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary"><User size={20} /></div>
+                                                <div>
+                                                    <h6 className="fw-bold mb-0 text-white">{m.name}</h6>
+                                                    <span className="text-muted small">{m.date}</span>
                                                 </div>
                                             </div>
-                                        </td>
-                                        <td className="py-4 px-4 border-0">
-                                            <span className={`badge rounded-pill ${u.role === 'emblos' ? 'bg-primary' : 'bg-secondary'} bg-opacity-10 text-${u.role === 'emblos' ? 'primary' : 'muted'} small`}>
-                                                {u.role?.toUpperCase()}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-4 border-0">
-                                            <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'}`}>
-                                                {u.isFrozen ? 'Frozen' : 'Active'}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-4 border-0 text-end">
-                                            <div className="d-flex gap-2 justify-content-end">
-                                                <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0"><Eye size={16} /></button>
-                                                {u.role === 'emblos' && (
-                                                    <button
-                                                        onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen' })}
-                                                        className={`btn btn-sm ${u.isFrozen ? 'btn-success' : 'btn-danger'} rounded-pill`}
-                                                    >
-                                                        {u.isFrozen ? 'Unfreeze' : 'Freeze'}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </Motion.div>
-                )}
-
-                {activeTab === 'settings' && (
-                    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
-                        <div className="col-12 col-md-6">
-                            <section className="glass p-5 rounded-4 border-0 shadow-lg">
-                                <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
-                                    <Lock size={20} className="text-primary" /> Admin Security
-                                </h4>
-                                <form onSubmit={handlePassChange}>
-                                    <div className="mb-4">
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Set New Access Gateway Key</label>
-                                        <input
-                                            required
-                                            type="password"
-                                            placeholder="••••••••••••"
-                                            className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                            style={{ background: 'rgba(255,255,255,0.03) !important', letterSpacing: '0.3em' }}
-                                            value={newPass}
-                                            onChange={e => setNewPass(e.target.value)}
-                                        />
-                                    </div>
-                                    <button type="submit" className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y">Update Credentials</button>
-                                    {passUpdateStatus && (
-                                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
-                                            <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
-                                        </Motion.div>
-                                    )}
-                                </form>
-                            </section>
-                        </div>
-                    </Motion.div>
-                )}
-            </AnimatePresence>
-        </main>
-
-                            {/* Modal - Common for Product and Gallery uploads */ }
-    {
-        isModalOpen && (
-            <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1050 }}>
-                <Motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="glass p-5 rounded-5 border border-secondary border-opacity-10 w-100 shadow-2xl"
-                    style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}
-                >
-                    <div className="d-flex justify-content-between align-items-center mb-5">
-                        <h2 className="h4 fw-bold mb-0">
-                            {uploadType === 'shop' ? (editingProduct ? 'Edit Inventory' : 'Add to Shop') : (editingGalleryItem ? 'Edit Artwork' : 'Gallery Upload')}
-                        </h2>
-                        <button onClick={() => setIsModalOpen(false)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
-
-                        <div className="d-flex flex-column gap-4">
-                            <div>
-                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Artwork Label</label>
-                                <input
-                                    required
-                                    placeholder="Enter title..."
-                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                    style={{ background: 'rgba(255,255,255,0.03) !important' }}
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </div>
-
-                            {uploadType === 'gallery' && (
-                                <div className="row g-3">
-                                    <div className="col-12 col-md-6">
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Category</label>
-                                        <select
-                                            required
-                                            className="form-select bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                            style={{ background: 'rgba(255,255,255,0.03) !important' }}
-                                            value={formData.category}
-                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                        >
-                                            <option value="Painting">Painting</option>
-                                            <option value="Pencil Drawing">Pencil Drawing</option>
-                                            <option value="Calligraphy">Calligraphy</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-12 col-md-6">
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Medium</label>
-                                        <input
-                                            required
-                                            placeholder="e.g. Graphite on Paper"
-                                            className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                            style={{ background: 'rgba(255,255,255,0.03) !important' }}
-                                            value={formData.medium}
-                                            onChange={e => setFormData({ ...formData, medium: e.target.value })}
-                                        />
+                                            <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
+                                        </div>
+                                        <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
+                                            <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
+                                        </div>
+                                        <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
+                                            <span>Email: {m.email}</span>
+                                            <span>Phone: {m.phone}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            )}
+                            ))}
+                        </Motion.div>
+                    )}
 
-                            {uploadType === 'shop' && (
-                                <>
-                                    <div>
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Retail Price (₹)</label>
-                                        <div className="input-group glass rounded-4 border-0 overflow-hidden">
-                                            <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
+                    {activeTab === 'users' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
+                            <table className="table table-dark table-hover align-middle">
+                                <thead>
+                                    <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
+                                        <th className="py-3 px-4 border-0">Identity</th>
+                                        <th className="py-3 px-4 border-0">Role</th>
+                                        <th className="py-3 px-4 border-0">Status</th>
+                                        <th className="py-3 px-4 border-0 text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users?.map(u => (
+                                        <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
+                                            <td className="py-4 px-4 border-0">
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
+                                                    <div className="d-flex flex-column">
+                                                        <span className="text-white fw-bold small">{u.username}</span>
+                                                        <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{u.email}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-4 border-0">
+                                                <span className={`badge rounded-pill ${u.role === 'emblos' ? 'bg-primary' : 'bg-secondary'} bg-opacity-10 text-${u.role === 'emblos' ? 'primary' : 'muted'} small`}>
+                                                    {u.role?.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 border-0">
+                                                <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'}`}>
+                                                    {u.isFrozen ? 'Frozen' : 'Active'}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 border-0 text-end">
+                                                <div className="d-flex gap-2 justify-content-end">
+                                                    <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0"><Eye size={16} /></button>
+                                                    {u.role === 'emblos' && (
+                                                        <button
+                                                            onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen' })}
+                                                            className={`btn btn-sm ${u.isFrozen ? 'btn-success' : 'btn-danger'} rounded-pill`}
+                                                        >
+                                                            {u.isFrozen ? 'Unfreeze' : 'Freeze'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </Motion.div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
+                            <div className="col-12 col-md-6">
+                                <section className="glass p-5 rounded-4 border-0 shadow-lg">
+                                    <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
+                                        <Lock size={20} className="text-primary" /> Admin Security
+                                    </h4>
+                                    <form onSubmit={handlePassChange}>
+                                        <div className="mb-4">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Set New Access Gateway Key</label>
                                             <input
-                                                type="number"
-                                                placeholder="0.00"
-                                                className="form-control bg-transparent border-0 text-white py-3"
-                                                value={formData.price}
-                                                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                required
+                                                type="password"
+                                                placeholder="••••••••••••"
+                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important', letterSpacing: '0.3em' }}
+                                                value={newPass}
+                                                onChange={e => setNewPass(e.target.value)}
                                             />
                                         </div>
-                                    </div>
+                                        <button type="submit" className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y">Update Credentials</button>
+                                        {passUpdateStatus && (
+                                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
+                                                <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
+                                            </Motion.div>
+                                        )}
+                                    </form>
+                                </section>
+                            </div>
+                        </Motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+
+            {/* Modal - Common for Product and Gallery uploads */}
+            {
+                isModalOpen && (
+                    <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1050 }}>
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="glass p-5 rounded-5 border border-secondary border-opacity-10 w-100 shadow-2xl"
+                            style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}
+                        >
+                            <div className="d-flex justify-content-between align-items-center mb-5">
+                                <h2 className="h4 fw-bold mb-0">
+                                    {uploadType === 'shop' ? (editingProduct ? 'Edit Inventory' : 'Add to Shop') : (editingGalleryItem ? 'Edit Artwork' : 'Gallery Upload')}
+                                </h2>
+                                <button onClick={() => setIsModalOpen(false)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="d-flex flex-column gap-4">
+
+                                <div className="d-flex flex-column gap-4">
                                     <div>
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Public Description</label>
-                                        <textarea
-                                            required={uploadType === 'shop'}
-                                            rows="3"
-                                            placeholder="Artistic vision, materials, or context..."
+                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Artwork Label</label>
+                                        <input
+                                            required
+                                            placeholder="Enter title..."
                                             className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                            style={{ background: 'rgba(255,255,255,0.03) !important', resize: 'none' }}
-                                            value={formData.description}
-                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         />
                                     </div>
-                                </>
-                            )}
 
-                            <div>
-                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Visual Resource</label>
-                                <div className="d-flex flex-column gap-3">
-                                    <label className="d-flex flex-column align-items-center justify-content-center p-5 rounded-5 cursor-pointer transition-all hover-translate-y" style={{ border: '2px dashed rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
-                                        <div className="bg-primary bg-opacity-10 p-3 rounded-pill mb-3 text-primary shadow-lg shadow-primary-10">
-                                            <Upload size={24} />
-                                        </div>
-                                        <span className="fw-bold small text-white-50">Drag & Drop or Multi-Select</span>
-                                        <span className="text-muted extra-small mt-1">Images or MP4 Videos supported</span>
-                                        <input type="file" accept="image/*,video/*" onChange={handleImageUpload} className="d-none" />
-                                    </label>
-
-                                    {formData.image && (
-                                        <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
-                                            {(imageFile?.type?.includes('video') || (editingGalleryItem?.type === 'video')) ? (
-                                                <video src={formData.image} className="w-100 h-100 object-fit-cover" muted controls autoPlay loop playsInline />
-                                            ) : (
-                                                <img src={formData.image} className="w-100 h-100 object-fit-cover" alt="" />
-                                            )}
-                                            <div className="position-absolute top-0 end-0 m-2">
-                                                <button type="button" onClick={() => resetForm()} className="btn btn-sm btn-danger rounded-circle p-2 shadow-lg"><X size={14} /></button>
+                                    {uploadType === 'gallery' && (
+                                        <div className="row g-3">
+                                            <div className="col-12 col-md-6">
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Category</label>
+                                                <select
+                                                    required
+                                                    className="form-select bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                    style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                                    value={formData.category}
+                                                    onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                                >
+                                                    <option value="Painting">Painting</option>
+                                                    <option value="Pencil Drawing">Pencil Drawing</option>
+                                                    <option value="Calligraphy">Calligraphy</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
                                             </div>
-                                        </Motion.div>
+                                            <div className="col-12 col-md-6">
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block" style={{ letterSpacing: '0.05em' }}>Medium</label>
+                                                <input
+                                                    required
+                                                    placeholder="e.g. Graphite on Paper"
+                                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                    style={{ background: 'rgba(255,255,255,0.03) !important' }}
+                                                    value={formData.medium}
+                                                    onChange={e => setFormData({ ...formData, medium: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
                                     )}
-                                </div>
-                            </div>
-                        </div>
 
-                        <button type="submit" disabled={isUploading} className="btn btn-primary py-3 rounded-4 fw-bold border-0 mt-4 shadow-xl transition-all hover-translate-y">
-                            {isUploading ? (
-                                <div className="d-flex align-items-center justify-content-center gap-3">
-                                    <span className="spinner-border spinner-border-sm" role="status"></span>
-                                    <span>Transmitting Data...</span>
+                                    {uploadType === 'shop' && (
+                                        <>
+                                            <div>
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Retail Price (₹)</label>
+                                                <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                    <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="0.00"
+                                                        className="form-control bg-transparent border-0 text-white py-3"
+                                                        value={formData.price}
+                                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Public Description</label>
+                                                <textarea
+                                                    required={uploadType === 'shop'}
+                                                    rows="3"
+                                                    placeholder="Artistic vision, materials, or context..."
+                                                    className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                    style={{ background: 'rgba(255,255,255,0.03) !important', resize: 'none' }}
+                                                    value={formData.description}
+                                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <div>
+                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Visual Resource</label>
+                                        <div className="d-flex flex-column gap-3">
+                                            <label className="d-flex flex-column align-items-center justify-content-center p-5 rounded-5 cursor-pointer transition-all hover-translate-y" style={{ border: '2px dashed rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
+                                                <div className="bg-primary bg-opacity-10 p-3 rounded-pill mb-3 text-primary shadow-lg shadow-primary-10">
+                                                    <Upload size={24} />
+                                                </div>
+                                                <span className="fw-bold small text-white-50">Drag & Drop or Multi-Select</span>
+                                                <span className="text-muted extra-small mt-1">Images or MP4 Videos supported</span>
+                                                <input type="file" accept="image/*,video/*" onChange={handleImageUpload} className="d-none" />
+                                            </label>
+
+                                            {formData.image && (
+                                                <Motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="position-relative rounded-4 overflow-hidden shadow-2xl" style={{ height: '200px' }}>
+                                                    {(imageFile?.type?.includes('video') || (editingGalleryItem?.type === 'video')) ? (
+                                                        <video src={formData.image} className="w-100 h-100 object-fit-cover" muted controls autoPlay loop playsInline />
+                                                    ) : (
+                                                        <img src={formData.image} className="w-100 h-100 object-fit-cover" alt="" />
+                                                    )}
+                                                    <div className="position-absolute top-0 end-0 m-2">
+                                                        <button type="button" onClick={() => resetForm()} className="btn btn-sm btn-danger rounded-circle p-2 shadow-lg"><X size={14} /></button>
+                                                    </div>
+                                                </Motion.div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            ) : (
-                                (editingProduct || editingGalleryItem) ? 'Commit Changes' : 'Initialize Resource'
-                            )}
-                        </button>
-                    </form>
-                </Motion.div>
-            </div>
-        )
-    }
-                        </div >
-                    );
+
+                                <button type="submit" disabled={isUploading} className="btn btn-primary py-3 rounded-4 fw-bold border-0 mt-4 shadow-xl transition-all hover-translate-y">
+                                    {isUploading ? (
+                                        <div className="d-flex align-items-center justify-content-center gap-3">
+                                            <span className="spinner-border spinner-border-sm" role="status"></span>
+                                            <span>Transmitting Data...</span>
+                                        </div>
+                                    ) : (
+                                        (editingProduct || editingGalleryItem) ? 'Commit Changes' : 'Initialize Resource'
+                                    )}
+                                </button>
+                            </form>
+                        </Motion.div>
+                    </div>
+                )
+            }
+        </div >
+    );
 };
 
 export default Admin;
