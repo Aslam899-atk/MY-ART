@@ -110,11 +110,12 @@ const Dashboard = () => {
                         </button>
                     )}
                     {isFrozen && (
-                        <div className="d-flex align-items-center gap-2 text-danger small bg-danger bg-opacity-10 p-3 rounded-4">
-                            <AlertCircle size={20} />
+                        <div className="d-flex align-items-center gap-3 text-danger bg-danger bg-opacity-10 p-4 rounded-4 w-100">
+                            <AlertCircle size={32} />
                             <div>
-                                <div className="fw-bold">Payment Expired</div>
-                                <div>Contact Admin to unfreeze.</div>
+                                <div className="fw-bold h5 mb-1">Account Frozen</div>
+                                <div className="small opacity-75">നിങ്ങളുടെ സബ്സ്ക്രിപ്ഷൻ കാലാവധി കഴിഞ്ഞിരിക്കുന്നു. പഴയ വർക്കുകൾ ഇപ്പോൾ പബ്ലിക് സൈറ്റിൽ കാണില്ല.</div>
+                                <div className="small fw-bold mt-1">Contact Admin to activate again.</div>
                             </div>
                         </div>
                     )}

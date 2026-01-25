@@ -140,18 +140,60 @@ app.get('/api/users', asyncHandler(async (req, res) => {
 
 // ACTIONS
 app.get('/api/products', asyncHandler(async (req, res) => {
-    // Show active items, or legacy items that have no status field yet
-    const filter = req.query.all === 'true' ? {} : { status: { $in: ['active', null, undefined] } };
+    // PUBLIC view: only active items from non-frozen users
+    const filter = req.query.all === 'true' ? {} : { status: 'active' };
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
 }));
 
+// Automatic Subscription Management (Freeze Expired Users)
+const handleSubscriptionExpiries = async () => {
+    try {
+        const now = new Date();
+        const expiredUsers = await User.find({
+            role: 'emblos',
+            isFrozen: false,
+            'emblosAccess.endDate': { $lt: now }
+        });
+
+        if (expiredUsers.length > 0) {
+            console.log(`❄️ Freezing ${expiredUsers.length} expired accounts...`);
+            for (const user of expiredUsers) {
+                user.isFrozen = true;
+                await user.save();
+                // Hide their items
+                await Promise.all([
+                    Product.updateMany({ creatorId: user._id }, { status: 'frozen' }),
+                    Gallery.updateMany({ creatorId: user._id }, { status: 'frozen' })
+                ]);
+            }
+        }
+    } catch (e) {
+        console.error("Auto-freeze error:", e);
+    }
+};
+
+// Run subscription check every hour
+setInterval(handleSubscriptionExpiries, 3600000);
+
 // Self-healing migration for existing data
 const runMigration = async () => {
     try {
-        await Product.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
-        await Gallery.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
-        console.log("✅ Legacy data migration check complete.");
+        // 1. Mark legacy items as active if they have no status
+        const pMod = await Product.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
+        const gMod = await Gallery.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
+
+        // 2. Ensure all items of frozen users are marked frozen
+        const frozenUsers = await User.find({ isFrozen: true });
+        for (const user of frozenUsers) {
+            await Product.updateMany({ creatorId: user._id }, { status: 'frozen' });
+            await Gallery.updateMany({ creatorId: user._id }, { status: 'frozen' });
+        }
+
+        // 3. Run initial expiry check
+        await handleSubscriptionExpiries();
+
+        console.log("✅ Data integrity check & migration complete.");
     } catch (e) {
         console.error("Migration error:", e);
     }
