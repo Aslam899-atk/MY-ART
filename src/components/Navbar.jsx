@@ -65,9 +65,6 @@ const Navbar = () => {
                                         </button>
                                         <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end glass border-0 mt-2 p-2 shadow-2xl">
                                             <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/orders"><ShoppingBag size={14} /> My Orders</Link></li>
-                                            {isAdmin && (
-                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/admin"><LayoutDashboard size={14} /> Admin Panel</Link></li>
-                                            )}
                                             {user.role === 'emblos' && (
                                                 <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/dashboard"><LayoutDashboard size={14} /> Emblos Dashboard</Link></li>
                                             )}

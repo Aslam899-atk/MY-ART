@@ -139,11 +139,7 @@ const Login = () => {
                             </div>
                         )}
 
-                        <div className="mt-2 border-top border-secondary border-opacity-10 pt-3">
-                            <button onClick={() => navigate('/admin')} className="btn btn-link text-decoration-none text-secondary small hover-text-primary transition-all d-inline-flex align-items-center opacity-50 hover-opacity-100">
-                                <Lock size={12} className="me-1" /> Admin Access
-                            </button>
-                        </div>
+
 
                         <div className="mt-3">
                             <button onClick={() => navigate('/')} className="btn btn-link text-decoration-none text-muted small hover-text-white transition-all">
