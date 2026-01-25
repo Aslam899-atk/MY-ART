@@ -6,7 +6,7 @@ import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search }
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
-    const { products, addOrder, toggleLike, likedIds, user, addMessage } = useContext(AppContext);
+    const { products, addOrder, toggleLike, likedIds, user, addMessage, users } = useContext(AppContext);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showOrderForm, setShowOrderForm] = useState(false);
     const [showInquiryForm, setShowInquiryForm] = useState(false);
@@ -151,7 +151,8 @@ const Shop = () => {
                                 <>
                                     <div className="mb-4 text-center">
                                         <h2 className="h3 fw-bold mb-0">Complete Your <span className="text-primary">Order</span></h2>
-                                        <p className="text-muted small">You are ordering: <strong>{selectedProduct.name}</strong></p>
+                                        <p className="text-muted small mb-0">You are ordering: <strong>{selectedProduct.name}</strong></p>
+                                        <div className="extra-small opacity-50 fw-bold">By {users?.find(u => (u._id || u.id) === selectedProduct.creatorId)?.username || 'Art Void'}</div>
                                     </div>
 
 
@@ -233,7 +234,8 @@ const Shop = () => {
                                 <>
                                     <div className="mb-4 text-center">
                                         <h2 className="h3 fw-bold mb-0">Ask about <span className="text-primary">Product</span></h2>
-                                        <p className="text-muted small">Artwork: <strong>{selectedProduct.name}</strong></p>
+                                        <p className="text-muted small mb-0">Product: <strong>{selectedProduct.name}</strong></p>
+                                        <div className="extra-small opacity-50 fw-bold">By {users?.find(u => (u._id || u.id) === selectedProduct.creatorId)?.username || 'Art Void'}</div>
                                     </div>
 
                                     <div className="d-flex gap-3 align-items-start p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
