@@ -32,7 +32,8 @@ const Shop = () => {
             address: orderForm.address,
             image: selectedProduct.image,
             creatorId: selectedProduct.creatorId,
-            customerId: user?._id || user?.id
+            customerId: user?._id || user?.id,
+            type: 'product'
         });
         setIsSuccess(true);
         setTimeout(() => {
