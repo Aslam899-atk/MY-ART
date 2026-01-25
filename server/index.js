@@ -140,10 +140,23 @@ app.get('/api/users', asyncHandler(async (req, res) => {
 
 // ACTIONS
 app.get('/api/products', asyncHandler(async (req, res) => {
-    const filter = req.query.all === 'true' ? {} : { status: 'active' };
+    // Show active items, or legacy items that have no status field yet
+    const filter = req.query.all === 'true' ? {} : { status: { $in: ['active', null, undefined] } };
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
 }));
+
+// Self-healing migration for existing data
+const runMigration = async () => {
+    try {
+        await Product.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
+        await Gallery.updateMany({ status: { $exists: false } }, { $set: { status: 'active' } });
+        console.log("✅ Legacy data migration check complete.");
+    } catch (e) {
+        console.error("Migration error:", e);
+    }
+};
+runMigration();
 
 app.post('/api/products', asyncHandler(async (req, res) => {
     const { creatorId } = req.body;
@@ -201,7 +214,7 @@ app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
 
 // GALLERY
 app.get('/api/gallery', asyncHandler(async (req, res) => {
-    const filter = req.query.all === 'true' ? {} : { status: 'active' };
+    const filter = req.query.all === 'true' ? {} : { status: { $in: ['active', null, undefined] } };
     const items = await Gallery.find(filter).sort({ createdAt: -1 });
     res.json(items);
 }));

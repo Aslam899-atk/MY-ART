@@ -7,13 +7,19 @@ const LoginPopup = () => {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        if (!isLoadingAuth && !user) {
+        const hasClosed = sessionStorage.getItem('login_popup_closed');
+        if (!isLoadingAuth && !user && !hasClosed) {
             const timer = setTimeout(() => {
                 setShow(true);
-            }, 2000); // Show after 2 seconds
+            }, 3000); // 3 seconds delay
             return () => clearTimeout(timer);
         }
     }, [user, isLoadingAuth]);
+
+    const handleClose = () => {
+        setShow(false);
+        sessionStorage.setItem('login_popup_closed', 'true');
+    };
 
     if (!show || user) return null;
 
@@ -21,7 +27,7 @@ const LoginPopup = () => {
         <div className="fixed-top w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 1060, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}>
             <div className="glass p-5 rounded-4 text-center border border-white border-opacity-10 shadow-2xl position-relative" style={{ maxWidth: '400px', width: '90%' }}>
                 <button
-                    onClick={() => setShow(false)}
+                    onClick={handleClose}
                     className="position-absolute top-0 end-0 m-3 btn btn-link text-white opacity-50 hover-opacity-100"
                 >
                     <X size={20} />

@@ -28,7 +28,9 @@ const Shop = () => {
             phone: orderForm.phone,
             email: orderForm.email,
             address: orderForm.address,
-            image: selectedProduct.image
+            image: selectedProduct.image,
+            creatorId: selectedProduct.creatorId,
+            customerId: user?._id || user?.id
         });
         setIsSuccess(true);
         setTimeout(() => {
