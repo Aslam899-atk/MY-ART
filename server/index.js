@@ -213,7 +213,7 @@ app.post('/api/products', asyncHandler(async (req, res) => {
 
     const newProduct = new Product({
         ...req.body,
-        status: initialStatus
+        status: req.body.status || initialStatus
     });
     await newProduct.save();
     res.json(newProduct);
@@ -254,9 +254,9 @@ app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
     res.json({ user, item: product });
 }));
 
-// GALLERY
 app.get('/api/gallery', asyncHandler(async (req, res) => {
-    const filter = req.query.all === 'true' ? {} : { status: { $in: ['active', null, undefined] } };
+    // PUBLIC view: only active items from non-frozen users
+    const filter = req.query.all === 'true' ? {} : { status: 'active' };
     const items = await Gallery.find(filter).sort({ createdAt: -1 });
     res.json(items);
 }));
@@ -274,7 +274,7 @@ app.post('/api/gallery', asyncHandler(async (req, res) => {
 
     const newItem = new Gallery({
         ...req.body,
-        status: initialStatus
+        status: req.body.status || initialStatus
     });
     await newItem.save();
     res.json(newItem);

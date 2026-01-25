@@ -13,7 +13,9 @@ import {
     ExternalLink,
     Plus,
     X,
-    User
+    User,
+    Upload,
+    Package
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
 
@@ -42,14 +44,16 @@ const Dashboard = () => {
     }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [uploadType, setUploadType] = useState('gallery'); // 'gallery' or 'shop'
     const [uploadFormData, setUploadFormData] = useState({
         title: '',
         description: '',
         category: 'Painting',
         medium: '',
-        type: 'image',
-        url: ''
+        price: '',
+        image: '' // This will store preview URL or Cloudinary URL
     });
+    const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
     // Filter relevant data
@@ -67,23 +71,73 @@ const Dashboard = () => {
         setPriceInput({ ...priceInput, [orderId]: '' });
     };
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setUploadFormData({ ...uploadFormData, image: reader.result });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleUpload = async (e) => {
         e.preventDefault();
         if (isFrozen) return alert("Account frozen. Cannot upload.");
         setIsUploading(true);
         try {
-            // In a real app, use Cloudinary here. For now, we use the URL directly
-            // or assume user provides a URL for simplicity in this demo form.
-            // If we had imageFile state here, we'd do the same as Admin.jsx.
-            await addGalleryItem({
-                ...uploadFormData,
-                status: 'pending' // Always pending for Emblos
-            });
+            let finalImageUrl = uploadFormData.image;
+
+            if (imageFile) {
+                const cloudData = new FormData();
+                cloudData.append('file', imageFile);
+                cloudData.append('upload_preset', 'hnefpiqg');
+                cloudData.append('cloud_name', 'dw7wcsate');
+
+                const resourceType = imageFile.type.includes('video') ? 'video' : 'image';
+                const response = await fetch(`https://api.cloudinary.com/v1_1/dw7wcsate/${resourceType}/upload`, {
+                    method: 'POST',
+                    body: cloudData
+                });
+
+                const data = await response.json();
+                if (data.secure_url) {
+                    finalImageUrl = data.secure_url;
+                } else {
+                    throw new Error("Upload failed");
+                }
+            }
+
+            if (uploadType === 'gallery') {
+                const itemType = imageFile?.type?.includes('video') ? 'video' : 'image';
+                await addGalleryItem({
+                    title: uploadFormData.title,
+                    description: uploadFormData.description,
+                    category: uploadFormData.category,
+                    medium: uploadFormData.medium,
+                    url: finalImageUrl,
+                    type: itemType,
+                    status: 'pending'
+                });
+            } else {
+                await addProduct({
+                    name: uploadFormData.title,
+                    description: uploadFormData.description,
+                    price: Number(uploadFormData.price) || 0,
+                    image: finalImageUrl,
+                    status: 'pending'
+                });
+            }
+
             setIsUploadModalOpen(false);
-            setUploadFormData({ title: '', description: '', category: 'Painting', medium: '', type: 'image', url: '' });
-            alert("Uploaded successfully! Waiting for Admin approval.");
+            setUploadFormData({ title: '', description: '', category: 'Painting', medium: '', price: '', image: '' });
+            setImageFile(null);
+            alert("Sent for Admin Approval! Your work will be public once approved.");
         } catch (err) {
-            alert("Upload failed.");
+            console.error(err);
+            alert("Upload failed. Please check your connection.");
         } finally {
             setIsUploading(false);
         }
@@ -122,44 +176,97 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Modal */}
             {isUploadModalOpen && (
-                <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 11000 }}>
-                    <div className="glass p-5 rounded-5 border border-white border-opacity-10 w-100" style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fw-bold mb-0 text-gradient">Upload New Artwork</h4>
-                            <button onClick={() => setIsUploadModalOpen(false)} className="btn text-white-50"><X size={24} /></button>
+                <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.92)', zIndex: 11000 }}>
+                    <div className="glass p-5 rounded-5 border border-white border-opacity-10 w-100 shadow-2xl" style={{ maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="d-flex justify-content-between align-items-center mb-5">
+                            <h2 className="h4 fw-bold mb-0 text-gradient">New Creation</h2>
+                            <button onClick={() => setIsUploadModalOpen(false)} className="btn text-white-50 p-2 rounded-circle hover-glass"><X size={24} /></button>
                         </div>
+
+                        {/* Type Toggle */}
+                        <div className="d-flex gap-2 p-2 glass rounded-4 mb-5 border-0">
+                            <button onClick={() => setUploadType('gallery')} className={`btn flex-grow-1 rounded-3 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 border-0 ${uploadType === 'gallery' ? 'btn-primary shadow-glow' : 'text-white-50'}`}>
+                                <ImageIcon size={18} /> Gallery Artwork
+                            </button>
+                            <button onClick={() => setUploadType('shop')} className={`btn flex-grow-1 rounded-3 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 border-0 ${uploadType === 'shop' ? 'btn-primary shadow-glow' : 'text-white-50'}`}>
+                                <Package size={18} /> Shop Product
+                            </button>
+                        </div>
+
                         <form onSubmit={handleUpload} className="d-flex flex-column gap-4">
                             <div>
-                                <label className="small fw-bold opacity-50 mb-2">Title</label>
-                                <input required className="form-control glass border-0 text-white" value={uploadFormData.title} onChange={e => setUploadFormData({ ...uploadFormData, title: e.target.value })} />
+                                <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">{uploadType === 'gallery' ? 'Artwork' : 'Product'} Title</label>
+                                <input required placeholder="Enter title..." className="form-control glass border-0 text-white py-3" value={uploadFormData.title} onChange={e => setUploadFormData({ ...uploadFormData, title: e.target.value })} />
                             </div>
-                            <div className="row">
-                                <div className="col-6">
-                                    <label className="small fw-bold opacity-50 mb-2">Category</label>
-                                    <select className="form-select glass border-0 text-white" value={uploadFormData.category} onChange={e => setUploadFormData({ ...uploadFormData, category: e.target.value })}>
-                                        <option value="Painting" className="bg-dark">Painting</option>
-                                        <option value="Pencil Drawing" className="bg-dark">Pencil Drawing</option>
-                                        <option value="Calligraphy" className="bg-dark">Calligraphy</option>
-                                        <option value="Other" className="bg-dark">Other</option>
-                                    </select>
+
+                            {uploadType === 'gallery' ? (
+                                <div className="row g-3">
+                                    <div className="col-6">
+                                        <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">Category</label>
+                                        <select className="form-select glass border-0 text-white py-3" value={uploadFormData.category} onChange={e => setUploadFormData({ ...uploadFormData, category: e.target.value })}>
+                                            <option value="Painting" className="bg-dark">Painting</option>
+                                            <option value="Pencil Drawing" className="bg-dark">Pencil Drawing</option>
+                                            <option value="Calligraphy" className="bg-dark">Calligraphy</option>
+                                            <option value="Other" className="bg-dark">Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-6">
+                                        <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">Medium</label>
+                                        <input required className="form-control glass border-0 text-white py-3" placeholder="e.g. Oil on Canvas" value={uploadFormData.medium} onChange={e => setUploadFormData({ ...uploadFormData, medium: e.target.value })} />
+                                    </div>
                                 </div>
-                                <div className="col-6">
-                                    <label className="small fw-bold opacity-50 mb-2">Medium</label>
-                                    <input required className="form-control glass border-0 text-white" placeholder="e.g. Oil on Canvas" value={uploadFormData.medium} onChange={e => setUploadFormData({ ...uploadFormData, medium: e.target.value })} />
+                            ) : (
+                                <div>
+                                    <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">Price (₹)</label>
+                                    <div className="input-group glass rounded-3 border-0 overflow-hidden">
+                                        <span className="input-group-text bg-transparent border-0 text-primary ps-3 small fw-bold">₹</span>
+                                        <input type="number" required placeholder="0.00" className="form-control bg-transparent border-0 text-white py-3 shadow-none" value={uploadFormData.price} onChange={e => setUploadFormData({ ...uploadFormData, price: e.target.value })} />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">Description</label>
+                                <textarea className="form-control glass border-0 text-white py-3" rows="3" placeholder="Tell us about this creation..." value={uploadFormData.description} onChange={e => setUploadFormData({ ...uploadFormData, description: e.target.value })} />
+                            </div>
+
+                            <div>
+                                <label className="small fw-bold opacity-50 mb-2 uppercase tracking-widest">Choose Picture / Video</label>
+                                <div className="d-flex flex-column gap-3">
+                                    <label className="d-flex flex-column align-items-center justify-content-center p-5 rounded-5 cursor-pointer transition-all hover-glass border-2 border-dashed border-secondary border-opacity-20" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                        <div className="bg-primary bg-opacity-10 p-3 rounded-pill mb-3 text-primary shadow-lg"><Upload size={24} /></div>
+                                        <span className="fw-bold small text-white-50">Drag & Drop or Multi-Select</span>
+                                        <span className="text-muted extra-small mt-1">Images or MP4 Videos supported</span>
+                                        <input type="file" required={!uploadFormData.image} accept="image/*,video/*" onChange={handleImageUpload} className="d-none" />
+                                    </label>
+
+                                    {uploadFormData.image && (
+                                        <div className="position-relative rounded-4 overflow-hidden border border-white border-opacity-10 shadow-2xl" style={{ height: '220px' }}>
+                                            {imageFile?.type?.includes('video') ? (
+                                                <video src={uploadFormData.image} className="w-100 h-100 object-fit-cover" muted controls autoPlay loop playsInline />
+                                            ) : (
+                                                <img src={uploadFormData.image} className="w-100 h-100 object-fit-cover" alt="" />
+                                            )}
+                                            <div className="position-absolute top-0 end-0 m-3">
+                                                <button type="button" onClick={() => { setImageFile(null); setUploadFormData({ ...uploadFormData, image: '' }); }} className="btn btn-sm btn-danger rounded-circle p-2 shadow-lg"><X size={14} /></button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div>
-                                <label className="small fw-bold opacity-50 mb-2">Resource URL</label>
-                                <input required className="form-control glass border-0 text-white" placeholder="https://..." value={uploadFormData.url} onChange={e => setUploadFormData({ ...uploadFormData, url: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="small fw-bold opacity-50 mb-2">Description</label>
-                                <textarea className="form-control glass border-0 text-white" rows="3" value={uploadFormData.description} onChange={e => setUploadFormData({ ...uploadFormData, description: e.target.value })} />
-                            </div>
-                            <button type="submit" disabled={isUploading} className="btn btn-primary py-3 rounded-pill fw-bold shadow-glow border-0">
-                                {isUploading ? 'Uploading...' : 'Submit for Approval'}
+
+                            <button type="submit" disabled={isUploading} className="btn btn-primary py-4 rounded-4 fw-bold shadow-glow border-0 mt-3 d-flex align-items-center justify-content-center gap-2">
+                                {isUploading ? (
+                                    <>
+                                        <div className="spinner-border spinner-border-sm" role="status"></div>
+                                        <span>Transmitting to Server...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus size={20} /> Submit for Approval
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
