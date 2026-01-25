@@ -4,7 +4,7 @@ import { Send, Mail, User, MessageCircle, Upload, X, Instagram, Phone, MapPin } 
 import { motion as Motion } from 'framer-motion';
 
 const Contact = () => {
-    const [msgType, setMsgType] = useState('inquiry'); // 'inquiry' or 'service'
+    const msgType = 'service'; // Always 'service' now
     const [formData, setFormData] = useState({ name: '', email: '', image: '', phone: '', address: '' });
     const { addMessage, addOrder } = useContext(AppContext);
     const [submitted, setSubmitted] = useState(false);
@@ -68,7 +68,7 @@ const Contact = () => {
                             transition={{ delay: 0.1 }}
                             className="display-2 fw-bold mb-3"
                         >
-                            Project <span className="text-gradient">Inquiries</span>
+                            Order <span className="text-gradient">Request</span>
                         </Motion.h1>
                         <Motion.p
                             initial={{ opacity: 0 }}
@@ -77,7 +77,7 @@ const Contact = () => {
                             className="lead text-muted mx-auto"
                             style={{ maxWidth: '600px' }}
                         >
-                            Ready to transform your vision into a masterpiece? Whether it's a custom commission or a general query, we're here to help.
+                            Ready to transform your vision into a masterpiece? Submit your custom commission request below, and we'll get back to you shortly.
                         </Motion.p>
                     </header>
 
@@ -142,20 +142,7 @@ const Contact = () => {
                         {/* FORM AREA */}
                         <div className="col-lg-8 order-lg-1">
                             <div className="glass p-4 p-md-5 border-0">
-                                <div className="d-flex gap-3 mb-5 p-2 rounded-pill glass" style={{ maxWidth: '400px', background: 'rgba(255,255,255,0.05)' }}>
-                                    <button
-                                        onClick={() => setMsgType('inquiry')}
-                                        className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'inquiry' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
-                                    >
-                                        Message
-                                    </button>
-                                    <button
-                                        onClick={() => setMsgType('service')}
-                                        className={`flex-grow-1 btn rounded-pill py-2 border-0 transition-all small fw-bold ${msgType === 'service' ? 'btn-primary shadow-sm' : 'text-white opacity-50'}`}
-                                    >
-                                        Order Request
-                                    </button>
-                                </div>
+                                <h3 className="h4 fw-bold mb-5 font-serif text-center">Commission Brief</h3>
 
                                 <form onSubmit={handleSubmit} className="row g-4">
                                     <div className="col-md-6 d-flex flex-column gap-2">
@@ -231,7 +218,7 @@ const Contact = () => {
 
                                     <div className="col-12 mt-4">
                                         <button type="submit" className="btn btn-primary btn-lg w-100 py-3 rounded-pill d-flex align-items-center justify-content-center gap-3 border-0 fw-bold shadow-lg">
-                                            <Send size={20} /> {msgType === 'service' ? 'Send Brief' : 'Submit Inquiry'}
+                                            <Send size={20} /> Send Order Brief
                                         </button>
                                     </div>
 

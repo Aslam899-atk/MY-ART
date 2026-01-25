@@ -2,16 +2,16 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';
-import { Heart, Search, Share2, ZoomIn, X, Play, Filter } from 'lucide-react';
+import { Heart, Search, Share2, ZoomIn, X, Play, Filter, MessageSquare, Send } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Gallery = () => {
-    const { galleryItems, toggleGalleryLike, likedIds, addMessage, user } = useContext(AppContext);
+    const { galleryItems, toggleGalleryLike, likedIds, addMessage, user, addGalleryComment } = useContext(AppContext);
     const [selectedItem, setSelectedItem] = useState(null);
     const [filter, setFilter] = useState('All');
-    const [showInquiryForm, setShowInquiryForm] = useState(false);
-    const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', email: '' });
-    const [isSuccess, setIsSuccess] = useState(false);
+    const [showComments, setShowComments] = useState(false);
+    const [commentText, setCommentText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const categories = ['All', 'Painting', 'Pencil Drawing', 'Calligraphy', 'Other'];
 
@@ -19,21 +19,18 @@ const Gallery = () => {
         ? galleryItems
         : galleryItems.filter(item => item.category === filter);
 
-    const handleShare = async (item) => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: item.title || 'Art Void Gallery',
-                    text: 'Explore this masterpiece from Art Void Studio.',
-                    url: window.location.href
-                });
-            } catch {
-                console.log('Share canceled');
-            }
-        } else {
-            alert('URL copied to clipboard!');
-            navigator.clipboard.writeText(window.location.href);
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        if (!commentText.trim() || !selectedItem) return;
+        setIsSubmitting(true);
+        const res = await addGalleryComment(selectedItem._id || selectedItem.id, commentText);
+        if (res?.success) {
+            setCommentText('');
+            // Refresh local selected item to show the new comment immediately
+            const updatedItem = galleryItems.find(i => (i._id || i.id) === (selectedItem._id || selectedItem.id));
+            if (updatedItem) setSelectedItem(updatedItem);
         }
+        setIsSubmitting(false);
     };
 
     return (
@@ -108,8 +105,7 @@ const Gallery = () => {
                                         src={item.url}
                                         alt={item.title || 'Artwork'}
                                         className="w-100 h-100 transition-transform duration-700 hover-zoom"
-                                        onClick={() => setSelectedItem(item)}
-                                        style={{ cursor: 'pointer' }}
+                                        style={{ objectFit: 'cover' }}
                                     />
                                 )}
 
@@ -136,7 +132,20 @@ const Gallery = () => {
                                             <Heart size={18} fill={likedIds.includes(item._id || item.id) ? "var(--primary)" : "none"} className={likedIds.includes(item._id || item.id) ? "text-primary border-0" : ""} />
                                         </button>
                                         <button
-                                            onClick={() => handleShare(item)}
+                                            onClick={() => { setSelectedItem(item); setShowComments(true); }}
+                                            className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
+                                        >
+                                            <MessageSquare size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (navigator.share) {
+                                                    navigator.share({ title: item.title, url: window.location.href });
+                                                } else {
+                                                    alert('Link copied!');
+                                                    navigator.clipboard.writeText(window.location.href);
+                                                }
+                                            }}
                                             className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
                                         >
                                             <Share2 size={18} />
@@ -157,29 +166,10 @@ const Gallery = () => {
                 </AnimatePresence>
             </div>
 
-            {/* Premium Preview Modal */}
-            <ItemPreview
-                item={selectedItem}
-                isOpen={!!selectedItem && !showInquiryForm}
-                onClose={() => setSelectedItem(null)}
-                isLiked={selectedItem && likedIds.includes(selectedItem._id || selectedItem.id)}
-                toggleLike={() => toggleGalleryLike(selectedItem?._id || selectedItem?.id)}
-                onInquire={() => setShowInquiryForm(true)}
-                onNext={() => {
-                    const currentIndex = filteredItems.findIndex(i => (i._id || i.id) === (selectedItem?._id || selectedItem?.id));
-                    const nextIndex = (currentIndex + 1) % filteredItems.length;
-                    setSelectedItem(filteredItems[nextIndex]);
-                }}
-                onPrev={() => {
-                    const currentIndex = filteredItems.findIndex(i => (i._id || i.id) === (selectedItem?._id || selectedItem?.id));
-                    const prevIndex = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
-                    setSelectedItem(filteredItems[prevIndex]);
-                }}
-            />
-
+            {/* Simple Comment Modal */}
             <AnimatePresence>
-                {selectedItem && showInquiryForm && (
-                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.95)', zIndex: 11000, overflowY: 'auto', backdropFilter: 'blur(10px)' }}>
+                {showComments && selectedItem && (
+                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 11000, backdropFilter: 'blur(10px)' }}>
                         <Motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -188,78 +178,51 @@ const Gallery = () => {
                             style={{ maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}
                         >
                             <button
-                                onClick={() => setShowInquiryForm(false)}
+                                onClick={() => { setShowComments(false); setSelectedItem(null); }}
                                 className="position-absolute top-0 end-0 m-4 btn text-muted p-0 border-0"
                             >
                                 <X size={24} />
                             </button>
 
-                            {!isSuccess ? (
-                                <>
-                                    <div className="mb-4 text-center">
-                                        <h2 className="h3 fw-bold mb-0">Ask about <span className="text-primary">Masterpiece</span></h2>
-                                        <p className="text-muted small">Artwork: <strong>{selectedItem.title}</strong></p>
-                                    </div>
+                            <div className="mb-4 text-center">
+                                <h2 className="h4 fw-bold mb-1">Community <span className="text-primary">Talk</span></h2>
+                                <p className="text-muted small">on {selectedItem.title}</p>
+                            </div>
 
-                                    <div className="d-flex gap-3 align-items-start p-3 rounded-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                        <div className="flex-shrink-0">
-                                            <img
-                                                src={selectedItem.url}
-                                                alt={selectedItem.title}
-                                                className="rounded-3"
-                                                style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                                            />
+                            <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+                                {selectedItem.comments && selectedItem.comments.length > 0 ? (
+                                    selectedItem.comments.map((comment, idx) => (
+                                        <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                                <span className="fw-bold extra-small text-primary">{comment.username}</span>
+                                                <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
+                                            </div>
+                                            <p className="extra-small mb-0 text-white-50">{comment.text}</p>
                                         </div>
-                                        <div>
-                                            <div className="fw-bold fs-5">{selectedItem.title}</div>
-                                            <div className="text-primary small fw-bold">{selectedItem.medium}</div>
-                                        </div>
-                                    </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-5 opacity-30 small italic">No comments yet. Be the first!</div>
+                                )}
+                            </div>
 
-                                    <form onSubmit={(e) => {
-                                        e.preventDefault();
-                                        addMessage({
-                                            name: inquiryForm.name,
-                                            phone: inquiryForm.phone,
-                                            email: inquiryForm.email,
-                                            message: `Inquiry about artwork: "${selectedItem.title}" (${selectedItem.category})`,
-                                            receiverId: selectedItem.creatorId,
-                                            image: selectedItem.url,
-                                            type: 'inquiry'
-                                        });
-                                        setIsSuccess(true);
-                                        setTimeout(() => {
-                                            setIsSuccess(false);
-                                            setShowInquiryForm(false);
-                                            setSelectedItem(null);
-                                            setInquiryForm({ name: '', phone: '', email: '' });
-                                        }, 3000);
-                                    }} className="d-flex flex-column gap-3">
-                                        <div className="alert alert-info border-0 bg-primary bg-opacity-10 text-primary small mb-0">
-                                            The artist will receive your contact details and message.
-                                        </div>
-                                        <div className="position-relative">
-                                            <User size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
-                                            <input required placeholder="Full Name" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.name} onChange={e => setInquiryForm({ ...inquiryForm, name: e.target.value })} />
-                                        </div>
-                                        <div className="position-relative">
-                                            <Phone size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
-                                            <input required placeholder="Phone Number" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.phone} onChange={e => setInquiryForm({ ...inquiryForm, phone: e.target.value })} />
-                                        </div>
-                                        <div className="position-relative">
-                                            <Mail size={18} className="position-absolute translate-middle-y text-muted" style={{ left: '1rem', top: '50%' }} />
-                                            <input required type="email" placeholder="Gmail Address" className="form-control bg-dark border-0 text-white ps-5 py-3" style={{ background: 'rgba(0,0,0,0.2) !important' }} value={inquiryForm.email} onChange={e => setInquiryForm({ ...inquiryForm, email: e.target.value })} />
-                                        </div>
-                                        <button type="submit" className="btn btn-primary py-3 fw-bold border-0 rounded-3 mt-2">Send Message</button>
-                                    </form>
-                                </>
-                            ) : (
-                                <div className="text-center py-4">
-                                    <div className="text-success mb-4"><CheckCircle size={80} /></div>
-                                    <h2 className="h2 fw-bold mb-3">Inquiry Sent!</h2>
-                                    <p className="lead text-muted">The artist has received your message about <strong className="text-white">{selectedItem.title}</strong>.</p>
-                                </div>
-                            )}
+                            <form onSubmit={handleCommentSubmit} className="position-relative mt-2">
+                                <input
+                                    type="text"
+                                    placeholder={user ? "Write a comment..." : "Login to comment"}
+                                    disabled={!user || isSubmitting}
+                                    className="form-control glass border-0 text-white extra-small py-3 ps-3 pe-5 rounded-pill"
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!user || isSubmitting || !commentText.trim()}
+                                    className="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-1 p-2 rounded-circle border-0 d-flex align-items-center justify-content-center"
+                                    style={{ width: '32px', height: '32px' }}
+                                >
+                                    <Send size={14} />
+                                </button>
+                            </form>
                         </Motion.div>
                     </div>
                 )}
