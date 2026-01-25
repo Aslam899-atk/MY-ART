@@ -7,7 +7,7 @@ import {
     CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
     Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
     ChevronRight, Filter, ExternalLink, MoreVertical, Eye,
-    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3
+    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush
 } from 'lucide-react';
 
 const Admin = () => {
@@ -54,11 +54,14 @@ const Admin = () => {
         const totalLikes = products.reduce((sum, p) => sum + (p.likes || 0), 0) + galleryItems.reduce((sum, g) => sum + (g.likes || 0), 0);
         const pendingRequests = users?.filter(u => u.emblosAccess?.status === 'pending').length || 0;
 
+        const emblosCount = users?.filter(u => u.role === 'emblos').length || 0;
+
         return {
             revenue: totalRevenue,
             pending: pendingOrders,
             likes: totalLikes,
             users: users?.length || 0,
+            emblos: emblosCount,
             requests: pendingRequests,
             growth: '+12.5%'
         };
@@ -364,9 +367,10 @@ const Admin = () => {
                                 { label: 'Total Revenue', value: `₹${stats.revenue}`, icon: DollarSign, color: 'primary', trend: '+5.4%' },
                                 { label: 'Active Orders', value: stats.pending, icon: ShoppingBag, color: 'success', trend: 'Critical' },
                                 { label: 'Engagement', value: stats.likes, icon: Heart, color: 'danger', trend: '+18%' },
+                                { label: 'Total Emblos', value: stats.emblos, icon: Brush, color: 'warning', trend: 'Active' },
                                 { label: 'Art Collectors', value: stats.users, icon: UsersIcon, color: 'info', trend: stats.growth },
                             ].map((stat, idx) => (
-                                <div key={idx} className="col-12 col-md-6 col-xl-3">
+                                <div key={idx} className="col-12 col-md-6 col-xl">
                                     <div className="glass p-4 rounded-4 border-0 h-100 transition-all hover-translate-y">
                                         <div className="d-flex justify-content-between align-items-start mb-3">
                                             <div className={`bg-${stat.color} bg-opacity-10 p-2 rounded-3 text-${stat.color}`}>
@@ -801,7 +805,7 @@ const Admin = () => {
                                     )}
 
                                     <div>
-                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Visual Resource</label>
+                                        <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Choose Picture / Video</label>
                                         <div className="d-flex flex-column gap-3">
                                             <label className="d-flex flex-column align-items-center justify-content-center p-5 rounded-5 cursor-pointer transition-all hover-translate-y" style={{ border: '2px dashed rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
                                                 <div className="bg-primary bg-opacity-10 p-3 rounded-pill mb-3 text-primary shadow-lg shadow-primary-10">
