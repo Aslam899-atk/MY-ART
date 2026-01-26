@@ -607,3 +607,30 @@ a {
   flex-direction: row !important;
   margin-top: 75px;
 }
+
+.shadow-glow-blue {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.shadow-glow-blue:focus {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  outline: none;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.blink {
+  animation: blink 2s infinite;
+}

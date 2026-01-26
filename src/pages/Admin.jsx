@@ -626,11 +626,11 @@ const Admin = () => {
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
                                                     <select
-                                                        className="form-select form-select-sm glass border-0 text-white fw-bold"
-                                                        style={{ width: '140px', fontSize: '0.75rem' }}
+                                                        className={`form-select form-select-sm glass border-0 text-white fw-bold ${(!isAdmin && o.creatorId?.toString() === (user?._id || user?.id)?.toString()) ? 'shadow-glow-blue' : ''}`}
+                                                        style={{ width: '140px', fontSize: '0.75rem', cursor: 'pointer' }}
                                                         value={o.deliveryStatus || 'Pending'}
                                                         onChange={(e) => updateOrderStatus(o._id, e.target.value, true)}
-                                                        disabled={!isAdmin && o.creatorId !== (user?._id || user?.id)}
+                                                        disabled={!isAdmin && o.creatorId?.toString() !== (user?._id || user?.id)?.toString()}
                                                     >
                                                         <option value="Pending" className="bg-dark">⏳ Pending</option>
                                                         <option value="Shipped" className="bg-dark">🚚 Shipped</option>
