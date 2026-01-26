@@ -43,6 +43,53 @@ html {
   background: rgba(124, 58, 237, 0.6);
 }
 
+/* Skeleton Animation */
+@keyframes skeleton-loading {
+  0% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  100% {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.skeleton {
+  animation: skeleton-loading 1.5s linear infinite alternate;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  transition: transform 0.1s ease-out, opacity 0.3s ease;
+  mix-blend-mode: difference;
+}
+
+.custom-cursor-follower {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  transition: transform 0.05s ease-out;
+}
+
+@media (max-width: 768px) {
+
+  .custom-cursor,
+  .custom-cursor-follower {
+    display: none;
+  }
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--bg-dark);

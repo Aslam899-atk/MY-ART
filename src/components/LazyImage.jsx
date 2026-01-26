@@ -6,17 +6,15 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
 
     return (
         <div
-            className={`${className} position-relative`}
-            style={{ ...style, backgroundColor: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}
+            className={`${className} position-relative skeleton`}
+            style={{
+                ...style,
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                overflow: 'hidden',
+                aspectRatio: props.aspectRatio || 'unset'
+            }}
             onClick={onClick}
         >
-            {/* Loading Placeholder */}
-            {!isLoaded && !hasError && (
-                <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-gray-900">
-                    <div className="spinner-border text-secondary" role="status" style={{ width: '1.5rem', height: '1.5rem', opacity: 0.5, borderWidth: '0.15em' }}></div>
-                </div>
-            )}
-
             <img
                 src={src}
                 alt={alt}
@@ -24,7 +22,7 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                 style={{
                     objectFit: 'cover',
                     opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.5s ease-in-out',
+                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                     ...style
                 }}
                 loading="lazy"
@@ -32,6 +30,13 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                 onError={() => setHasError(true)}
                 {...props}
             />
+
+            {/* Error state */}
+            {hasError && (
+                <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark">
+                    <span className="extra-small text-muted">Image Unavailable</span>
+                </div>
+            )}
         </div>
     );
 };

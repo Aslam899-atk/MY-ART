@@ -45,7 +45,14 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="footer-bottom pt-5 border-top border-secondary border-opacity-10 text-center">
+                <div className="footer-bottom pt-5 border-top border-secondary border-opacity-10 text-center position-relative">
+                    <button
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="btn glass rounded-circle p-2 text-white border-0 position-absolute end-0 top-0 translate-middle-y mt-0 me-3 hover-scale"
+                        title="Back to top"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                    </button>
                     <p className="small text-muted mb-0">
                         © {new Date().getFullYear()} ART VOID • Professional Portfolio • Designed with passion
                     </p>

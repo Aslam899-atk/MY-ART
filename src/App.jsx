@@ -15,6 +15,7 @@ import RequestAccess from './pages/RequestAccess';
 import Dashboard from './pages/Dashboard';
 import UserOrders from './pages/UserOrders';
 import SupabaseHelp from './pages/SupabaseHelp';
+import CustomCursor from './components/CustomCursor';
 
 
 function AppContent() {
@@ -79,6 +80,7 @@ function AppContent() {
   return (
     <Router>
       <div className="app">
+        <CustomCursor />
         <LoginPopup />
         <Navbar />
         <Routes>
