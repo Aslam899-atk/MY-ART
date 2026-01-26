@@ -506,6 +506,7 @@ const Admin = () => {
                                     <thead>
                                         <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20 uppercase small">
                                             <th className="py-3 px-4 border-0">Item</th>
+                                            <th className="py-3 px-4 border-0">Reference</th>
                                             <th className="py-3 px-4 border-0">Creator (Emblos)</th>
                                             <th className="py-3 px-4 border-0">Customer</th>
                                             <th className="py-3 px-4 border-0">Price</th>
@@ -526,13 +527,17 @@ const Admin = () => {
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
                                                         {o.image ? (
-                                                            <img
-                                                                src={o.image}
-                                                                className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                                                alt=""
-                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image })}
-                                                            />
+                                                            <div className="position-relative group" onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}>
+                                                                <img
+                                                                    src={o.image}
+                                                                    className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                                                    alt=""
+                                                                />
+                                                                <div className="position-absolute top-50 start-50 translate-middle opacity-0 group-hover-opacity-100 transition-all pointer-events-none">
+                                                                    <Eye size={20} className="text-white shadow-lg" />
+                                                                </div>
+                                                            </div>
                                                         ) : (
                                                             <div
                                                                 className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer"
@@ -549,6 +554,18 @@ const Admin = () => {
                                                             {!o.productId && <div className="extra-small text-warning fw-bold" style={{ fontSize: '0.6rem' }}>External Request</div>}
                                                         </div>
                                                     </div>
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    {o.image ? (
+                                                        <button
+                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}
+                                                            className="btn btn-sm btn-primary py-1 px-3 rounded-pill extra-small fw-bold d-flex align-items-center gap-2"
+                                                        >
+                                                            <ImageIcon size={12} /> View Reference
+                                                        </button>
+                                                    ) : (
+                                                        <span className="extra-small text-muted italic">No Image</span>
+                                                    )}
                                                 </td>
                                                 <td className="py-4 px-4 border-0 small">
                                                     {o.creatorId ? (

@@ -87,6 +87,7 @@ const Message = mongoose.model('Message', messageSchema);
 const orderSchema = new mongoose.Schema({
     productName: String,
     productId: String,
+    image: String, // Store reference image or shop item thumbnail
     price: Number,
     priceGiven: { type: Boolean, default: false },
     customer: String,
@@ -540,21 +541,22 @@ app.get('/api/orders', asyncHandler(async (req, res) => {
 app.post('/api/orders', asyncHandler(async (req, res) => {
     const { productId, type } = req.body;
     let creatorId = req.body.creatorId || null;
+    let image = req.body.image || null;
     let status = type === 'service' ? 'Pending Price' : 'Approved';
 
-    // If order is linked to a shop/gallery item, auto-assign to the uploader
+    // If order is linked to a shop/gallery item, auto-assign to the uploader and sync image
     if (productId) {
         const item = (await Product.findById(productId)) || (await Gallery.findById(productId));
-        if (item && item.creatorId) {
-            creatorId = item.creatorId.toString();
-            // If it's a fixed-price product, status is Approved. If it's gallery, maybe Pending Price.
-            // But based on user request: "uploaded thath in shop... that upload cheythaverk thanne order labikkanam"
+        if (item) {
+            if (item.creatorId) creatorId = item.creatorId.toString();
+            image = item.image || item.url;
         }
     }
 
     const newOrder = new Order({
         ...req.body,
         creatorId,
+        image,
         status,
         date: new Date().toLocaleDateString()
     });
