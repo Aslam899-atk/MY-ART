@@ -17,7 +17,8 @@ import {
     User,
     Upload,
     Package,
-    ClipboardList
+    ClipboardList,
+    Trash2
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
 
@@ -36,6 +37,9 @@ const Dashboard = () => {
         addGalleryItem,
         deleteProduct,
         deleteGalleryItem,
+        updateOrderStatus,
+        updateProduct,
+        updateGalleryItem,
         isLoadingAuth
     } = useContext(AppContext);
 
@@ -49,6 +53,7 @@ const Dashboard = () => {
         }
     }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
+    const [orderFilter, setOrderFilter] = useState('All');
     const [previewImage, setPreviewImage] = useState(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('gallery'); // 'gallery' or 'shop'
@@ -64,11 +69,12 @@ const Dashboard = () => {
     const [isUploading, setIsUploading] = useState(false);
 
     // Filter relevant data
-    const myProducts = products.filter(p => p.creatorId === (user?._id || user?.id));
-    const myGallery = galleryItems.filter(g => g.creatorId === (user?._id || user?.id));
-    const myOrders = orders.filter(o => o.creatorId === (user?._id || user?.id));
+    const userId = user?._id || user?.id;
+    const myProducts = products.filter(p => p.creatorId === userId);
+    const myGallery = galleryItems.filter(g => g.creatorId === userId);
+    const myOrders = orders.filter(o => o.creatorId === userId || o.customerId === userId);
     const publicTasks = orders.filter(o => o.type === 'service' && !o.creatorId);
-    const myMessages = messages.filter(m => m.receiverId === (user?._id || user?.id));
+    const myMessages = messages.filter(m => m.receiverId === userId || m.senderId === userId);
 
     const isFrozen = user?.isFrozen;
 
@@ -93,6 +99,11 @@ const Dashboard = () => {
         } else {
             alert("Claim Failed. Please try again.");
         }
+    };
+    const handleStatusChange = async (orderId, newStatus) => {
+        await updateOrderStatus(orderId, { status: newStatus });
+        // Refresh local data – simple reload for demo purposes
+        window.location.reload();
     };
 
     const handleImageUpload = (e) => {
@@ -439,63 +450,81 @@ const Dashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {myOrders.map(order => (
-                                            <tr key={order._id} className="border-bottom border-white border-opacity-5">
-                                                <td className="border-0 py-3">
-                                                    <div className="d-flex align-items-center gap-3">
-                                                        <img
-                                                            src={order.image}
-                                                            className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                                            style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                            alt=""
-                                                            onClick={() => setPreviewImage(order.image)}
-                                                        />
-                                                        <div>
-                                                            <div className="fw-bold small">{order.productName}</div>
-                                                            <div className="extra-small opacity-50">{order.date}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="border-0 small">
-                                                    <div>{order.customer}</div>
-                                                    <div className="extra-small opacity-50">{order.phone}</div>
-                                                </td>
-                                                <td className="border-0">
-                                                    {order.price ? (
-                                                        <span className="fw-bold text-primary">₹{order.price}</span>
-                                                    ) : (
-                                                        <div className="d-flex align-items-center gap-2">
-                                                            <input
-                                                                type="number"
-                                                                placeholder="Enter Price"
-                                                                className="form-control form-control-sm glass border-0"
-                                                                style={{ width: '100px' }}
-                                                                value={priceInput[order._id] || ''}
-                                                                onChange={(e) => setPriceInput({ ...priceInput, [order._id]: e.target.value })}
+                                        {myOrders
+                                            .filter(order => orderFilter === 'All' || order.status === orderFilter)
+                                            .map(order => (
+                                                <tr key={order._id} className="border-bottom border-white border-opacity-5">
+                                                    <td className="border-0 py-3">
+                                                        <div className="d-flex align-items-center gap-3">
+                                                            <img
+                                                                src={order.image}
+                                                                className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                                alt=""
+                                                                onClick={() => setPreviewImage(order.image)}
                                                             />
+                                                            <div>
+                                                                <div className="fw-bold small">{order.productName}</div>
+                                                                <div className="extra-small opacity-50">{order.date}</div>
+                                                            </div>
                                                         </div>
-                                                    )}
-                                                </td>
-                                                <td className="border-0">
-                                                    <span className={`badge ${order.status === 'Approved' ? 'bg-success' : (order.status === 'Price Submitted' ? 'bg-info' : 'bg-warning')} small`}>
-                                                        {order.status}
-                                                    </span>
-                                                </td>
-                                                <td className="border-0">
-                                                    {!order.price && (
-                                                        <button
-                                                            onClick={() => handlePriceSubmit(order._id)}
-                                                            className="btn btn-primary btn-sm rounded-pill px-3 fw-bold"
-                                                        >
-                                                            Set Price
-                                                        </button>
-                                                    )}
-                                                    {order.status === 'Approved' && (
-                                                        <CheckCircle size={18} className="text-success" />
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
+                                                    </td>
+                                                    <td className="border-0 small">
+                                                        <div>{order.customer}</div>
+                                                        <div className="extra-small opacity-50">{order.phone}</div>
+                                                    </td>
+                                                    <td className="border-0">
+                                                        {order.price ? (
+                                                            <span className="fw-bold text-primary">₹{order.price}</span>
+                                                        ) : (
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <input
+                                                                    type="number"
+                                                                    placeholder="Enter Price"
+                                                                    className="form-control form-control-sm glass border-0"
+                                                                    style={{ width: '100px' }}
+                                                                    value={priceInput[order._id] || ''}
+                                                                    onChange={(e) => setPriceInput({ ...priceInput, [order._id]: e.target.value })}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="border-0">
+                                                        <span className={`badge ${order.status === 'Approved' ? 'bg-success' : (order.status === 'Price Submitted' ? 'bg-info' : 'bg-warning')} small`}>
+                                                            {order.status}
+                                                        </span>
+                                                    </td>
+                                                    <td className="border-0">
+                                                        {/* Price submit */}
+                                                        {!order.price && (
+                                                            <button
+                                                                onClick={() => handlePriceSubmit(order._id)}
+                                                                className="btn btn-primary btn-sm rounded-pill px-3 fw-bold"
+                                                            >
+                                                                Set Price
+                                                            </button>
+                                                        )}
+                                                        {/* Status transitions */}
+                                                        {order.status === 'Pending' && (
+                                                            <button
+                                                                onClick={() => handleStatusChange(order._id, 'Shipped')}
+                                                                className="btn btn-outline-info btn-sm ms-2"
+                                                            >
+                                                                Mark Shipped
+                                                            </button>
+                                                        )}
+                                                        {order.status === 'Shipped' && (
+                                                            <button
+                                                                onClick={() => handleStatusChange(order._id, 'Completed')}
+                                                                className="btn btn-outline-success btn-sm ms-2"
+                                                            >
+                                                                Mark Completed
+                                                            </button>
+                                                        )}
+                                                        {order.status === 'Approved' && <CheckCircle size={18} className="text-success" />}
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         {myOrders.length === 0 && (
                                             <tr><td colSpan="5" className="text-center py-5 border-0 text-white opacity-30">No orders yet</td></tr>
                                         )}

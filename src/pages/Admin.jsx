@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
@@ -1162,7 +1162,7 @@ const Admin = () => {
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                {orders.filter(o => o.creatorId === selectedUser._id).length === 0 && (
+                                                {orders.filter(o => o.creatorId === (selectedUser._id || selectedUser.id)).length === 0 && (
                                                     <tr><td colSpan="3" className="text-center py-4 text-muted small">No orders attributed to this artist.</td></tr>
                                                 )}
                                             </tbody>
