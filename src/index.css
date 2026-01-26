@@ -46,16 +46,70 @@ html {
 /* Skeleton Animation */
 @keyframes skeleton-loading {
   0% {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.03);
   }
 
   100% {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
   }
 }
 
 .skeleton {
   animation: skeleton-loading 1.5s linear infinite alternate;
+}
+
+/* Mesh Background Animation */
+@keyframes mesh-gradient {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(2%, 4%) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-3%, 2%) scale(0.95);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.mesh-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #030303;
+  overflow: hidden;
+}
+
+.mesh-bg-item {
+  position: absolute;
+  width: 100vmax;
+  height: 100vmax;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.mesh-bg-1 {
+  top: -50vmax;
+  left: -50vmax;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  animation: mesh-gradient 25s ease-in-out infinite alternate;
+}
+
+.mesh-bg-2 {
+  bottom: -50vmax;
+  right: -50vmax;
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+  animation: mesh-gradient 30s ease-in-out infinite alternate-reverse;
 }
 
 /* Custom Cursor */
@@ -110,12 +164,17 @@ body {
 }
 
 .glass {
-  background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
   border-radius: 24px;
-  box-shadow: var(--glass-shadow);
+}
+
+.glass:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 img {
