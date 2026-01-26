@@ -198,9 +198,16 @@ const Dashboard = () => {
                     <img src={user?.avatar} className="rounded-circle border border-2 border-primary" style={{ width: '60px', height: '60px' }} alt="" />
                     <div>
                         <h4 className="fw-bold mb-1 text-gradient">{user?.username}</h4>
-                        <span className={`badge rounded-pill ${isFrozen ? 'bg-danger' : 'bg-success'} px-3 py-1`}>
-                            {isFrozen ? 'Account Frozen' : 'Active Emblos'}
-                        </span>
+                        <div className="d-flex align-items-center gap-2">
+                            <span className={`badge rounded-pill ${isFrozen ? 'bg-danger' : 'bg-success'} px-3 py-1`}>
+                                {isFrozen ? 'Account Frozen' : 'Active Emblos'}
+                            </span>
+                            {user?.emblosAccess?.endDate && (
+                                <span className="extra-small text-muted fw-bold">
+                                    {isFrozen ? 'Expired:' : 'Renews:'} {new Date(user.emblosAccess.endDate).toLocaleDateString()}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className="d-flex gap-3 align-items-center">
@@ -660,6 +667,16 @@ const Dashboard = () => {
                                 <Send size={12} className="me-1" /> Contact Admin
                             </button>
                         </div>
+                        {user?.emblosAccess?.endDate && (
+                            <div className="mb-4 p-3 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10 d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2 text-primary small fw-bold">
+                                    <Clock size={14} /> Subscription {isFrozen ? 'Expired' : 'Status'}
+                                </div>
+                                <div className="small text-white-50 fw-bold">
+                                    {isFrozen ? 'Termination' : 'Validity'}: {new Date(user.emblosAccess.endDate).toLocaleDateString()}
+                                </div>
+                            </div>
+                        )}
                         <div className="d-flex flex-column gap-3">
                             {adminMessages.length > 0 ? (
                                 adminMessages.map((msg, idx) => (
@@ -691,7 +708,7 @@ const Dashboard = () => {
                 {previewImage && (
                     <div
                         className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 12000 }}
+                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 14000 }}
                         onClick={() => setPreviewImage(null)}
                     >
                         <Motion.div

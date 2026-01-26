@@ -1232,7 +1232,7 @@ const Admin = () => {
                 {previewImage && (
                     <div
                         className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1300 }}
+                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 14000 }}
                         onClick={() => setPreviewImage(null)}
                     >
                         <Motion.div
