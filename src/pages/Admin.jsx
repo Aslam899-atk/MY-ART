@@ -115,7 +115,13 @@ const Admin = () => {
         // Filter based on role if not admin
         if (!isAdmin && user?.role === 'emblos') {
             const userId = (user._id || user.id)?.toString();
-            base = orders.filter(o => !o.creatorId || o.creatorId.toString() === userId);
+            base = orders.filter(o => {
+                // Own assigned orders
+                if (o.creatorId?.toString() === userId) return true;
+                // Open external requests (no productId means it's not a shop/gallery item)
+                if (!o.creatorId && !o.productId) return true;
+                return false;
+            });
         }
         if (!q) return base;
         return base.filter(o =>
@@ -670,38 +676,44 @@ const Admin = () => {
                                                         </div>
                                                     ) : (
                                                         <div className="d-flex flex-column gap-2">
-                                                            <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
-                                                            {isAdmin ? (
-                                                                <select
-                                                                    className="form-select form-select-sm glass border-0 text-primary fw-bold"
-                                                                    style={{ width: '150px', fontSize: '0.7rem' }}
-                                                                    onChange={async (e) => {
-                                                                        if (e.target.value) {
-                                                                            await claimOrder(o._id, null, e.target.value);
-                                                                        }
-                                                                    }}
-                                                                    defaultValue=""
-                                                                >
-                                                                    <option value="" className="bg-dark">Assign Artist...</option>
-                                                                    {users.filter(u => u.role === 'emblos').map(artist => (
-                                                                        <option key={artist._id} value={artist._id} className="bg-dark">
-                                                                            {artist.username}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
+                                                            {o.productId ? (
+                                                                <span className="fw-bold text-white small opacity-75">Art Void (Main)</span>
                                                             ) : (
-                                                                user?.role === 'emblos' && (
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if (window.confirm('Claim this order? You will be responsible for fulfilling it.')) {
-                                                                                claimOrder(o._id);
-                                                                            }
-                                                                        }}
-                                                                        className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
-                                                                    >
-                                                                        Claim Order
-                                                                    </button>
-                                                                )
+                                                                <>
+                                                                    <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
+                                                                    {isAdmin ? (
+                                                                        <select
+                                                                            className="form-select form-select-sm glass border-0 text-primary fw-bold"
+                                                                            style={{ width: '150px', fontSize: '0.7rem' }}
+                                                                            onChange={async (e) => {
+                                                                                if (e.target.value) {
+                                                                                    await claimOrder(o._id, null, e.target.value);
+                                                                                }
+                                                                            }}
+                                                                            defaultValue=""
+                                                                        >
+                                                                            <option value="" className="bg-dark">Assign Artist...</option>
+                                                                            {users.filter(u => u.role === 'emblos').map(artist => (
+                                                                                <option key={artist._id} value={artist._id} className="bg-dark">
+                                                                                    {artist.username}
+                                                                                </option>
+                                                                            ))}
+                                                                        </select>
+                                                                    ) : (
+                                                                        user?.role === 'emblos' && (
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    if (window.confirm('Claim this order? You will be responsible for fulfilling it.')) {
+                                                                                        claimOrder(o._id);
+                                                                                    }
+                                                                                }}
+                                                                                className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
+                                                                            >
+                                                                                Claim Order
+                                                                            </button>
+                                                                        )
+                                                                    )}
+                                                                </>
                                                             )}
                                                         </div>
                                                     )}
