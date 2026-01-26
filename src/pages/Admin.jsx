@@ -9,6 +9,7 @@ import {
     ChevronRight, Filter, ExternalLink, MoreVertical, Eye,
     AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush
 } from 'lucide-react';
+import ItemPreview from '../components/ItemPreview';
 
 const Admin = () => {
     const {
@@ -17,7 +18,8 @@ const Admin = () => {
         messages, deleteMessage, sendInternalMessage,
         orders, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice,
         users, updateEmblosStatus,
-        isAdmin, setIsAdmin, changePassword, verifyAdminPassword
+        isAdmin, setIsAdmin, changePassword, verifyAdminPassword,
+        toggleLike, toggleGalleryLike, likedIds
     } = useContext(AppContext);
 
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -1205,40 +1207,18 @@ const Admin = () => {
                 )}
             </AnimatePresence>
 
-            {/* Comment View Modal */}
-            <AnimatePresence>
-                {commentModalItem && (
-                    <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 12000 }}>
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass p-5 rounded-5 border border-white border-opacity-10 w-100"
-                            style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto' }}
-                        >
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <h3 className="h5 fw-bold mb-0 text-gradient">Comments</h3>
-                                <button onClick={() => setCommentModalItem(null)} className="btn text-white-50 p-0 border-0"><X size={24} /></button>
-                            </div>
-                            <div className="d-flex flex-column gap-3">
-                                {commentModalItem.comments && commentModalItem.comments.length > 0 ? (
-                                    commentModalItem.comments.map((c, i) => (
-                                        <div key={i} className="glass p-3 rounded-4 border-0 bg-opacity-5">
-                                            <div className="d-flex justify-content-between align-items-center mb-1">
-                                                <span className="fw-bold small text-primary">{c.username}</span>
-                                                <span className="extra-small opacity-30">{new Date(c.date).toLocaleDateString()}</span>
-                                            </div>
-                                            <p className="small mb-0 opacity-75">{c.text}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-5 opacity-30">No comments yet.</div>
-                                )}
-                            </div>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={commentModalItem}
+                isOpen={!!commentModalItem}
+                onClose={() => setCommentModalItem(null)}
+                isLiked={commentModalItem && likedIds.includes(commentModalItem._id || commentModalItem.id)}
+                toggleLike={() => {
+                    const id = commentModalItem._id || commentModalItem.id;
+                    if (products.find(p => (p._id || p.id) === id)) toggleLike(id);
+                    else toggleGalleryLike(id);
+                }}
+            />
         </div >
     );
 };

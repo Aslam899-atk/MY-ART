@@ -6,7 +6,7 @@ import { AppContext } from '../context/AppContext';
 import ItemPreview from '../components/ItemPreview';
 
 const Home = () => {
-    const { galleryItems, toggleGalleryLike, likedIds } = useContext(AppContext);
+    const { galleryItems, toggleGalleryLike, toggleLike, likedIds } = useContext(AppContext);
     const [selectedItem, setSelectedItem] = React.useState(null);
 
     const featuredGallery = useMemo(() => {
@@ -309,7 +309,11 @@ const Home = () => {
                 isOpen={!!selectedItem}
                 onClose={() => setSelectedItem(null)}
                 isLiked={selectedItem && likedIds.includes(selectedItem._id || selectedItem.id)}
-                toggleLike={() => toggleGalleryLike(selectedItem?._id || selectedItem?.id)}
+                toggleLike={() => {
+                    const id = selectedItem._id || selectedItem.id;
+                    if (selectedItem.price || selectedItem.image) toggleLike(id);
+                    else toggleGalleryLike(id);
+                }}
                 onNext={() => {
                     const items = featuredGallery.length > 0 ? featuredGallery : projects;
                     const currentIndex = items.findIndex(i => (i._id || i.id || i.title) === (selectedItem?._id || selectedItem?.id || selectedItem?.title));

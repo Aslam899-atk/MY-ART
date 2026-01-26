@@ -166,67 +166,18 @@ const Gallery = () => {
                 </AnimatePresence>
             </div>
 
-            {/* Simple Comment Modal */}
-            <AnimatePresence>
-                {showComments && selectedItem && (
-                    <div className="d-flex align-items-center justify-content-center px-3 py-4 position-fixed top-0 start-0 w-100 h-100" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 11000, backdropFilter: 'blur(10px)' }}>
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass p-4 p-md-5 position-relative w-100 my-auto"
-                            style={{ maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}
-                        >
-                            <button
-                                onClick={() => { setShowComments(false); setSelectedItem(null); }}
-                                className="position-absolute top-0 end-0 m-4 btn text-muted p-0 border-0"
-                            >
-                                <X size={24} />
-                            </button>
-
-                            <div className="mb-4 text-center">
-                                <h2 className="h4 fw-bold mb-1">Community <span className="text-primary">Talk</span></h2>
-                                <p className="text-muted small">on {selectedItem.title}</p>
-                            </div>
-
-                            <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-                                {selectedItem.comments && selectedItem.comments.length > 0 ? (
-                                    selectedItem.comments.map((comment, idx) => (
-                                        <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5">
-                                            <div className="d-flex justify-content-between align-items-center mb-1">
-                                                <span className="fw-bold extra-small text-primary">{comment.username}</span>
-                                                <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
-                                            </div>
-                                            <p className="extra-small mb-0 text-white-50">{comment.text}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-5 opacity-30 small italic">No comments yet. Be the first!</div>
-                                )}
-                            </div>
-
-                            <form onSubmit={handleCommentSubmit} className="position-relative mt-2">
-                                <input
-                                    type="text"
-                                    placeholder={user ? "Write a comment..." : "Login to comment"}
-                                    disabled={!user || isSubmitting}
-                                    className="form-control glass border-0 text-white extra-small py-3 ps-3 pe-5 rounded-pill"
-                                    value={commentText}
-                                    onChange={(e) => setCommentText(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!user || isSubmitting || !commentText.trim()}
-                                    className="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-1 p-2 rounded-circle border-0 d-flex align-items-center justify-content-center"
-                                    style={{ width: '32px', height: '32px' }}
-                                >
-                                    <Send size={14} />
-                                </button>
-                            </form>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={selectedItem}
+                isOpen={showComments}
+                onClose={() => { setShowComments(false); setSelectedItem(null); }}
+                isLiked={selectedItem && likedIds.includes(selectedItem._id || selectedItem.id)}
+                toggleLike={() => toggleGalleryLike(selectedItem?._id || selectedItem?.id)}
+                onInquire={(item) => {
+                    // Navigate to contact or handle inquiry
+                    window.location.href = `/contact?item=${item.title}`;
+                }}
+            />
         </div>
     );
 };

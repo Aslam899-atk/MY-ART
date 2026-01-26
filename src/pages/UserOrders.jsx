@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { ShoppingBag, Clock, CheckCircle, Trash2, X } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle, Trash2, X, Eye } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import ItemPreview from '../components/ItemPreview';
 
 const UserOrders = () => {
-    const { orders, user, users, deleteOrder } = useContext(AppContext);
-    const [previewImage, setPreviewImage] = useState(null);
+    const { orders, user, users, deleteOrder, toggleLike, toggleGalleryLike, likedIds } = useContext(AppContext);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
     const myOrders = orders.filter(o => o.customerId === (user?._id || user?.id));
 
@@ -26,7 +27,7 @@ const UserOrders = () => {
                                     className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                     style={{ width: '120px', height: '120px', objectFit: 'cover' }}
                                     alt=""
-                                    onClick={() => setPreviewImage(order.image)}
+                                    onClick={() => setSelectedOrder(order)}
                                 />
                                 <div className="flex-grow-1">
                                     <div className="d-flex justify-content-between align-items-start">
@@ -87,32 +88,22 @@ const UserOrders = () => {
                 )}
             </div>
 
-            {/* Image Preview Modal */}
-            <AnimatePresence>
-                {previewImage && (
-                    <div
-                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 11000 }}
-                        onClick={() => setPreviewImage(null)}
-                    >
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="position-relative"
-                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
-                        >
-                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
-                            <button
-                                onClick={() => setPreviewImage(null)}
-                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
-                            >
-                                <X size={24} />
-                            </button>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={selectedOrder ? {
+                    ...selectedOrder,
+                    title: selectedOrder.productName,
+                    url: selectedOrder.image
+                } : null}
+                isOpen={!!selectedOrder}
+                onClose={() => setSelectedOrder(null)}
+                isLiked={selectedOrder && likedIds.includes(selectedOrder.productId || selectedOrder.id)}
+                toggleLike={() => {
+                    const id = selectedOrder.productId || selectedOrder.id;
+                    if (selectedOrder.type === 'product') toggleLike(id);
+                    else toggleGalleryLike(id);
+                }}
+            />
         </div>
     );
 };

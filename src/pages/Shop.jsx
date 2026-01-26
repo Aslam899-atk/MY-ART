@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';
-import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search } from 'lucide-react';
+import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search, MessageSquare } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Shop = () => {
@@ -94,7 +94,7 @@ const Shop = () => {
                                     src={product.image}
                                     alt={product.name}
                                     className="w-100 h-100 transition-all hover-zoom"
-                                    onClick={() => { setSelectedProduct(product); setShowOrderForm(true); }}
+                                    onClick={() => { setSelectedProduct(product); setShowPreview(true); }}
                                     style={{ objectFit: 'cover', cursor: 'pointer' }}
                                 />
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">

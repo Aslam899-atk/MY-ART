@@ -141,7 +141,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{item.title || 'Untitled Masterpiece'}</h2>
+                                <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{item.title || item.name || 'Untitled Masterpiece'}</h2>
                                 {item.price && (
                                     <div className="d-flex align-items-center gap-3 text-muted small mb-4 pb-4 border-bottom border-white border-opacity-10">
                                         <div className="d-flex align-items-center gap-1">

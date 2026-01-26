@@ -18,9 +18,11 @@ import {
     Upload,
     Package,
     ClipboardList,
-    Trash2
+    Trash2,
+    Eye
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
+import ItemPreview from '../components/ItemPreview';
 
 const Dashboard = () => {
     const {
@@ -40,6 +42,9 @@ const Dashboard = () => {
         updateOrderStatus,
         updateProduct,
         updateGalleryItem,
+        toggleLike,
+        toggleGalleryLike,
+        likedIds,
         isLoadingAuth
     } = useContext(AppContext);
 
@@ -399,19 +404,19 @@ const Dashboard = () => {
                                                 <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg" />
                                             )}
 
-                                            <div className="position-absolute top-0 start-0 m-2 d-flex gap-2">
+                                            <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
                                                 <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')}`}>
                                                     {item.status}
                                                 </div>
                                             </div>
 
-                                            <div className="position-absolute top-0 end-0 m-2 opacity-0 group-hover-opacity-100 transition-all d-flex gap-2">
+                                            <div className="position-absolute top-0 end-0 m-2 opacity-0 group-hover-opacity-100 transition-all d-flex gap-2" style={{ zIndex: 5 }}>
                                                 <button
                                                     onClick={() => setCommentModalItem(item)}
                                                     className="btn btn-primary btn-sm rounded-circle p-2 shadow-lg"
-                                                    title="View Comments"
+                                                    title="View Full Preview"
                                                 >
-                                                    <MessageSquare size={14} />
+                                                    <Eye size={14} />
                                                 </button>
                                                 <button
                                                     onClick={async () => {
@@ -653,40 +658,18 @@ const Dashboard = () => {
                 )}
             </AnimatePresence>
 
-            {/* Comment View Modal */}
-            <AnimatePresence>
-                {commentModalItem && (
-                    <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 12000 }}>
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass p-5 rounded-5 border border-white border-opacity-10 w-100"
-                            style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto' }}
-                        >
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <h3 className="h5 fw-bold mb-0 text-gradient">Comments</h3>
-                                <button onClick={() => setCommentModalItem(null)} className="btn text-white-50 p-0 border-0"><X size={24} /></button>
-                            </div>
-                            <div className="d-flex flex-column gap-3">
-                                {commentModalItem.comments && commentModalItem.comments.length > 0 ? (
-                                    commentModalItem.comments.map((c, i) => (
-                                        <div key={i} className="glass p-3 rounded-4 border-0 bg-opacity-5">
-                                            <div className="d-flex justify-content-between align-items-center mb-1">
-                                                <span className="fw-bold small text-primary">{c.username}</span>
-                                                <span className="extra-small opacity-30">{new Date(c.date).toLocaleDateString()}</span>
-                                            </div>
-                                            <p className="small mb-0 opacity-75">{c.text}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-5 opacity-30">No comments yet.</div>
-                                )}
-                            </div>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={commentModalItem}
+                isOpen={!!commentModalItem}
+                onClose={() => setCommentModalItem(null)}
+                isLiked={commentModalItem && likedIds.includes(commentModalItem._id || commentModalItem.id)}
+                toggleLike={() => {
+                    const id = commentModalItem._id || commentModalItem.id;
+                    if (commentModalItem.itemType === 'product') toggleLike(id);
+                    else toggleGalleryLike(id);
+                }}
+            />
         </div>
     );
 };
