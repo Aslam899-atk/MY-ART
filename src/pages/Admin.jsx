@@ -689,34 +689,49 @@ const Admin = () => {
 
                     {activeTab === 'messages' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
-                            {messages.filter(m => !m.isInternal).map(m => (
-                                <div key={m._id || m.id} className="col-12">
-                                    <div className="glass p-4 rounded-4 border-0">
-                                        <div className="d-flex justify-content-between align-items-start mb-4">
-                                            <div className="d-flex align-items-center gap-3">
-                                                <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary"><User size={20} /></div>
-                                                <div>
-                                                    <h6 className="fw-bold mb-0 text-white">{m.name}</h6>
-                                                    <span className="text-muted small">{m.date}</span>
+                            {messages.map(m => {
+                                const sender = m.senderId ? users.find(u => (u._id || u.id) === m.senderId) : null;
+                                const senderName = sender ? sender.username : (m.name || 'System');
+
+                                return (
+                                    <div key={m._id || m.id} className="col-12">
+                                        <div className="glass p-4 rounded-4 border-0">
+                                            <div className="d-flex justify-content-between align-items-start mb-4">
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+                                                        {m.isInternal ? <MessageSquare size={20} /> : <User size={20} />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <h6 className="fw-bold mb-0 text-white">{senderName}</h6>
+                                                            {m.isInternal && <span className="badge bg-primary bg-opacity-10 text-primary extra-small">Internal</span>}
+                                                            {!m.isInternal && <span className="badge bg-success bg-opacity-10 text-success extra-small">Public Inquiry</span>}
+                                                        </div>
+                                                        <span className="text-muted small">{m.date}</span>
+                                                    </div>
+                                                </div>
+                                                <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
+                                            </div>
+                                            <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
+                                                <div className="d-flex flex-column gap-3">
+                                                    {m.image && (
+                                                        <img src={m.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                                    )}
+                                                    <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
                                                 </div>
                                             </div>
-                                            <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
-                                        </div>
-                                        <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
-                                            <div className="d-flex flex-column gap-3">
-                                                {m.image && (
-                                                    <img src={m.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                            <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
+                                                {m.email && <span>Email: {m.email}</span>}
+                                                {m.phone && <span>Phone: {m.phone}</span>}
+                                                {m.isInternal && m.receiverId === 'all_emblos' && <span className="text-primary fw-bold">Target: All Emblos Artists</span>}
+                                                {m.isInternal && m.receiverId !== 'all_emblos' && (
+                                                    <span className="text-primary fw-bold">Target: {users.find(u => (u._id || u.id) === m.receiverId)?.username || 'Direct Message'}</span>
                                                 )}
-                                                <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
                                             </div>
                                         </div>
-                                        <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
-                                            <span>Email: {m.email}</span>
-                                            <span>Phone: {m.phone}</span>
-                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </Motion.div>
                     )}
 

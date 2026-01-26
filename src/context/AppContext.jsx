@@ -324,6 +324,30 @@ export const AppProvider = ({ children }) => {
         return { success: false };
     };
 
+    const deleteGalleryComment = async (itemId, commentId) => {
+        const res = await fetch(`${API_URL}/gallery/${itemId}/comment/${commentId}`, {
+            method: 'DELETE'
+        });
+        if (res.ok) {
+            const updated = await res.json();
+            setGalleryItems((prev) => prev.map((g) => ((g._id || g.id) === itemId ? updated : g)));
+            return { success: true };
+        }
+        return { success: false };
+    };
+
+    const deleteProductComment = async (productId, commentId) => {
+        const res = await fetch(`${API_URL}/products/${productId}/comment/${commentId}`, {
+            method: 'DELETE'
+        });
+        if (res.ok) {
+            const updated = await res.json();
+            setProducts((prev) => prev.map((p) => ((p._id || p.id) === productId ? updated : p)));
+            return { success: true };
+        }
+        return { success: false };
+    };
+
     // ---------- Message CRUD ----------
     const addMessage = async (msg) => {
         const res = await fetch(`${API_URL}/messages`, {
@@ -524,8 +548,8 @@ export const AppProvider = ({ children }) => {
 
     return (
         <AppContext.Provider value={{
-            products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds, addProductComment,
-            galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike, addGalleryComment,
+            products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds, addProductComment, deleteProductComment,
+            galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike, addGalleryComment, deleteGalleryComment,
             messages, addMessage, deleteMessage, sendInternalMessage,
             orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,
             users, requestEmblosAccess, updateEmblosStatus, deleteUserByEmail,

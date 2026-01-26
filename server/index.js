@@ -312,6 +312,15 @@ app.put('/api/products/:id/comment', asyncHandler(async (req, res) => {
     res.json(product);
 }));
 
+app.delete('/api/products/:id/comment/:commentId', asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+
+    product.comments = product.comments.filter(c => c._id.toString() !== req.params.commentId);
+    await product.save();
+    res.json(product);
+}));
+
 app.get('/api/gallery', asyncHandler(async (req, res) => {
     // PUBLIC view: only active items from non-frozen users
     const filter = req.query.all === 'true' ? {} : { status: 'active' };
@@ -379,6 +388,15 @@ app.put('/api/gallery/:id/comment', asyncHandler(async (req, res) => {
     if (!item) return res.status(404).json({ error: 'Artwork not found' });
 
     item.comments.push({ username, text });
+    await item.save();
+    res.json(item);
+}));
+
+app.delete('/api/gallery/:id/comment/:commentId', asyncHandler(async (req, res) => {
+    const item = await Gallery.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: 'Artwork not found' });
+
+    item.comments = item.comments.filter(c => c._id.toString() !== req.params.commentId);
     await item.save();
     res.json(item);
 }));

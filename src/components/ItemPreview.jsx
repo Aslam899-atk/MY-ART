@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare, Image as ImageIcon } from 'lucide-react';
+import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
     if (!item) return null;
 
-    const { addGalleryComment, addProductComment, user, users, products, galleryItems } = useContext(AppContext);
+    const { addGalleryComment, addProductComment, deleteGalleryComment, deleteProductComment, user, isAdmin, users, products, galleryItems } = useContext(AppContext);
 
     // Sync with global state to ensure live updates (comments/likes)
     const liveItem = isOpen ? (
@@ -101,7 +101,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                         {/* Media Section */}
                         <div className="col-12 col-lg-8 bg-black d-flex align-items-center justify-content-center position-relative overflow-hidden" style={{ minHeight: '40vh' }}>
                             {/* Backdrop Glow */}
-                            <div className="position-absolute top-50 start-50 translate-middle w-50 h-50 bg-primary opacity-20 blur-3xl rounded-circle"></div>
+                            <div className="position-absolute top-50 start-50 translate-middle w-50 h-50 bg-primary opacity-20 blur-3xl rounded-circle pointer-events-none" style={{ zIndex: 0 }}></div>
 
                             {mediaType === 'video' ? (
                                 <video
@@ -205,10 +205,25 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
                                         {liveItem.comments && liveItem.comments.length > 0 ? (
                                             liveItem.comments.map((comment, idx) => (
-                                                <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5">
+                                                <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5 position-relative group">
                                                     <div className="d-flex justify-content-between align-items-center mb-1">
                                                         <span className="fw-bold extra-small text-primary">{comment.username}</span>
-                                                        <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
+                                                            {isAdmin && (
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (window.confirm("Delete this comment?")) {
+                                                                            const deleteFn = liveItem.price ? deleteProductComment : deleteGalleryComment;
+                                                                            await deleteFn(liveItem._id || liveItem.id, comment._id || comment.id);
+                                                                        }
+                                                                    }}
+                                                                    className="btn btn-link p-0 text-danger border-0 opacity-0 group-hover-opacity-100 transition-all"
+                                                                >
+                                                                    <Trash2 size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <p className="extra-small mb-0 text-white-50">{comment.text}</p>
                                                 </div>
