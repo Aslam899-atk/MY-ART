@@ -32,19 +32,12 @@ const UserOrders = () => {
                                     <div className="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h4 className="fw-bold mb-0">{order.productName}</h4>
-                                            <div className="extra-small text-primary fw-bold mb-2">Artist: {users.find(u => u._id === order.creatorId)?.username || 'Art Void'}</div>
+                                            <div className="extra-small text-primary fw-bold mb-2">Artist: {users.find(u => (u._id || u.id) === order.creatorId)?.username || 'Art Void'}</div>
                                         </div>
                                         <div className="d-flex flex-column align-items-end gap-1">
                                             <span className={`badge rounded-pill ${order.type === 'service' ? 'bg-info bg-opacity-10 text-info' : 'bg-primary bg-opacity-10 text-primary'} px-3 py-1 extra-small uppercase fw-bold`}>
                                                 {order.type === 'service' ? 'Request' : 'Order'}
                                             </span>
-                                            {order.type === 'service' && (
-                                                <span className={`badge rounded-pill ${order.status === 'Approved' ? 'bg-success' :
-                                                    (order.status === 'Price Submitted' ? 'bg-info' : 'bg-warning')
-                                                    } px-2 py-1 extra-small`}>
-                                                    {order.status === 'Price Submitted' ? 'Price Negotiated' : order.status}
-                                                </span>
-                                            )}
                                         </div>
                                     </div>
                                     <div className="small text-white opacity-50 mb-3">{order.date}</div>
@@ -66,9 +59,9 @@ const UserOrders = () => {
                                             <div className="small text-white-50 font-italic">
                                                 {order.status === 'Approved' ? (
                                                     <span className="text-success fw-bold d-flex align-items-center gap-2"><CheckCircle size={16} /> Request Approved</span>
-                                                ) : (order.status === 'Price Submitted' ? (
-                                                    <span className="text-info fw-bold d-flex align-items-center gap-2"><Clock size={16} /> Waiting for Admin Approval</span>
-                                                ) : 'Request Processing...')}
+                                                ) : (
+                                                    <span className="text-muted italic d-flex align-items-center gap-2">Request Processing...</span>
+                                                )}
                                             </div>
                                         )}
 

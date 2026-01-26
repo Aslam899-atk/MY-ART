@@ -56,8 +56,21 @@ function AppContent() {
       setLoading(false);
     };
 
+    // 6. Dynamic Title Management
+    const path = window.location.pathname;
+    const titles = {
+      '/': 'ART VOID | Creative Masterpieces',
+      '/gallery': 'Gallery | ART VOID Laboratory',
+      '/shop': 'Art Store | Acquire Masterpieces',
+      '/contact': 'Inquiry | Custom Commissions',
+      '/dashboard': 'Emblos Console | Dashboard',
+      '/orders': 'Track Orders | ART VOID',
+      '/admin': 'Admin Console | ART VOID'
+    };
+    document.title = titles[path] || 'ART VOID';
+
     loadResources();
-  }, [isLoadingAuth, galleryItems]);
+  }, [isLoadingAuth, galleryItems, window.location.pathname]);
 
   if (loading) {
     return <Preloader />;

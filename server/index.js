@@ -450,7 +450,7 @@ app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
     const order = await Order.findByIdAndUpdate(req.params.id, {
         price,
         priceGiven: true,
-        status: 'Price Submitted'
+        status: 'Approved'
     }, { new: true });
     res.json(order);
 }));
@@ -469,7 +469,7 @@ app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
     if (price) {
         updateData.price = price;
         updateData.priceGiven = true;
-        updateData.status = 'Price Submitted';
+        updateData.status = 'Approved';
     } else {
         updateData.status = 'Pending Price';
     }

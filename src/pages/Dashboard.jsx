@@ -95,7 +95,7 @@ const Dashboard = () => {
 
         const res = await claimOrder(orderId, price);
         if (res.success) {
-            alert("Task Claimed! കസ്റ്റമർക്ക് ഇപ്പോൾ പ്രൈസ് കാണാൻ സാധിക്കും. അഡ്മിൻ അപ്രൂവ് ചെയ്താൽ ഓർഡർ കൺഫേം ആകും.");
+            alert("Task Claimed! കസ്റ്റമർക്ക് ഇപ്പോൾ പ്രൈസ് കാണാൻ സാധിക്കും. കസ്റ്റമർ കൺഫേം ചെയ്താൽ ലിസ്റ്റ് പബ്ലിക് ആകും.");
         } else {
             alert("Claim Failed. Please try again.");
         }
