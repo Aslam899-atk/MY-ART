@@ -1,6 +1,7 @@
 import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
     Image as ImageIcon,
@@ -46,6 +47,7 @@ const Dashboard = () => {
         }
     }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
+    const [previewImage, setPreviewImage] = useState(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('gallery'); // 'gallery' or 'shop'
     const [uploadFormData, setUploadFormData] = useState({
@@ -412,8 +414,19 @@ const Dashboard = () => {
                                         {myOrders.map(order => (
                                             <tr key={order._id} className="border-bottom border-white border-opacity-5">
                                                 <td className="border-0 py-3">
-                                                    <div className="fw-bold small">{order.productName}</div>
-                                                    <div className="extra-small opacity-50">{order.date}</div>
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <img
+                                                            src={order.image}
+                                                            className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                            style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                            alt=""
+                                                            onClick={() => setPreviewImage(order.image)}
+                                                        />
+                                                        <div>
+                                                            <div className="fw-bold small">{order.productName}</div>
+                                                            <div className="extra-small opacity-50">{order.date}</div>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="border-0 small">
                                                     <div>{order.customer}</div>
@@ -516,7 +529,13 @@ const Dashboard = () => {
                                             <tr key={task._id} className="border-bottom border-white border-opacity-5">
                                                 <td className="py-3 border-0">
                                                     {task.image ? (
-                                                        <img src={task.image} className="rounded-3 shadow-sm" style={{ width: '80px', height: '80px', objectFit: 'cover' }} alt="" />
+                                                        <img
+                                                            src={task.image}
+                                                            className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                            style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                                            alt=""
+                                                            onClick={() => setPreviewImage(task.image)}
+                                                        />
                                                     ) : (
                                                         <div className="glass rounded-3 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}><ImageIcon size={20} className="opacity-20" /></div>
                                                     )}
@@ -541,6 +560,33 @@ const Dashboard = () => {
                     )}
                 </div>
             </div>
+
+            {/* Image Preview Modal */}
+            <AnimatePresence>
+                {previewImage && (
+                    <div
+                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 12000 }}
+                        onClick={() => setPreviewImage(null)}
+                    >
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="position-relative"
+                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+                        >
+                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
+                            >
+                                <X size={24} />
+                            </button>
+                        </Motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
