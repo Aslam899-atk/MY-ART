@@ -10,13 +10,16 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
 
     // Sync with global state to ensure live updates (comments/likes)
     const liveItem = isOpen ? (
-        products.find(p => (p._id || p.id) === (item._id || item.id)) ||
-        galleryItems.find(g => (g._id || g.id) === (item._id || item.id)) ||
+        products.find(p => (p._id || p.id) === (item.productId || item._id || item.id)) ||
+        galleryItems.find(g => (g._id || g.id) === (item.productId || item._id || item.id)) ||
         item
     ) : item;
 
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Auto-detect type if missing
+    const mediaType = liveItem.type || ((liveItem.url || liveItem.image)?.includes('.mp4') ? 'video' : 'image');
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -55,7 +58,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-0 p-md-4"
-                    style={{ background: 'rgba(3, 3, 3, 0.98)', zIndex: 10000, backdropFilter: 'blur(15px)' }}
+                    style={{ background: 'rgba(3, 3, 3, 0.98)', zIndex: 999999, backdropFilter: 'blur(20px)' }}
                     onClick={onClose}
                 >
                     {/* Close Button */}
@@ -100,9 +103,9 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                             {/* Backdrop Glow */}
                             <div className="position-absolute top-50 start-50 translate-middle w-50 h-50 bg-primary opacity-20 blur-3xl rounded-circle"></div>
 
-                            {item.type === 'video' ? (
+                            {mediaType === 'video' ? (
                                 <video
-                                    src={item.url}
+                                    src={liveItem.url || liveItem.image}
                                     className="w-100 h-100 object-fit-contain position-relative"
                                     style={{ zIndex: 1 }}
                                     controls

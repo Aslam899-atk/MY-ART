@@ -52,7 +52,6 @@ const Admin = () => {
     const [emblosRate, setEmblosRate] = useState('');
     const [emblosRules, setEmblosRules] = useState('');
     const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null);
     const [commentModalItem, setCommentModalItem] = useState(null);
     const [messageTarget, setMessageTarget] = useState(null); // { id, name } or 'all_emblos'
     const [internalMsg, setInternalMsg] = useState('');
@@ -533,7 +532,7 @@ const Admin = () => {
                                                             className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                                             style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                                                             alt=""
-                                                            onClick={() => setPreviewImage(o.image)}
+                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image })}
                                                         />
                                                         <div>
                                                             <div className="fw-bold text-white fs-6">{o.productName}</div>
@@ -584,7 +583,7 @@ const Admin = () => {
                                 {products.map(p => (
                                     <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
                                         <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
-                                            <div className="position-relative" style={{ height: '220px' }}>
+                                            <div className="position-relative cursor-pointer" style={{ height: '220px' }} onClick={() => setCommentModalItem(p)}>
                                                 <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
                                                 <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
                                                     <button onClick={() => setCommentModalItem(p)} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Comments"><MessageSquare size={16} /></button>
@@ -624,7 +623,7 @@ const Admin = () => {
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
                             {galleryItems.map(item => (
                                 <div key={item._id || item.id} className="col-6 col-md-3">
-                                    <div className="glass rounded-4 overflow-hidden border-0 position-relative group" style={{ height: '200px' }}>
+                                    <div className="glass rounded-4 overflow-hidden border-0 position-relative group cursor-pointer" style={{ height: '200px' }} onClick={() => setCommentModalItem(item)}>
                                         {item.type === 'video' ? (
                                             <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
                                         ) : (
@@ -1161,7 +1160,7 @@ const Admin = () => {
                                                         src={item.image || item.url}
                                                         className="w-100 h-100 object-fit-cover shadow-lg pointer"
                                                         alt=""
-                                                        onClick={() => setPreviewImage(item.image || item.url)}
+                                                        onClick={() => setCommentModalItem(item)}
                                                     />
                                                     <div className="position-absolute top-0 start-0 m-2">
                                                         <span className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'} extra-small`}>{item.status}</span>
@@ -1199,7 +1198,7 @@ const Admin = () => {
                                                                     className="rounded-circle cursor-pointer"
                                                                     style={{ width: '30px', height: '30px', objectFit: 'cover' }}
                                                                     alt=""
-                                                                    onClick={() => setPreviewImage(order.image)}
+                                                                    onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image })}
                                                                 />
                                                                 <div className="fw-bold extra-small">{order.productName}</div>
                                                             </div>
@@ -1227,32 +1226,7 @@ const Admin = () => {
                 )}
             </AnimatePresence>
 
-            {/* Image Preview Modal */}
-            <AnimatePresence>
-                {previewImage && (
-                    <div
-                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 14000 }}
-                        onClick={() => setPreviewImage(null)}
-                    >
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="position-relative"
-                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
-                        >
-                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
-                            <button
-                                onClick={() => setPreviewImage(null)}
-                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
-                            >
-                                <X size={24} />
-                            </button>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Premium Preview Modal now handled by ItemPreview at the end */}
 
             {/* Internal Messaging Modal */}
             <AnimatePresence>

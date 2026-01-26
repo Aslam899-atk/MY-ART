@@ -59,7 +59,6 @@ const Dashboard = () => {
     }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
     const [orderFilter, setOrderFilter] = useState('All');
-    const [previewImage, setPreviewImage] = useState(null);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('gallery'); // 'gallery' or 'shop'
     const [uploadFormData, setUploadFormData] = useState({
@@ -411,9 +410,9 @@ const Dashboard = () => {
                                     <div key={idx} className="col-md-4">
                                         <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '200px' }}>
                                             {(item.type === 'video' || (item.url || item.image)?.includes('.mp4')) ? (
-                                                <video src={item.url || item.image} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
+                                                <video src={item.url || item.image} className="w-100 h-100 object-fit-cover cursor-pointer" muted loop autoPlay playsInline onClick={() => setCommentModalItem(item)} />
                                             ) : (
-                                                <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg" />
+                                                <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem(item)} />
                                             )}
 
                                             <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
@@ -486,7 +485,7 @@ const Dashboard = () => {
                                                                 className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                                                 style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                                                 alt=""
-                                                                onClick={() => setPreviewImage(order.image)}
+                                                                onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image })}
                                                             />
                                                             <div>
                                                                 <div className="fw-bold small">{order.productName}</div>
@@ -616,7 +615,7 @@ const Dashboard = () => {
                                                             className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                                             style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                                                             alt=""
-                                                            onClick={() => setPreviewImage(task.image)}
+                                                            onClick={() => setCommentModalItem({ ...task, title: 'Commission Request', url: task.image })}
                                                         />
                                                     ) : (
                                                         <div className="glass rounded-3 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}><ImageIcon size={20} className="opacity-20" /></div>
@@ -703,32 +702,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Image Preview Modal */}
-            <AnimatePresence>
-                {previewImage && (
-                    <div
-                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 14000 }}
-                        onClick={() => setPreviewImage(null)}
-                    >
-                        <Motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="position-relative"
-                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
-                        >
-                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
-                            <button
-                                onClick={() => setPreviewImage(null)}
-                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
-                            >
-                                <X size={24} />
-                            </button>
-                        </Motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Image Preview Modal removed in favor of ItemPreview */}
 
             {/* Premium Preview Modal */}
             <ItemPreview
