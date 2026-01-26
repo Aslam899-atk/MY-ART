@@ -6,7 +6,15 @@ import { AppContext } from '../context/AppContext';
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
     if (!item) return null;
 
-    const { addGalleryComment, addProductComment, user, users } = useContext(AppContext);
+    const { addGalleryComment, addProductComment, user, users, products, galleryItems } = useContext(AppContext);
+
+    // Sync with global state to ensure live updates (comments/likes)
+    const liveItem = isOpen ? (
+        products.find(p => (p._id || p.id) === (item._id || item.id)) ||
+        galleryItems.find(g => (g._id || g.id) === (item._id || item.id)) ||
+        item
+    ) : item;
+
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,8 +39,8 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
         e.preventDefault();
         if (!commentText.trim()) return;
         setIsSubmitting(true);
-        const commentFn = item.price ? addProductComment : addGalleryComment;
-        const res = await commentFn(item._id || item.id, commentText);
+        const commentFn = liveItem.price ? addProductComment : addGalleryComment;
+        const res = await commentFn(liveItem._id || liveItem.id, commentText);
         if (res?.success) {
             setCommentText('');
         }
@@ -107,8 +115,8 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     initial={{ scale: 1.1, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ duration: 0.6 }}
-                                    src={item.url || item.image}
-                                    alt={item.title}
+                                    src={liveItem.url || liveItem.image}
+                                    alt={liveItem.title}
                                     className="img-fluid w-100 h-100 object-fit-contain p-2 p-md-4 position-relative"
                                     style={{ zIndex: 1 }}
                                 />
@@ -133,22 +141,22 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                             >
                                 <div className="d-flex align-items-center gap-2 mb-3">
                                     <span className="badge glass text-primary border-0 px-3 py-2 rounded-pill small fw-bold">
-                                        <Tag size={12} className="me-1" /> {item.category || 'Artwork'}
+                                        <Tag size={12} className="me-1" /> {liveItem.category || 'Artwork'}
                                     </span>
-                                    {item.price && (
+                                    {liveItem.price && (
                                         <span className="badge glass text-accent border-0 px-3 py-2 rounded-pill small fw-bold">
-                                            ₹{item.price}
+                                            ₹{liveItem.price}
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{item.title || item.name || 'Untitled Masterpiece'}</h2>
-                                {item.price && (
+                                <h2 className="display-6 fw-bold mb-3 font-heading text-gradient" style={{ letterSpacing: '-1px' }}>{liveItem.title || liveItem.name || 'Untitled Masterpiece'}</h2>
+                                {liveItem.price && (
                                     <div className="d-flex align-items-center gap-3 text-muted small mb-4 pb-4 border-bottom border-white border-opacity-10">
                                         <div className="d-flex align-items-center gap-1">
-                                            <User size={14} /> <span>By {users?.find(u => (u._id || u.id) === item.creatorId)?.username || 'Admin'}</span>
+                                            <User size={14} /> <span>By {users?.find(u => (u._id || u.id) === liveItem.creatorId)?.username || 'Admin'}</span>
                                         </div>
                                         <div className="d-flex align-items-center gap-1">
-                                            <Calendar size={14} /> <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently'}</span>
+                                            <Calendar size={14} /> <span>{liveItem.createdAt ? new Date(liveItem.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently'}</span>
                                         </div>
                                     </div>
                                 )}
@@ -162,20 +170,20 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                             >
                                 <h5 className="small text-uppercase tracking-widest text-primary fw-bold mb-3">Description</h5>
                                 <p className="text-muted mb-4 lead" style={{ fontSize: '1rem', lineHeight: '1.7' }}>
-                                    {item.description || "A professional handcrafted piece of art that blends technical skill with creative vision. Each detail is carefully considered to create a lasting impression and evoke deep emotional resonance."}
+                                    {liveItem.description || "A professional handcrafted piece of art that blends technical skill with creative vision. Each detail is carefully considered to create a lasting impression and evoke deep emotional resonance."}
                                 </p>
 
                                 <div className="row g-3 mb-4">
                                     <div className="col-6">
                                         <div className="glass p-3 rounded-4 text-center">
                                             <div className="extra-small text-muted mb-1 text-uppercase text-truncate">Medium</div>
-                                            <div className="small fw-bold text-truncate">{item.medium || 'Custom'}</div>
+                                            <div className="small fw-bold text-truncate">{liveItem.medium || 'Custom'}</div>
                                         </div>
                                     </div>
                                     <div className="col-6">
                                         <div className="glass p-3 rounded-4 text-center">
                                             <div className="extra-small text-muted mb-1 text-uppercase text-truncate">Status</div>
-                                            <div className="small fw-bold text-success text-truncate">{item.price ? 'Available' : 'Portfolio'}</div>
+                                            <div className="small fw-bold text-success text-truncate">{liveItem.price ? 'Available' : 'Portfolio'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -187,8 +195,8 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     </h5>
 
                                     <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
-                                        {item.comments && item.comments.length > 0 ? (
-                                            item.comments.map((comment, idx) => (
+                                        {liveItem.comments && liveItem.comments.length > 0 ? (
+                                            liveItem.comments.map((comment, idx) => (
                                                 <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5">
                                                     <div className="d-flex justify-content-between align-items-center mb-1">
                                                         <span className="fw-bold extra-small text-primary">{comment.username}</span>
@@ -232,7 +240,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                             >
                                 <div className="d-flex gap-2 w-100">
                                     <button
-                                        onClick={() => toggleLike(item._id || item.id)}
+                                        onClick={() => toggleLike(liveItem._id || liveItem.id)}
                                         className="btn glass flex-grow-1 py-3 px-4 rounded-3 text-white border-0 shadow-sm d-flex align-items-center justify-content-center gap-2 hover-scale"
                                     >
                                         <Heart size={20} fill={isLiked ? "var(--primary)" : "none"} className={isLiked ? "text-primary" : ""} />
@@ -247,7 +255,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                 </div>
                                 {onOrder ? (
                                     <button
-                                        onClick={() => onOrder(item)}
+                                        onClick={() => onOrder(liveItem)}
                                         className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 d-flex align-items-center justify-content-center gap-2 shadow-glow hover-scale"
                                     >
                                         <ShoppingBag size={20} /> Request Order
@@ -255,7 +263,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                 ) : (
                                     onInquire && (
                                         <button
-                                            onClick={() => onInquire(item)}
+                                            onClick={() => onInquire(liveItem)}
                                             className="btn btn-primary w-100 py-3 rounded-3 fw-bold border-0 d-flex align-items-center justify-content-center gap-2 shadow-glow hover-scale"
                                         >
                                             <Send size={20} /> Send Inquiry
