@@ -18,7 +18,7 @@ const Admin = () => {
         messages, deleteMessage, sendInternalMessage,
         orders, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice,
         users, updateEmblosStatus,
-        isAdmin, setIsAdmin, changePassword, verifyAdminPassword,
+        isAdmin, setIsAdmin, verifyAdminPassword,
         toggleLike, toggleGalleryLike, likedIds
     } = useContext(AppContext);
 
@@ -44,8 +44,6 @@ const Admin = () => {
     const [formData, setFormData] = useState({ name: '', price: '', image: '', description: '', category: '', medium: '' });
     const [imageFile, setImageFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [newPass, setNewPass] = useState('');
-    const [passUpdateStatus, setPassUpdateStatus] = useState('');
     const [deleteEmail, setDeleteEmail] = useState('');
     const [isDeletingUser, setIsDeletingUser] = useState(false);
     const [deleteStatus, setDeleteStatus] = useState({ error: '', success: '' });
@@ -56,6 +54,7 @@ const Admin = () => {
     const [messageTarget, setMessageTarget] = useState(null); // { id, name } or 'all_emblos'
     const [internalMsg, setInternalMsg] = useState('');
     const [isSendingInternal, setIsSendingInternal] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const { deleteUserByEmail, appSettings, updateAppSetting } = useContext(AppContext);
 
@@ -266,14 +265,6 @@ const Admin = () => {
         setEditingGalleryItem(null);
         setFormData({ name: '', price: '', image: '', description: '', category: '', medium: '' });
         setImageFile(null);
-    };
-
-    const handlePassChange = async (e) => {
-        e.preventDefault();
-        await changePassword(newPass);
-        setPassUpdateStatus('Credential updated successfully');
-        setNewPass('');
-        setTimeout(() => setPassUpdateStatus(''), 3000);
     };
 
     const handleDeleteUser = async (e) => {
@@ -791,7 +782,11 @@ const Admin = () => {
                                                             <MessageSquare size={16} />
                                                         </button>
                                                     )}
-                                                    <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0"><Eye size={16} /></button>
+                                                    {activeTab !== 'collectors' && (
+                                                        <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0" title="View Identity Details">
+                                                            <Eye size={16} />
+                                                        </button>
+                                                    )}
                                                     {u.role === 'emblos' && (
                                                         <div className="d-flex gap-1 align-items-center bg-white bg-opacity-5 p-1 rounded-pill">
                                                             {u.isFrozen && (
@@ -843,35 +838,7 @@ const Admin = () => {
 
                     {activeTab === 'settings' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
-                            <div className="col-12 col-md-6">
-                                <section className="glass p-5 rounded-4 border-0 shadow-lg">
-                                    <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
-                                        <Lock size={20} className="text-primary" /> Admin Security
-                                    </h4>
-                                    <form onSubmit={handlePassChange}>
-                                        <div className="mb-4">
-                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Set New Access Gateway Key</label>
-                                            <input
-                                                required
-                                                type="password"
-                                                placeholder="••••••••••••"
-                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
-                                                style={{ background: 'rgba(255,255,255,0.03) !important', letterSpacing: '0.3em' }}
-                                                value={newPass}
-                                                onChange={e => setNewPass(e.target.value)}
-                                            />
-                                        </div>
-                                        <button type="submit" className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y">Update Credentials</button>
-                                        {passUpdateStatus && (
-                                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
-                                                <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
-                                            </Motion.div>
-                                        )}
-                                    </form>
-                                </section>
-                            </div>
-
-                            <div className="col-12 col-md-6 mt-4 mt-md-0">
+                            <div className="col-12">
                                 <section className="glass p-5 rounded-4 border-0 shadow-lg border-danger-subtle">
                                     <h4 className="fw-bold mb-4 d-flex align-items-center gap-3 text-danger">
                                         <Trash2 size={20} /> Danger Zone
@@ -1125,23 +1092,82 @@ const Admin = () => {
                                         <div className="extra-small text-muted">{selectedUser.email}</div>
                                     </div>
                                 </div>
-                                <div className="d-flex gap-2">
-                                    <button
-                                        onClick={async () => {
-                                            if (window.confirm(`Are you sure you want to PERMANENTLY delete artist "${selectedUser.username}"?`)) {
-                                                const res = await deleteUserByEmail(selectedUser.email);
-                                                if (res.success) {
-                                                    setSelectedUser(null);
-                                                } else {
-                                                    alert(res.message);
-                                                }
-                                            }
-                                        }}
-                                        className="btn btn-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-2"
-                                    >
-                                        <Trash2 size={14} /> Delete Artist
-                                    </button>
-                                    <button onClick={() => setSelectedUser(null)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
+                                <button onClick={() => setSelectedUser(null)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
+                            </div>
+
+                            {/* Delete Message Box - Black BG, White Text */}
+                            <div className="p-4 border-bottom border-danger border-opacity-20" style={{ background: '#000000' }}>
+                                <div className="d-flex flex-column gap-3">
+                                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-4">
+                                        <div className="d-flex align-items-start gap-3 flex-grow-1">
+                                            <div className="bg-primary bg-opacity-10 p-3 rounded-4 text-primary mt-1">
+                                                <MessageSquare size={24} />
+                                            </div>
+                                            <div className="w-100">
+                                                <div className="d-flex align-items-center gap-2 mb-2">
+                                                    <h6 className="fw-bold mb-0" style={{ color: '#ffffff' }}>Identity Insight & Action</h6>
+                                                    <span className="badge bg-white bg-opacity-10 text-white extra-small px-2 py-1 rounded-pill">Priority Context</span>
+                                                </div>
+                                                <div className="glass p-3 rounded-4 border-0 mb-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                    <p className="mb-0 small" style={{ color: '#ffffff', opacity: 0.9, lineHeight: '1.6' }}>
+                                                        {selectedUser.emblosAccess?.message || "This user is registered as a regular collector. No specific request message was submitted during registration."}
+                                                    </p>
+                                                </div>
+                                                <div className="d-flex flex-wrap gap-2">
+                                                    <span className="extra-small text-muted">Action:</span>
+                                                    {!showDeleteConfirm ? (
+                                                        <button
+                                                            onClick={() => setShowDeleteConfirm(true)}
+                                                            className="btn btn-link p-0 text-danger extra-small text-decoration-none fw-bold hover-scale"
+                                                        >
+                                                            Initiate Termination Request
+                                                        </button>
+                                                    ) : (
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <span className="extra-small text-danger fw-bold blink">Confirm Termination?</span>
+                                                            <button
+                                                                onClick={async () => {
+                                                                    const res = await deleteUserByEmail(selectedUser.email);
+                                                                    if (res.success) {
+                                                                        alert('✅ Identity Purged Successfully');
+                                                                        setSelectedUser(null);
+                                                                        setShowDeleteConfirm(false);
+                                                                    } else {
+                                                                        alert('❌ Error: ' + res.message);
+                                                                        setShowDeleteConfirm(false);
+                                                                    }
+                                                                }}
+                                                                className="btn btn-danger btn-xs py-1 px-3 rounded-pill extra-small fw-bold"
+                                                            >
+                                                                YES, DELETE
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setShowDeleteConfirm(false)}
+                                                                className="btn btn-link p-0 text-white extra-small text-decoration-none"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex flex-column gap-2" style={{ minWidth: '200px' }}>
+                                            <div className="glass p-3 rounded-4 border-0 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                                <div className="extra-small text-white-50 text-uppercase tracking-widest mb-1">Access Level</div>
+                                                <div className={`fw-bold ${selectedUser.role === 'emblos' ? 'text-primary' : 'text-success'}`}>
+                                                    {selectedUser.role?.toUpperCase() || 'COLLECTOR'}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setMessageTarget({ id: selectedUser._id || selectedUser.id, name: selectedUser.username })}
+                                                className="btn btn-primary w-100 py-2 rounded-4 fw-bold extra-small d-flex align-items-center justify-content-center gap-2 shadow-lg border-0"
+                                            >
+                                                <Send size={14} /> Send Direct Msg
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1158,13 +1184,13 @@ const Admin = () => {
                                         },
                                         {
                                             label: 'Total Orders',
-                                            value: orders.filter(o => o.creatorId === selectedUser._id).length,
+                                            value: orders.filter(o => o.creatorId === selectedUser._id || o.creatorId === selectedUser.id).length,
                                             icon: ShoppingBag, color: 'success'
                                         },
                                         {
                                             label: 'Total Artworks',
-                                            value: (products.filter(p => p.creatorId === selectedUser._id).length +
-                                                galleryItems.filter(g => g.creatorId === selectedUser._id).length),
+                                            value: (products.filter(p => p.creatorId === selectedUser._id || p.creatorId === selectedUser.id).length +
+                                                galleryItems.filter(g => g.creatorId === selectedUser._id || g.creatorId === selectedUser.id).length),
                                             icon: ImageIcon, color: 'primary'
                                         },
                                     ].map((stat, idx) => (
