@@ -28,6 +28,8 @@ const Dashboard = () => {
         orders,
         messages,
         submitOrderPrice,
+        approveOrderPrice,
+        claimOrder,
         sendInternalMessage,
         addProduct,
         addGalleryItem,
@@ -75,14 +77,17 @@ const Dashboard = () => {
 
     const handleClaimTask = async (orderId) => {
         if (isFrozen) return alert("Account frozen.");
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/orders/${orderId}/claim`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ creatorId: user?._id || user?.id })
-        });
-        if (res.ok) {
-            alert("Task Claimed! Check your 'Orders' tab to set the price.");
-            window.location.reload();
+
+        const price = window.prompt("ഈ വർക്കിനായി നിങ്ങൾ ഉദ്ദേശിക്കുന്ന Price (₹) എത്രയാണ്?");
+        if (!price || isNaN(price)) {
+            return alert("ദയവായി ഒരു സാധുവായ തുക നൽകുക.");
+        }
+
+        const res = await claimOrder(orderId, price);
+        if (res.success) {
+            alert("Task Claimed! കസ്റ്റമർക്ക് ഇപ്പോൾ പ്രൈസ് കാണാൻ സാധിക്കും. അഡ്മിൻ അപ്രൂവ് ചെയ്താൽ ഓർഡർ കൺഫേം ആകും.");
+        } else {
+            alert("Claim Failed. Please try again.");
         }
     };
 

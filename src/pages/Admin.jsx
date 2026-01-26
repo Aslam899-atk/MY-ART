@@ -44,6 +44,22 @@ const Admin = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [newPass, setNewPass] = useState('');
     const [passUpdateStatus, setPassUpdateStatus] = useState('');
+    const [deleteEmail, setDeleteEmail] = useState('');
+    const [isDeletingUser, setIsDeletingUser] = useState(false);
+    const [deleteStatus, setDeleteStatus] = useState({ error: '', success: '' });
+    const [emblosRate, setEmblosRate] = useState('');
+    const [emblosRules, setEmblosRules] = useState('');
+    const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
+
+    const { deleteUserByEmail, appSettings, updateAppSetting } = useContext(AppContext);
+
+    useEffect(() => {
+        if (appSettings.emblos_config) {
+            setEmblosRate(appSettings.emblos_config.monthlyFee || '');
+            setEmblosRules(appSettings.emblos_config.rules?.join('\n') || '');
+        }
+    }, [appSettings.emblos_config]);
 
     const navigate = useNavigate();
 
@@ -253,6 +269,34 @@ const Admin = () => {
         setPassUpdateStatus('Credential updated successfully');
         setNewPass('');
         setTimeout(() => setPassUpdateStatus(''), 3000);
+    };
+
+    const handleDeleteUser = async (e) => {
+        e.preventDefault();
+        setDeleteStatus({ error: '', success: '' });
+        setIsDeletingUser(true);
+
+        const result = await deleteUserByEmail(deleteEmail);
+        setIsDeletingUser(false);
+
+        if (result.success) {
+            setDeleteStatus({ error: '', success: 'User and all associated data deleted successfully' });
+            setDeleteEmail('');
+        } else {
+            setDeleteStatus({ error: result.message || 'Deletion failed', success: '' });
+        }
+    };
+
+    const handleUpdateEmblosConfig = async (e) => {
+        e.preventDefault();
+        setIsUpdatingConfig(true);
+        const rulesArray = emblosRules.split('\n').filter(r => r.trim());
+        await updateAppSetting('emblos_config', {
+            monthlyFee: emblosRate,
+            rules: rulesArray
+        });
+        setIsUpdatingConfig(false);
+        alert('Configuration Updated Successfully!');
     };
 
     // Sidebar items
@@ -478,9 +522,15 @@ const Admin = () => {
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
-                                                        <img src={o.image} className="rounded-2 shadow-sm" style={{ width: '40px', height: '40px', objectFit: 'cover' }} alt="" />
+                                                        <img
+                                                            src={o.image}
+                                                            className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                            style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                                            alt=""
+                                                            onClick={() => setPreviewImage(o.image)}
+                                                        />
                                                         <div>
-                                                            <div className="fw-bold text-white">{o.productName}</div>
+                                                            <div className="fw-bold text-white fs-6">{o.productName}</div>
                                                             <div className="extra-small opacity-50">{o.date}</div>
                                                         </div>
                                                     </div>
@@ -683,6 +733,18 @@ const Admin = () => {
                                                             {u.isFrozen ? 'Unfreeze' : 'Freeze'}
                                                         </button>
                                                     )}
+                                                    <button
+                                                        onClick={async () => {
+                                                            if (window.confirm(`Are you sure you want to PERMANENTLY delete user "${u.username}" (${u.email}) and all their artworks? This cannot be undone.`)) {
+                                                                const res = await deleteUserByEmail(u.email);
+                                                                if (!res.success) alert(res.message);
+                                                            }
+                                                        }}
+                                                        className="btn btn-sm btn-outline-danger rounded-circle p-2"
+                                                        title="Delete User"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -721,6 +783,99 @@ const Admin = () => {
                                                 <CheckCircle size={16} className="me-2" /> {passUpdateStatus}
                                             </Motion.div>
                                         )}
+                                    </form>
+                                </section>
+                            </div>
+
+                            <div className="col-12 col-md-6 mt-4 mt-md-0">
+                                <section className="glass p-5 rounded-4 border-0 shadow-lg border-danger-subtle">
+                                    <h4 className="fw-bold mb-4 d-flex align-items-center gap-3 text-danger">
+                                        <Trash2 size={20} /> Danger Zone
+                                    </h4>
+                                    <p className="text-muted small mb-4">Request account termination by entering the associated Gmail address. This action is irreversible.</p>
+                                    <form onSubmit={handleDeleteUser}>
+                                        <div className="mb-4">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">User Gmail Address</label>
+                                            <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                <span className="input-group-text bg-transparent border-0 text-white-50 ps-4"><Mail size={16} /></span>
+                                                <input
+                                                    required
+                                                    type="email"
+                                                    placeholder="user@gmail.com"
+                                                    className="form-control bg-transparent border-0 text-white py-3"
+                                                    value={deleteEmail}
+                                                    onChange={e => setDeleteEmail(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex gap-3">
+                                            <button
+                                                type="submit"
+                                                disabled={isDeletingUser}
+                                                className="btn btn-danger flex-grow-1 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y d-flex align-items-center justify-content-center gap-2"
+                                            >
+                                                {isDeletingUser && <span className="spinner-border spinner-border-sm" role="status"></span>}
+                                                {isDeletingUser ? 'Processing...' : 'Delete Account'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setDeleteEmail('')}
+                                                className="btn glass px-4 py-3 rounded-4 fw-bold border-0 transition-all hover-bg-white-5"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+
+                                        {deleteStatus.success && (
+                                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-success small fw-bold">
+                                                <CheckCircle size={16} className="me-2" /> {deleteStatus.success}
+                                            </Motion.div>
+                                        )}
+                                        {deleteStatus.error && (
+                                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-center text-danger small fw-bold">
+                                                <AlertCircle size={16} className="me-2" /> {deleteStatus.error}
+                                            </Motion.div>
+                                        )}
+                                    </form>
+                                </section>
+                            </div>
+
+                            <div className="col-12 col-md-6 mt-4 mt-md-0">
+                                <section className="glass p-5 rounded-4 border-0 shadow-lg">
+                                    <h4 className="fw-bold mb-4 d-flex align-items-center gap-3">
+                                        <Brush size={20} className="text-primary" /> Emblos Configuration
+                                    </h4>
+                                    <form onSubmit={handleUpdateEmblosConfig}>
+                                        <div className="mb-4">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Monthly Artist Fee (₹)</label>
+                                            <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
+                                                <input
+                                                    required
+                                                    type="number"
+                                                    placeholder="e.g. 500"
+                                                    className="form-control bg-transparent border-0 text-white py-3"
+                                                    value={emblosRate}
+                                                    onChange={e => setEmblosRate(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mb-4">
+                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Access Rules (One per line)</label>
+                                            <textarea
+                                                rows="5"
+                                                placeholder="Enter rules here..."
+                                                className="form-control bg-dark border-0 text-white py-3 px-4 rounded-4"
+                                                style={{ background: 'rgba(255,255,255,0.03) !important', resize: 'none' }}
+                                                value={emblosRules}
+                                                onChange={e => setEmblosRules(e.target.value)}
+                                            />
+                                        </div>
+                                        <button type="submit" disabled={isUpdatingConfig} className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 transition-all hover-translate-y d-flex align-items-center justify-content-center gap-2">
+                                            {isUpdatingConfig && <span className="spinner-border spinner-border-sm" role="status"></span>}
+                                            {isUpdatingConfig ? 'Updating...' : 'Save Configuration'}
+                                        </button>
                                     </form>
                                 </section>
                             </div>
@@ -865,6 +1020,187 @@ const Admin = () => {
                     </div>
                 )
             }
+
+            {/* Artist Detail Dashboard Modal */}
+            <AnimatePresence>
+                {selectedUser && (
+                    <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-0 p-md-3" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1200, overflowY: 'auto' }}>
+                        <Motion.div
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 50, opacity: 0 }}
+                            className="glass w-100 h-100 h-md-auto rounded-md-5 border-0 shadow-2xl overflow-hidden d-flex flex-column"
+                            style={{ maxWidth: '1000px', maxHeight: '95vh' }}
+                        >
+                            {/* Modal Header */}
+                            <div className="p-4 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center sticky-top bg-dark" style={{ zIndex: 10 }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <img src={selectedUser.avatar || '/icon.png'} className="rounded-circle border border-primary p-1" style={{ width: '50px', height: '50px', objectFit: 'cover' }} alt="" />
+                                    <div>
+                                        <h4 className="fw-bold mb-0 text-white">{selectedUser.username} <span className="badge bg-primary bg-opacity-10 text-primary extra-small">{selectedUser.role?.toUpperCase()}</span></h4>
+                                        <div className="extra-small text-muted">{selectedUser.email}</div>
+                                    </div>
+                                </div>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            if (window.confirm(`Are you sure you want to PERMANENTLY delete artist "${selectedUser.username}"?`)) {
+                                                const res = await deleteUserByEmail(selectedUser.email);
+                                                if (res.success) {
+                                                    setSelectedUser(null);
+                                                } else {
+                                                    alert(res.message);
+                                                }
+                                            }
+                                        }}
+                                        className="btn btn-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-2"
+                                    >
+                                        <Trash2 size={14} /> Delete Artist
+                                    </button>
+                                    <button onClick={() => setSelectedUser(null)} className="btn text-white-50 p-2 hover-bg-white-5 rounded-circle border-0 transition-all"><X size={24} /></button>
+                                </div>
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="p-4 p-md-5 overflow-auto custom-scrollbar">
+                                {/* Stats Cards */}
+                                <div className="row g-4 mb-5">
+                                    {[
+                                        {
+                                            label: 'Total Likes',
+                                            value: (products.filter(p => p.creatorId === selectedUser._id).reduce((sum, p) => sum + (p.likes || 0), 0) +
+                                                galleryItems.filter(g => g.creatorId === selectedUser._id).reduce((sum, g) => sum + (g.likes || 0), 0)),
+                                            icon: Heart, color: 'danger'
+                                        },
+                                        {
+                                            label: 'Total Orders',
+                                            value: orders.filter(o => o.creatorId === selectedUser._id).length,
+                                            icon: ShoppingBag, color: 'success'
+                                        },
+                                        {
+                                            label: 'Total Artworks',
+                                            value: (products.filter(p => p.creatorId === selectedUser._id).length +
+                                                galleryItems.filter(g => g.creatorId === selectedUser._id).length),
+                                            icon: ImageIcon, color: 'primary'
+                                        },
+                                    ].map((stat, idx) => (
+                                        <div key={idx} className="col-12 col-md-4">
+                                            <div className="glass p-4 rounded-4 border-0 h-100 bg-opacity-5">
+                                                <div className={`bg-${stat.color} bg-opacity-10 p-2 rounded-3 text-${stat.color} d-inline-block mb-3`}>
+                                                    <stat.icon size={20} />
+                                                </div>
+                                                <h3 className="h2 fw-bold mb-0 text-white">{stat.value}</h3>
+                                                <p className="text-muted small mb-0 mt-1">{stat.label}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Artworks Section */}
+                                <div className="mb-5">
+                                    <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                                        <ImageIcon size={20} className="text-primary" /> Artist's Gallery & Inventory
+                                    </h5>
+                                    <div className="row g-3">
+                                        {[...products.filter(p => p.creatorId === selectedUser._id), ...galleryItems.filter(g => g.creatorId === selectedUser._id)].map((item, idx) => (
+                                            <div key={idx} className="col-6 col-md-3">
+                                                <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '150px' }}>
+                                                    <img
+                                                        src={item.image || item.url}
+                                                        className="w-100 h-100 object-fit-cover shadow-lg pointer"
+                                                        alt=""
+                                                        onClick={() => setPreviewImage(item.image || item.url)}
+                                                    />
+                                                    <div className="position-absolute top-0 start-0 m-2">
+                                                        <span className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'} extra-small`}>{item.status}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {products.filter(p => p.creatorId === selectedUser._id).length === 0 && galleryItems.filter(g => g.creatorId === selectedUser._id).length === 0 && (
+                                            <div className="col-12 text-center py-4 text-muted small">No artworks found for this artist.</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Orders Section */}
+                                <div>
+                                    <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                                        <ShoppingBag size={20} className="text-success" /> Artist's Orders
+                                    </h5>
+                                    <div className="table-responsive">
+                                        <table className="table table-dark table-hover align-middle border-0">
+                                            <thead>
+                                                <tr className="text-muted extra-small uppercase">
+                                                    <th className="border-0">Product</th>
+                                                    <th className="border-0 text-end">Price</th>
+                                                    <th className="border-0 text-end">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {orders.filter(o => o.creatorId === selectedUser._id).map(order => (
+                                                    <tr key={order._id} className="border-bottom border-white border-opacity-5">
+                                                        <td className="border-0 py-3">
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <img
+                                                                    src={order.image}
+                                                                    className="rounded-circle cursor-pointer"
+                                                                    style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                                                                    alt=""
+                                                                    onClick={() => setPreviewImage(order.image)}
+                                                                />
+                                                                <div className="fw-bold extra-small">{order.productName}</div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="border-0 text-end extra-small">
+                                                            {order.price ? <span className="text-primary fw-bold">₹{order.price}</span> : 'N/A'}
+                                                        </td>
+                                                        <td className="border-0 text-end">
+                                                            <span className={`badge ${order.status === 'Approved' ? 'bg-success' : 'bg-warning'} extra-small`}>
+                                                                {order.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {orders.filter(o => o.creatorId === selectedUser._id).length === 0 && (
+                                                    <tr><td colSpan="3" className="text-center py-4 text-muted small">No orders attributed to this artist.</td></tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </Motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Image Preview Modal */}
+            <AnimatePresence>
+                {previewImage && (
+                    <div
+                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1300 }}
+                        onClick={() => setPreviewImage(null)}
+                    >
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="position-relative"
+                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+                        >
+                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
+                            >
+                                <X size={24} />
+                            </button>
+                        </Motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div >
     );
 };

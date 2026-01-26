@@ -129,6 +129,13 @@ const userSchema = new mongoose.Schema({
 }, schemaOptions);
 const User = mongoose.model('User', userSchema);
 
+// 7. App Settings (General)
+const appSettingSchema = new mongoose.Schema({
+    key: { type: String, unique: true },
+    value: mongoose.Schema.Types.Mixed
+}, schemaOptions);
+const AppSetting = mongoose.model('AppSetting', appSettingSchema);
+
 
 // --- ROUTES ---
 
@@ -137,10 +144,40 @@ const asyncHandler = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+// APP SETTINGS
+app.get('/api/settings/:key', asyncHandler(async (req, res) => {
+    const setting = await AppSetting.findOne({ key: req.params.key });
+    res.json(setting || { key: req.params.key, value: null });
+}));
+
+app.post('/api/settings/:key', asyncHandler(async (req, res) => {
+    const { value } = req.body;
+    const setting = await AppSetting.findOneAndUpdate(
+        { key: req.params.key },
+        { value },
+        { upsert: true, new: true }
+    );
+    res.json(setting);
+}));
+
 // USER MANAGEMENT
 app.get('/api/users', asyncHandler(async (req, res) => {
     const users = await User.find().sort({ createdAt: -1 });
     res.json(users);
+}));
+
+app.delete('/api/users/delete-by-email', asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOneAndDelete({ email });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found with this email' });
+    }
+    // Also cleanup their products and gallery items
+    await Promise.all([
+        Product.deleteMany({ creatorId: user._id }),
+        Gallery.deleteMany({ creatorId: user._id })
+    ]);
+    res.json({ message: 'User and their content deleted successfully' });
 }));
 
 // ACTIONS
@@ -426,11 +463,18 @@ app.put('/api/orders/:id/approve-price', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
-    const { creatorId } = req.body;
-    const order = await Order.findByIdAndUpdate(req.params.id, {
-        creatorId,
-        status: 'Pending Price'
-    }, { new: true });
+    const { creatorId, price } = req.body;
+    const updateData = { creatorId };
+
+    if (price) {
+        updateData.price = price;
+        updateData.priceGiven = true;
+        updateData.status = 'Price Submitted';
+    } else {
+        updateData.status = 'Pending Price';
+    }
+
+    const order = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json(order);
 }));
 

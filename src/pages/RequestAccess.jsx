@@ -41,20 +41,31 @@ const RequestAccess = () => {
 
                         <div className="alert bg-primary bg-opacity-10 border-primary border-opacity-20 text-white p-4 rounded-4 mb-4">
                             <h6 className="fw-bold mb-3 d-flex align-items-center gap-2">
-                                <AlertCircle size={18} /> Emblos Access Rule
+                                <AlertCircle size={18} /> Emblos Access Rules & Plans
                             </h6>
-                            <p className="small opacity-75 mb-2">
-                                Emblos access website വഴി automatically approve ചെയ്യില്ല.
-                            </p>
-                            <p className="small opacity-75 mb-2">
-                                Request submit ചെയ്ത ശേഷം Admin personally contact ചെയ്യുന്നതാണ് (Gmail / Phone number വഴി).
-                            </p>
-                            <p className="small opacity-75 mb-2">
-                                Payment & terms confirm ചെയ്ത ശേഷം മാത്രമേ Admin dashboard വഴി access activate ചെയ്യൂ.
-                            </p>
-                            <p className="small opacity-75 mb-0 fw-bold text-primary">
-                                Admin confirmation ഇല്ലാതെ upload / publish അനുവദിക്കില്ല.
-                            </p>
+
+                            {appSettings.emblos_config?.monthlyFee && (
+                                <div className="mb-3">
+                                    <span className="badge bg-primary text-white p-2 rounded-3 mb-2">Registration Fee: ₹{appSettings.emblos_config.monthlyFee} / Month</span>
+                                </div>
+                            )}
+
+                            {appSettings.emblos_config?.rules?.length > 0 ? (
+                                <ul className="list-unstyled mb-0">
+                                    {appSettings.emblos_config.rules.map((rule, idx) => (
+                                        <li key={idx} className="small opacity-75 mb-2 d-flex gap-2">
+                                            <span className="text-primary">•</span> {rule}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <ul className="list-unstyled mb-0">
+                                    <li className="small opacity-75 mb-2">• ഓരോ മാസത്തിന് നിശ്ചിത രൂപ നൽകേണ്ടതുണ്ട്.</li>
+                                    <li className="small opacity-75 mb-2">• ഇത് കസ്റ്റമർക്ക് കാണാൻ സാധിക്കില്ല.</li>
+                                    <li className="small opacity-75 mb-2">• ഷിപ്പിംഗ് അടക്കമുള്ള കാര്യങ്ങൾ നിങ്ങൾ തന്നെ കൈകാര്യം ചെയ്യേണ്ടതാണ്.</li>
+                                    <li className="small opacity-75 mb-0 fw-bold text-primary">• Admin confirmation ഇല്ലാതെ upload / publish അനുവദിക്കില്ല.</li>
+                                </ul>
+                            )}
                         </div>
 
                         <form onSubmit={handleSubmit}>

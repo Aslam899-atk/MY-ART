@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { ShoppingBag, Clock, CheckCircle, Trash2 } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle, Trash2, X } from 'lucide-react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const UserOrders = () => {
     const { orders, user, users, deleteOrder } = useContext(AppContext);
+    const [previewImage, setPreviewImage] = useState(null);
 
     const myOrders = orders.filter(o => o.customerId === (user?._id || user?.id));
 
@@ -17,9 +19,15 @@ const UserOrders = () => {
             <div className="row g-4">
                 {myOrders.map(order => (
                     <div key={order._id} className="col-12 col-md-6">
-                        <div className="glass p-4 rounded-4 border border-white border-opacity-10 h-100 shadow-lg">
+                        <div className="glass p-4 rounded-4 border border-white border-opacity-10 h-100 shadow-lg group">
                             <div className="d-flex gap-4">
-                                <img src={order.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                <img
+                                    src={order.image}
+                                    className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                    style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                                    alt=""
+                                    onClick={() => setPreviewImage(order.image)}
+                                />
                                 <div className="flex-grow-1">
                                     <div className="d-flex justify-content-between align-items-start">
                                         <div>
@@ -31,8 +39,10 @@ const UserOrders = () => {
                                                 {order.type === 'service' ? 'Request' : 'Order'}
                                             </span>
                                             {order.type === 'service' && (
-                                                <span className={`badge rounded-pill ${order.status === 'Approved' ? 'bg-success' : 'bg-warning'} px-2 py-1 extra-small`}>
-                                                    {order.status}
+                                                <span className={`badge rounded-pill ${order.status === 'Approved' ? 'bg-success' :
+                                                    (order.status === 'Price Submitted' ? 'bg-info' : 'bg-warning')
+                                                    } px-2 py-1 extra-small`}>
+                                                    {order.status === 'Price Submitted' ? 'Price Negotiated' : order.status}
                                                 </span>
                                             )}
                                         </div>
@@ -56,7 +66,9 @@ const UserOrders = () => {
                                             <div className="small text-white-50 font-italic">
                                                 {order.status === 'Approved' ? (
                                                     <span className="text-success fw-bold d-flex align-items-center gap-2"><CheckCircle size={16} /> Request Approved</span>
-                                                ) : 'Request Processing...'}
+                                                ) : (order.status === 'Price Submitted' ? (
+                                                    <span className="text-info fw-bold d-flex align-items-center gap-2"><Clock size={16} /> Waiting for Admin Approval</span>
+                                                ) : 'Request Processing...')}
                                             </div>
                                         )}
 
@@ -81,6 +93,33 @@ const UserOrders = () => {
                     </div>
                 )}
             </div>
+
+            {/* Image Preview Modal */}
+            <AnimatePresence>
+                {previewImage && (
+                    <div
+                        className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3 animate-fade-in"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 11000 }}
+                        onClick={() => setPreviewImage(null)}
+                    >
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="position-relative"
+                            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+                        >
+                            <img src={previewImage} className="rounded-4 img-fluid shadow-2xl" style={{ maxHeight: '85vh' }} alt="" />
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
+                            >
+                                <X size={24} />
+                            </button>
+                        </Motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

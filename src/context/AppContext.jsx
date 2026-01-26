@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
     const [messages, setMessages] = useState([]);
     const [orders, setOrders] = useState([]);
     const [users, setUsers] = useState([]);
+    const [appSettings, setAppSettings] = useState({});
 
     // User Auth State
     const [user, setUser] = useState(() => {
@@ -56,6 +57,11 @@ export const AppProvider = ({ children }) => {
             setMessages(await msgRes.json());
             setOrders(await ordRes.json());
             setUsers(await usersRes.json());
+
+            // Fetch Emblos Config
+            const configRes = await fetch(`${API_URL}/settings/emblos_config`);
+            const configData = await configRes.json();
+            setAppSettings(prev => ({ ...prev, emblos_config: configData.value }));
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -115,6 +121,21 @@ export const AppProvider = ({ children }) => {
         }
     };
 
+    const deleteUserByEmail = async (email) => {
+        const res = await fetch(`${API_URL}/users/delete-by-email`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        if (res.ok) {
+            fetchData();
+            return { success: true };
+        } else {
+            const data = await res.json();
+            return { success: false, message: data.message };
+        }
+    };
+
     // --- ORDER ACTIONS ---
     const submitOrderPrice = async (orderId, price) => {
         const res = await fetch(`${API_URL}/orders/${orderId}/price`, {
@@ -131,6 +152,36 @@ export const AppProvider = ({ children }) => {
             headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchData();
+    };
+
+    const claimOrder = async (orderId, price) => {
+        const res = await fetch(`${API_URL}/orders/${orderId}/claim`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                creatorId: user?._id || user?.id,
+                price: Number(price)
+            })
+        });
+        if (res.ok) {
+            fetchData();
+            return { success: true };
+        }
+        return { success: false };
+    };
+
+    const updateAppSetting = async (key, value) => {
+        const res = await fetch(`${API_URL}/settings/${key}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setAppSettings(prev => ({ ...prev, [key]: data.value }));
+            return { success: true };
+        }
+        return { success: false };
     };
 
     const sendInternalMessage = async (data) => {
@@ -454,8 +505,9 @@ export const AppProvider = ({ children }) => {
             products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
             galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike, addGalleryComment,
             messages, addMessage, deleteMessage, sendInternalMessage,
-            orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice,
-            users, requestEmblosAccess, updateEmblosStatus,
+            orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,
+            users, requestEmblosAccess, updateEmblosStatus, deleteUserByEmail,
+            appSettings, updateAppSetting,
             isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth,
             user, loginUser, registerUser, logoutUser
