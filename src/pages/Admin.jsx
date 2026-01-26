@@ -54,6 +54,9 @@ const Admin = () => {
     const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
     const [commentModalItem, setCommentModalItem] = useState(null);
+    const [messageTarget, setMessageTarget] = useState(null); // { id, name } or 'all_emblos'
+    const [internalMsg, setInternalMsg] = useState('');
+    const [isSendingInternal, setIsSendingInternal] = useState(false);
 
     const { deleteUserByEmail, appSettings, updateAppSetting } = useContext(AppContext);
 
@@ -696,6 +699,17 @@ const Admin = () => {
 
                     {(activeTab === 'emblos' || activeTab === 'collectors') && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
+                            <div className="d-flex justify-content-between align-items-center mb-4 px-2">
+                                <h5 className="fw-bold mb-0">{activeTab === 'emblos' ? 'Artist Registry' : 'Collector Database'}</h5>
+                                {activeTab === 'emblos' && (
+                                    <button
+                                        onClick={() => setMessageTarget({ id: 'all_emblos', name: 'All Emblos Artists' })}
+                                        className="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2"
+                                    >
+                                        <Send size={14} /> Global Broadcast
+                                    </button>
+                                )}
+                            </div>
                             <table className="table table-dark table-hover align-middle">
                                 <thead>
                                     <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
@@ -735,7 +749,16 @@ const Admin = () => {
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4 border-0 text-end">
-                                                <div className="d-flex gap-2 justify-content-end">
+                                                <div className="d-flex gap-2 justify-content-end align-items-center">
+                                                    {u.role === 'emblos' && (
+                                                        <button
+                                                            onClick={() => setMessageTarget({ id: u._id || u.id, name: u.username })}
+                                                            className="btn btn-sm glass text-primary border-0 rounded-circle p-2"
+                                                            title="Message Artist"
+                                                        >
+                                                            <MessageSquare size={16} />
+                                                        </button>
+                                                    )}
                                                     <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0"><Eye size={16} /></button>
                                                     {u.role === 'emblos' && (
                                                         <div className="d-flex gap-1 align-items-center bg-white bg-opacity-5 p-1 rounded-pill">
@@ -1225,6 +1248,63 @@ const Admin = () => {
                                 className="position-absolute top-0 end-0 m-3 btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 border-0"
                             >
                                 <X size={24} />
+                            </button>
+                        </Motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Internal Messaging Modal */}
+            <AnimatePresence>
+                {messageTarget && (
+                    <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 13000 }}>
+                        <Motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="glass p-4 p-md-5 rounded-5 border border-white border-opacity-10 w-100"
+                            style={{ maxWidth: '500px' }}
+                        >
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 className="h5 fw-bold mb-1 text-gradient">Send Message</h3>
+                                    <p className="extra-small text-muted mb-0">Target: <span className="text-primary">{messageTarget.name}</span></p>
+                                </div>
+                                <button onClick={() => setMessageTarget(null)} className="btn text-white-50 p-0 border-0"><X size={24} /></button>
+                            </div>
+
+                            <textarea
+                                className="form-control glass border-0 text-white p-4 rounded-4 mb-4"
+                                rows="5"
+                                placeholder="Type your message to the artist(s) here..."
+                                style={{ background: 'rgba(255,255,255,0.03) !important', resize: 'none' }}
+                                value={internalMsg}
+                                onChange={(e) => setInternalMsg(e.target.value)}
+                            />
+
+                            <button
+                                onClick={async () => {
+                                    if (!internalMsg.trim()) return;
+                                    setIsSendingInternal(true);
+                                    await sendInternalMessage({
+                                        receiverId: messageTarget.id,
+                                        senderId: 'admin',
+                                        message: internalMsg,
+                                        name: 'System Admin'
+                                    });
+                                    setIsSendingInternal(false);
+                                    setInternalMsg('');
+                                    setMessageTarget(null);
+                                    alert("Message Transmitted Successfully.");
+                                }}
+                                disabled={isSendingInternal || !internalMsg.trim()}
+                                className="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg border-0 d-flex align-items-center justify-content-center gap-2"
+                            >
+                                {isSendingInternal ? (
+                                    <span className="spinner-border spinner-border-sm"></span>
+                                ) : (
+                                    <><Send size={18} /> Transmit Message</>
+                                )}
                             </button>
                         </Motion.div>
                     </div>

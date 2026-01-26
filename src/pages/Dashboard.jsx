@@ -82,6 +82,11 @@ const Dashboard = () => {
     const publicTasks = orders.filter(o => o.type === 'service' && !o.creatorId);
     const myMessages = messages.filter(m => m.receiverId === userId || m.senderId === userId);
 
+    const adminMessages = useMemo(() => {
+        const userId = user?._id || user?.id;
+        return messages.filter(m => m.type === 'internal' && (m.receiverId === userId || m.receiverId === 'all_emblos'));
+    }, [messages, user]);
+
     const isFrozen = user?.isFrozen;
 
     const handlePriceSubmit = async (orderId) => {
@@ -628,6 +633,56 @@ const Dashboard = () => {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* Bottom Admin Messages Box */}
+                <div className="mt-5 pt-4">
+                    <div className="glass p-4 rounded-4 border border-white border-opacity-10">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h5 className="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <MessageSquare size={20} className="text-primary" /> System Communications
+                            </h5>
+                            <button
+                                onClick={() => {
+                                    const msg = prompt("Transmit query to System Administration:");
+                                    if (msg) {
+                                        sendInternalMessage({
+                                            receiverId: 'admin',
+                                            senderId: user?._id || user?.id,
+                                            message: msg,
+                                            name: user?.username
+                                        });
+                                        alert("Query Transmitted.");
+                                    }
+                                }}
+                                className="btn glass extra-small text-primary border-0 rounded-pill px-3 py-2 fw-bold"
+                            >
+                                <Send size={12} className="me-1" /> Contact Admin
+                            </button>
+                        </div>
+                        <div className="d-flex flex-column gap-3">
+                            {adminMessages.length > 0 ? (
+                                adminMessages.map((msg, idx) => (
+                                    <Motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        key={msg._id || idx}
+                                        className={`p-3 rounded-4 ${msg.receiverId === 'all_emblos' ? 'bg-primary bg-opacity-10 border border-primary border-opacity-20' : 'bg-white bg-opacity-5 border border-white border-opacity-5'}`}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <span className="badge rounded-pill bg-primary bg-opacity-20 text-primary extra-small px-3">
+                                                {msg.receiverId === 'all_emblos' ? 'GLOBAL BROADCAST' : 'SYSTEM DIRECT'}
+                                            </span>
+                                            <span className="extra-small opacity-30">{msg.date}</span>
+                                        </div>
+                                        <p className="small mb-0 opacity-80" style={{ whiteSpace: 'pre-wrap' }}>{msg.message}</p>
+                                    </Motion.div>
+                                ))
+                            ) : (
+                                <div className="text-center py-4 text-white opacity-20 small italic">No messages from administration.</div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
