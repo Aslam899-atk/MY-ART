@@ -19,7 +19,8 @@ import {
     Package,
     ClipboardList,
     Trash2,
-    Eye
+    Eye,
+    Send
 } from 'lucide-react';
 import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';

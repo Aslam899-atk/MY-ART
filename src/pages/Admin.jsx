@@ -7,7 +7,7 @@ import {
     CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
     Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
     ChevronRight, Filter, ExternalLink, MoreVertical, Eye,
-    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush
+    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush, Send
 } from 'lucide-react';
 import ItemPreview from '../components/ItemPreview';
 
