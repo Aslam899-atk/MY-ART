@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 const RequestAccess = () => {
-    const { user, requestEmblosAccess } = useContext(AppContext);
+    const { user, requestEmblosAccess, appSettings } = useContext(AppContext);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         phone: '',

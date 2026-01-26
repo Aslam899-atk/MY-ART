@@ -21,11 +21,20 @@ const Footer = () => {
 
                     <div className="col-md-6 col-lg-3">
                         <div className="footer-links">
+                            <h4 className="small fw-bold text-uppercase tracking-widest text-primary mb-4">Artist Community</h4>
+                            <p className="extra-small text-muted mb-3">Join our elite circle of creators through the <strong>Emblos Program</strong>. Showcase your talent globally.</p>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/request-access">Join as Artist</Link>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/dashboard">Artist Dashboard</Link>
+                        </div>
+                    </div>
+
+                    <div className="col-md-6 col-lg-3">
+                        <div className="footer-links">
                             <h4 className="small fw-bold text-uppercase tracking-widest text-primary mb-4">Navigate</h4>
-                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white" to="/">Home</Link>
-                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white" to="/gallery">Gallery</Link>
-                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white" to="/shop">Shop</Link>
-                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white" to="/contact">Contact</Link>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/">Home</Link>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/gallery">Gallery</Link>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/shop">Shop</Link>
+                            <Link className="d-block mb-2 text-decoration-none text-muted hover-white transition-all" to="/contact">Order Request</Link>
                         </div>
                     </div>
 
