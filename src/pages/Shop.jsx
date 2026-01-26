@@ -19,7 +19,12 @@ const Shop = () => {
 
     const filteredProducts = products.filter(product => {
         if (!searchQuery) return true;
-        return product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const q = searchQuery.toLowerCase();
+        return (
+            product.name?.toLowerCase().includes(q) ||
+            product.category?.toLowerCase().includes(q) ||
+            product.description?.toLowerCase().includes(q)
+        );
     });
 
     const handleOrderSubmit = (e) => {

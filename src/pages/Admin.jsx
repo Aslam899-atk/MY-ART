@@ -87,6 +87,82 @@ const Admin = () => {
         };
     }, [orders, products, galleryItems, users]);
 
+    // Enhanced Search & Filtering Logic
+    const q = searchQuery.toLowerCase();
+
+    const filteredUsers = useMemo(() => {
+        const base = users.filter(u => u.role !== 'emblos');
+        if (!q) return base;
+        return base.filter(u =>
+            u.username?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q) ||
+            u._id?.toString().includes(q)
+        );
+    }, [users, q]);
+
+    const filteredEmblos = useMemo(() => {
+        const base = users.filter(u => u.role === 'emblos');
+        if (!q) return base;
+        return base.filter(u =>
+            u.username?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q) ||
+            u._id?.toString().includes(q)
+        );
+    }, [users, q]);
+
+    const filteredOrders = useMemo(() => {
+        let base = orders;
+        // Filter based on role if not admin
+        if (!isAdmin && user?.role === 'emblos') {
+            const userId = (user._id || user.id)?.toString();
+            base = orders.filter(o => !o.creatorId || o.creatorId.toString() === userId);
+        }
+        if (!q) return base;
+        return base.filter(o =>
+            o.productName?.toLowerCase().includes(q) ||
+            o.customer?.toLowerCase().includes(q) ||
+            o.email?.toLowerCase().includes(q) ||
+            o.phone?.toLowerCase().includes(q) ||
+            o._id?.toString().includes(q)
+        );
+    }, [orders, q, isAdmin, user]);
+
+    const filteredProducts = useMemo(() => {
+        if (!q) return products;
+        return products.filter(p =>
+            p.name?.toLowerCase().includes(q) ||
+            p.category?.toLowerCase().includes(q) ||
+            p.description?.toLowerCase().includes(q)
+        );
+    }, [products, q]);
+
+    const filteredGalleryItems = useMemo(() => {
+        if (!q) return galleryItems;
+        return galleryItems.filter(i =>
+            i.title?.toLowerCase().includes(q) ||
+            i.category?.toLowerCase().includes(q) ||
+            i.medium?.toLowerCase().includes(q)
+        );
+    }, [galleryItems, q]);
+
+    const filteredMessages = useMemo(() => {
+        if (!q) return messages;
+        return messages.filter(m =>
+            m.name?.toLowerCase().includes(q) ||
+            m.email?.toLowerCase().includes(q) ||
+            m.message?.toLowerCase().includes(q)
+        );
+    }, [messages, q]);
+
+    const filteredRequests = useMemo(() => {
+        const base = users.filter(u => u.emblosAccess?.status === 'pending');
+        if (!q) return base;
+        return base.filter(u =>
+            u.username?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q)
+        );
+    }, [users, q]);
+
     const handleAdminLogin = async (e) => {
         e.preventDefault();
         setIsVerifying(true);
@@ -383,6 +459,26 @@ const Admin = () => {
                     </div>
 
                     <div className="d-flex align-items-center gap-3">
+                        {/* Global Search Bar - Persistent Across Tabs */}
+                        {activeTab !== 'dashboard' && activeTab !== 'settings' && (
+                            <div className="glass p-2 rounded-pill d-flex align-items-center gap-2 px-3 shadow-lg" style={{ minWidth: '300px', background: 'rgba(255,255,255,0.03)' }}>
+                                <Search size={16} className="text-muted" />
+                                <input
+                                    type="text"
+                                    placeholder={`Search ${activeTab}...`}
+                                    className="form-control bg-transparent border-0 text-white shadow-none p-0 small"
+                                    style={{ fontSize: '0.85rem' }}
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                />
+                                {searchQuery && (
+                                    <button onClick={() => setSearchQuery('')} className="btn btn-link p-0 text-muted opacity-50 hover-opacity-100">
+                                        <X size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
                         {['products', 'gallery'].includes(activeTab) && (
                             <button
                                 onClick={() => { setUploadType(activeTab === 'products' ? 'shop' : 'gallery'); setIsModalOpen(true); resetForm(); }}
@@ -393,6 +489,8 @@ const Admin = () => {
                         )}
                     </div>
                 </header>
+
+
 
                 {/* Dashboard Overview */}
                 <AnimatePresence mode="wait">
@@ -459,7 +557,7 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {users?.filter(u => u.emblosAccess?.status === 'pending').map(u => (
+                                        {filteredRequests.map(u => (
                                             <tr key={u._id} className="border-bottom border-white border-opacity-5">
                                                 <td className="border-0 py-3">
                                                     <div className="d-flex align-items-center gap-3">
@@ -490,7 +588,7 @@ const Admin = () => {
                                                 </td>
                                             </tr>
                                         ))}
-                                        {users?.filter(u => u.emblosAccess?.status === 'pending').length === 0 && (
+                                        {filteredRequests.length === 0 && (
                                             <tr><td colSpan="4" className="text-center py-5 opacity-30">No pending requests</td></tr>
                                         )}
                                     </tbody>
@@ -515,14 +613,7 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {orders.filter(o => {
-                                            if (isAdmin) return true;
-                                            // Emblos sees their own orders + open requests
-                                            if (user?.role === 'emblos') {
-                                                return !o.creatorId || o.creatorId === (user._id || user.id);
-                                            }
-                                            return false;
-                                        }).map(o => (
+                                        {filteredOrders.map(o => (
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
@@ -656,7 +747,7 @@ const Admin = () => {
                     {activeTab === 'products' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                             <div className="row g-4">
-                                {products.map(p => (
+                                {filteredProducts.map(p => (
                                     <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
                                         <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
                                             <div className="position-relative cursor-pointer" style={{ height: '220px' }} onClick={() => setCommentModalItem(p)}>
@@ -697,7 +788,7 @@ const Admin = () => {
 
                     {activeTab === 'gallery' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
-                            {galleryItems.map(item => (
+                            {filteredGalleryItems.map(item => (
                                 <div key={item._id || item.id} className="col-6 col-md-3">
                                     <div className="glass rounded-4 overflow-hidden border-0 position-relative group cursor-pointer" style={{ height: '200px' }} onClick={() => setCommentModalItem(item)}>
                                         {item.type === 'video' ? (
@@ -741,7 +832,7 @@ const Admin = () => {
 
                     {activeTab === 'messages' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
-                            {messages.map(m => {
+                            {filteredMessages.map(m => {
                                 const sender = m.senderId ? users.find(u => (u._id || u.id) === m.senderId) : null;
                                 const senderName = sender ? sender.username : (m.name || 'System');
 
@@ -810,7 +901,7 @@ const Admin = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users?.filter(u => activeTab === 'emblos' ? u.role === 'emblos' : u.role !== 'emblos').map(u => (
+                                    {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).map(u => (
                                         <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
                                             <td className="py-4 px-4 border-0">
                                                 <div className="d-flex align-items-center gap-3">
@@ -895,7 +986,7 @@ const Admin = () => {
                                             </td>
                                         </tr>
                                     ))}
-                                    {users?.filter(u => activeTab === 'emblos' ? u.role === 'emblos' : u.role !== 'emblos').length === 0 && (
+                                    {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).length === 0 && (
                                         <tr><td colSpan="4" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
                                     )}
                                 </tbody>

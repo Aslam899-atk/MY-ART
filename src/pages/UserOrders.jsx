@@ -7,14 +7,40 @@ import ItemPreview from '../components/ItemPreview';
 const UserOrders = () => {
     const { orders, user, users, deleteOrder, toggleLike, toggleGalleryLike, likedIds } = useContext(AppContext);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const myOrders = orders.filter(o => o.customerId === (user?._id || user?.id));
+    const myOrders = orders.filter(o => {
+        const isMine = o.customerId === (user?._id || user?.id);
+        if (!isMine) return false;
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return o.productName?.toLowerCase().includes(q) || o.date?.toLowerCase().includes(q);
+    });
 
     return (
         <div className="container mt-5 pt-5 min-vh-100">
-            <div className="header mb-5">
-                <h1 className="display-4 fw-bold text-gradient">My Orders</h1>
-                <p className="text-muted">Track your artwork requests and purchases.</p>
+            <div className="header mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4">
+                <div>
+                    <h1 className="display-4 fw-bold text-gradient">My Orders</h1>
+                    <p className="text-muted mb-0">Track your artwork requests and purchases.</p>
+                </div>
+
+                {/* Search Bar */}
+                <div className="glass p-2 rounded-pill d-flex align-items-center gap-2 px-3 shadow-lg" style={{ minWidth: '300px', background: 'rgba(255,255,255,0.05)' }}>
+                    <Search size={18} className="text-muted" />
+                    <input
+                        type="text"
+                        placeholder="Search orders..."
+                        className="form-control bg-transparent border-0 text-white shadow-none p-0 small"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="btn btn-link p-0 text-muted opacity-50">
+                            <X size={16} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="row g-4">

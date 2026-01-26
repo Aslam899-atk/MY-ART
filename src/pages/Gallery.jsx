@@ -13,11 +13,21 @@ const Gallery = () => {
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     const categories = ['All', 'Painting', 'Pencil Drawing', 'Calligraphy', 'Other'];
 
-    const filteredItems = filter === 'All'
-        ? galleryItems
-        : galleryItems.filter(item => item.category === filter);
+    const filteredItems = galleryItems.filter(item => {
+        const matchesCategory = filter === 'All' || item.category === filter;
+        if (!matchesCategory) return false;
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (
+            item.title?.toLowerCase().includes(q) ||
+            item.category?.toLowerCase().includes(q) ||
+            item.medium?.toLowerCase().includes(q)
+        );
+    });
 
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
@@ -63,17 +73,36 @@ const Gallery = () => {
                     A collection of digital solutions and technical experiments. Every piece represents a challenge solved through code, design, and artistic engineering.
                 </Motion.p>
 
-                {/* Filters */}
-                <div className="d-flex justify-content-center gap-2 flex-wrap mb-5">
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setFilter(cat)}
-                            className={`btn rounded-pill px-4 py-2 border-0 transition-all small fw-bold ${filter === cat ? 'btn-primary shadow-glow' : 'glass text-white opacity-60 hover-opacity-100'}`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                {/* Filters & Search */}
+                <div className="d-flex flex-column align-items-center gap-4 mb-5">
+                    <div className="d-flex justify-content-center gap-2 flex-wrap">
+                        {categories.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setFilter(cat)}
+                                className={`btn rounded-pill px-4 py-2 border-0 transition-all small fw-bold ${filter === cat ? 'btn-primary shadow-glow' : 'glass text-white opacity-60 hover-opacity-100'}`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="glass p-2 rounded-pill d-flex align-items-center gap-2 px-3 shadow-lg" style={{ minWidth: '300px', maxWidth: '500px', width: '100%', background: 'rgba(255,255,255,0.05)' }}>
+                        <div className="ps-2 text-muted"><Search size={18} /></div>
+                        <input
+                            type="text"
+                            placeholder="Explore our technical masterpieces..."
+                            className="form-control bg-transparent border-0 text-white shadow-none py-2"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                        />
+                        {searchQuery && (
+                            <button onClick={() => setSearchQuery('')} className="btn btn-link p-0 text-muted opacity-50 hover-opacity-100">
+                                <X size={18} />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </header>
 
