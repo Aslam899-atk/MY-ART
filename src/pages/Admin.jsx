@@ -16,10 +16,10 @@ const Admin = () => {
         products, addProduct, deleteProduct, updateProduct,
         galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem,
         messages, deleteMessage, sendInternalMessage,
-        orders, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice,
+        orders, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,
         users, updateEmblosStatus,
         isAdmin, setIsAdmin, verifyAdminPassword,
-        toggleLike, toggleGalleryLike, likedIds
+        toggleLike, toggleGalleryLike, likedIds, user
     } = useContext(AppContext);
 
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -514,7 +514,14 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {orders.map(o => (
+                                        {orders.filter(o => {
+                                            if (isAdmin) return true;
+                                            // Emblos sees their own orders + open requests
+                                            if (user?.role === 'emblos') {
+                                                return !o.creatorId || o.creatorId === (user._id || user.id);
+                                            }
+                                            return false;
+                                        }).map(o => (
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
@@ -538,30 +545,57 @@ const Admin = () => {
                                                         <div>
                                                             <div className="fw-bold text-white fs-6">{o.productName}</div>
                                                             <div className="extra-small opacity-50">{o.date}</div>
+                                                            {o.productId && <div className="extra-small text-primary fw-bold" style={{ fontSize: '0.6rem' }}>Shop Link: Active</div>}
+                                                            {!o.productId && <div className="extra-small text-warning fw-bold" style={{ fontSize: '0.6rem' }}>External Request</div>}
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-4 border-0 small">
                                                     {o.creatorId ? (
-                                                        <span className="fw-bold text-white">{users.find(u => u._id === o.creatorId)?.username}</span>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <span className="fw-bold text-white">{users.find(u => (u._id || u.id) === o.creatorId)?.username || 'Unknown Artist'}</span>
+                                                            {isAdmin && (
+                                                                <button onClick={() => updateOrderStatus(o._id, null, false, true)} className="btn btn-link p-0 text-muted" title="Unassign">
+                                                                    <X size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     ) : (
-                                                        <select
-                                                            className="form-select form-select-sm glass border-0 text-primary fw-bold"
-                                                            style={{ width: '150px', fontSize: '0.7rem' }}
-                                                            onChange={async (e) => {
-                                                                if (e.target.value) {
-                                                                    await claimOrder(o._id, e.target.value, null);
-                                                                }
-                                                            }}
-                                                            defaultValue=""
-                                                        >
-                                                            <option value="" className="bg-dark">Assign Artist...</option>
-                                                            {users.filter(u => u.role === 'emblos').map(artist => (
-                                                                <option key={artist._id} value={artist._id} className="bg-dark">
-                                                                    {artist.username}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                                        <div className="d-flex flex-column gap-2">
+                                                            <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
+                                                            {isAdmin ? (
+                                                                <select
+                                                                    className="form-select form-select-sm glass border-0 text-primary fw-bold"
+                                                                    style={{ width: '150px', fontSize: '0.7rem' }}
+                                                                    onChange={async (e) => {
+                                                                        if (e.target.value) {
+                                                                            await claimOrder(o._id, null, e.target.value);
+                                                                        }
+                                                                    }}
+                                                                    defaultValue=""
+                                                                >
+                                                                    <option value="" className="bg-dark">Assign Artist...</option>
+                                                                    {users.filter(u => u.role === 'emblos').map(artist => (
+                                                                        <option key={artist._id} value={artist._id} className="bg-dark">
+                                                                            {artist.username}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            ) : (
+                                                                user?.role === 'emblos' && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (window.confirm('Claim this order? You will be responsible for fulfilling it.')) {
+                                                                                claimOrder(o._id);
+                                                                            }
+                                                                        }}
+                                                                        className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
+                                                                    >
+                                                                        Claim Order
+                                                                    </button>
+                                                                )
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
@@ -579,6 +613,7 @@ const Admin = () => {
                                                         style={{ width: '140px', fontSize: '0.75rem' }}
                                                         value={o.deliveryStatus || 'Pending'}
                                                         onChange={(e) => updateOrderStatus(o._id, e.target.value, true)}
+                                                        disabled={!isAdmin && o.creatorId !== (user?._id || user?.id)}
                                                     >
                                                         <option value="Pending" className="bg-dark">⏳ Pending</option>
                                                         <option value="Shipped" className="bg-dark">🚚 Shipped</option>
@@ -587,7 +622,7 @@ const Admin = () => {
                                                 </td>
                                                 <td className="py-4 px-4 border-0 text-end">
                                                     <div className="d-flex gap-2 justify-content-end">
-                                                        {o.status === 'Price Submitted' && (
+                                                        {o.status === 'Price Submitted' && isAdmin && (
                                                             <button onClick={() => approveOrderPrice(o._id)} className="btn btn-sm btn-primary rounded-pill px-3">Approve Price</button>
                                                         )}
                                                         <button onClick={() => { if (window.confirm('Delete order?')) deleteOrder(o._id) }} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>

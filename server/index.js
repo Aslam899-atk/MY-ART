@@ -538,9 +538,23 @@ app.get('/api/orders', asyncHandler(async (req, res) => {
 }));
 
 app.post('/api/orders', asyncHandler(async (req, res) => {
-    const status = req.body.type === 'service' ? 'Pending Price' : 'Approved';
+    const { productId, type } = req.body;
+    let creatorId = req.body.creatorId || null;
+    let status = type === 'service' ? 'Pending Price' : 'Approved';
+
+    // If order is linked to a shop/gallery item, auto-assign to the uploader
+    if (productId) {
+        const item = (await Product.findById(productId)) || (await Gallery.findById(productId));
+        if (item && item.creatorId) {
+            creatorId = item.creatorId.toString();
+            // If it's a fixed-price product, status is Approved. If it's gallery, maybe Pending Price.
+            // But based on user request: "uploaded thath in shop... that upload cheythaverk thanne order labikkanam"
+        }
+    }
+
     const newOrder = new Order({
         ...req.body,
+        creatorId,
         status,
         date: new Date().toLocaleDateString()
     });
@@ -559,10 +573,14 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/orders/:id/status', asyncHandler(async (req, res) => {
-    const { status, deliveryStatus } = req.body;
+    const { status, deliveryStatus, unassign } = req.body;
     const updateData = {};
     if (status) updateData.status = status;
     if (deliveryStatus) updateData.deliveryStatus = deliveryStatus;
+    if (unassign) {
+        updateData.creatorId = null;
+        updateData.status = 'Pending Price';
+    }
     const updatedOrder = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json(updatedOrder);
 }));

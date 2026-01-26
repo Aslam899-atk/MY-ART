@@ -154,13 +154,13 @@ export const AppProvider = ({ children }) => {
         if (res.ok) fetchData();
     };
 
-    const claimOrder = async (orderId, price) => {
+    const claimOrder = async (orderId, price = null, artistId = null) => {
         const res = await fetch(`${API_URL}/orders/${orderId}/claim`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                creatorId: user?._id || user?.id,
-                price: Number(price)
+                creatorId: artistId || user?._id || user?.id,
+                price: price ? Number(price) : null
             })
         });
         if (res.ok) {
@@ -390,10 +390,10 @@ export const AppProvider = ({ children }) => {
         setOrders((prev) => prev.filter((o) => (o._id || o.id) !== id));
     };
 
-    const updateOrderStatus = async (id, statusOrDeliveryStatus, isDeliveryStatus = false) => {
-        const body = isDeliveryStatus
+    const updateOrderStatus = async (id, statusOrDeliveryStatus, isDeliveryStatus = false, unassign = false) => {
+        const body = unassign ? { unassign: true } : (isDeliveryStatus
             ? { deliveryStatus: statusOrDeliveryStatus }
-            : { status: statusOrDeliveryStatus };
+            : { status: statusOrDeliveryStatus });
 
         const res = await fetch(`${API_URL}/orders/${id}/status`, {
             method: 'PUT',
