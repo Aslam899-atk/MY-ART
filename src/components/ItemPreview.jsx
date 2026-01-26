@@ -6,7 +6,7 @@ import { AppContext } from '../context/AppContext';
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
     if (!item) return null;
 
-    const { addGalleryComment, user, users } = useContext(AppContext);
+    const { addGalleryComment, addProductComment, user, users } = useContext(AppContext);
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,7 +31,8 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
         e.preventDefault();
         if (!commentText.trim()) return;
         setIsSubmitting(true);
-        const res = await addGalleryComment(item._id || item.id, commentText);
+        const commentFn = item.price ? addProductComment : addGalleryComment;
+        const res = await commentFn(item._id || item.id, commentText);
         if (res?.success) {
             setCommentText('');
         }

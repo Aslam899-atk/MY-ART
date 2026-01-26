@@ -255,6 +255,24 @@ export const AppProvider = ({ children }) => {
     };
 
     const toggleLike = (id) => handleLikeAction('product', id);
+
+    const addProductComment = async (id, text) => {
+        if (!user) {
+            await loginWithGoogle();
+            return;
+        }
+        const res = await fetch(`${API_URL}/products/${id}/comment`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user.username, text })
+        });
+        if (res.ok) {
+            const updated = await res.json();
+            setProducts((prev) => prev.map((p) => ((p._id || p.id) === id ? updated : p)));
+            return { success: true };
+        }
+        return { success: false };
+    };
     // ---------- Gallery CRUD ----------
     const addGalleryItem = async (item) => {
         const res = await fetch(`${API_URL}/gallery`, {
@@ -502,7 +520,7 @@ export const AppProvider = ({ children }) => {
 
     return (
         <AppContext.Provider value={{
-            products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds,
+            products, addProduct, deleteProduct, updateProduct, toggleLike, likedIds, addProductComment,
             galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike, addGalleryComment,
             messages, addMessage, deleteMessage, sendInternalMessage,
             orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,

@@ -35,6 +35,11 @@ const productSchema = new mongoose.Schema({
     image: String, // Cloudinary URL
     description: String,
     likes: { type: Number, default: 0 },
+    comments: [{
+        username: String,
+        text: String,
+        date: { type: Date, default: Date.now }
+    }],
     creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, default: 'pending' }, // 'pending', 'active', 'frozen'
     createdAt: { type: Date, default: Date.now }
@@ -294,6 +299,16 @@ app.put('/api/products/:id/like', asyncHandler(async (req, res) => {
 
     await Promise.all([user.save(), product.save()]);
     res.json({ user, item: product });
+}));
+
+app.put('/api/products/:id/comment', asyncHandler(async (req, res) => {
+    const { username, text } = req.body;
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+
+    product.comments.push({ username, text });
+    await product.save();
+    res.json(product);
 }));
 
 app.get('/api/gallery', asyncHandler(async (req, res) => {

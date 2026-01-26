@@ -10,6 +10,7 @@ const Shop = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showOrderForm, setShowOrderForm] = useState(false);
     const [showInquiryForm, setShowInquiryForm] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
     const [orderForm, setOrderForm] = useState({ name: '', phone: '', email: '', address: '' });
     const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', email: '' });
     const [isSuccess, setIsSuccess] = useState(false);
@@ -99,7 +100,18 @@ const Shop = () => {
                                 <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                                     <span className="badge glass text-white border-0 shadow-sm">₹{product.price}</span>
                                 </div>
-                                <div className="position-absolute bottom-0 end-0 m-3">
+                                <div className="position-absolute bottom-0 end-0 m-3 d-flex gap-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedProduct(product);
+                                            setShowPreview(true);
+                                        }}
+                                        className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
+                                        title="View Details & Comments"
+                                    >
+                                        <MessageSquare size={18} />
+                                    </button>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -302,6 +314,16 @@ const Shop = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Premium Preview Modal */}
+            <ItemPreview
+                item={selectedProduct}
+                isOpen={showPreview}
+                onClose={() => { setShowPreview(false); setSelectedProduct(null); }}
+                isLiked={selectedProduct && likedIds.includes(selectedProduct._id || selectedProduct.id)}
+                toggleLike={() => toggleLike(selectedProduct?._id || selectedProduct?.id)}
+                onOrder={(item) => { setShowPreview(false); setSelectedProduct(item); setShowOrderForm(true); }}
+            />
         </div>
     );
 };
