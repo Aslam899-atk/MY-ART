@@ -34,6 +34,8 @@ const Dashboard = () => {
         sendInternalMessage,
         addProduct,
         addGalleryItem,
+        deleteProduct,
+        deleteGalleryItem,
         isLoadingAuth
     } = useContext(AppContext);
 
@@ -376,15 +378,41 @@ const Dashboard = () => {
                             <h5 className="fw-bold mb-4">My Uploaded Items</h5>
                             {isFrozen && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger mb-4">Your account is frozen. All your items are hidden from public.</div>}
                             <div className="row g-3">
-                                {[...myProducts, ...myGallery].map((item, idx) => (
+                                {[...myProducts.map(p => ({ ...p, itemType: 'product' })), ...myGallery.map(g => ({ ...g, itemType: 'gallery' }))].map((item, idx) => (
                                     <div key={idx} className="col-md-4">
                                         <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '200px' }}>
-                                            <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg" />
-                                            <div className="position-absolute bottom-0 start-0 w-100 p-2 glass border-0 text-truncate small fw-bold">
-                                                {item.title || item.name}
+                                            {(item.type === 'video' || (item.url || item.image)?.includes('.mp4')) ? (
+                                                <video src={item.url || item.image} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
+                                            ) : (
+                                                <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg" />
+                                            )}
+
+                                            <div className="position-absolute top-0 start-0 m-2 d-flex gap-2">
+                                                <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')}`}>
+                                                    {item.status}
+                                                </div>
                                             </div>
-                                            <div className={`position-absolute top-0 end-0 m-2 badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')}`}>
-                                                {item.status}
+
+                                            <div className="position-absolute top-0 end-0 m-2 opacity-0 group-hover-opacity-100 transition-all">
+                                                <button
+                                                    onClick={async () => {
+                                                        if (window.confirm(`Are you sure you want to delete "${item.title || item.name}"?`)) {
+                                                            if (item.itemType === 'product') {
+                                                                await deleteProduct(item._id || item.id);
+                                                            } else {
+                                                                await deleteGalleryItem(item._id || item.id);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="btn btn-danger btn-sm rounded-circle p-2 shadow-lg"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+
+                                            <div className="position-absolute bottom-0 start-0 w-100 p-2 glass border-0 text-truncate small fw-bold" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                                {item.title || item.name}
                                             </div>
                                         </div>
                                     </div>
