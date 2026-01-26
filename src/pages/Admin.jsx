@@ -723,20 +723,44 @@ const Admin = () => {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-4 border-0">
-                                                <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'}`}>
-                                                    {u.isFrozen ? 'Frozen' : 'Active'}
-                                                </span>
+                                                <div className="d-flex flex-column gap-1">
+                                                    <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'} d-inline-block`} style={{ width: 'fit-content' }}>
+                                                        {u.isFrozen ? 'Frozen' : 'Active'}
+                                                    </span>
+                                                    {u.role === 'emblos' && u.emblosAccess?.endDate && (
+                                                        <span className="extra-small text-muted" style={{ fontSize: '0.6rem' }}>
+                                                            Terminates: {new Date(u.emblosAccess.endDate).toLocaleDateString()}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="py-4 px-4 border-0 text-end">
                                                 <div className="d-flex gap-2 justify-content-end">
                                                     <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0"><Eye size={16} /></button>
                                                     {u.role === 'emblos' && (
-                                                        <button
-                                                            onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen' })}
-                                                            className={`btn btn-sm ${u.isFrozen ? 'btn-success' : 'btn-danger'} rounded-pill`}
-                                                        >
-                                                            {u.isFrozen ? 'Unfreeze' : 'Freeze'}
-                                                        </button>
+                                                        <div className="d-flex gap-1 align-items-center bg-white bg-opacity-5 p-1 rounded-pill">
+                                                            {u.isFrozen && (
+                                                                <select
+                                                                    className="form-select form-select-sm bg-transparent border-0 text-white extra-small py-0"
+                                                                    style={{ width: '85px', fontSize: '0.65rem', boxShadow: 'none' }}
+                                                                    onChange={(e) => setPlanMonths(e.target.value)}
+                                                                    value={planMonths}
+                                                                >
+                                                                    <option className="bg-dark" value="1">1 Mon</option>
+                                                                    <option className="bg-dark" value="2">2 Mon</option>
+                                                                    <option className="bg-dark" value="3">3 Mon</option>
+                                                                    <option className="bg-dark" value="5">5 Mon</option>
+                                                                    <option className="bg-dark" value="6">6 Mon</option>
+                                                                    <option className="bg-dark" value="12">1 Year</option>
+                                                                </select>
+                                                            )}
+                                                            <button
+                                                                onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen', months: planMonths })}
+                                                                className={`btn btn-sm ${u.isFrozen ? 'btn-success shadow-glow' : 'btn-danger'} rounded-pill extra-small px-3 py-1 fw-bold`}
+                                                            >
+                                                                {u.isFrozen ? 'Unfreeze' : 'Freeze'}
+                                                            </button>
+                                                        </div>
                                                     )}
                                                     <button
                                                         onClick={async () => {

@@ -425,13 +425,20 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    if (status === 'active') {
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + parseInt(months || plan || 1));
+    if (status === 'active' || status === 'unfreeze') {
+        const monthsToAdd = parseInt(months || plan || 1);
+        let baseDate = new Date();
+
+        // If they already have an end date that is in the future, extend from there
+        if (user.emblosAccess?.endDate && new Date(user.emblosAccess.endDate) > baseDate) {
+            baseDate = new Date(user.emblosAccess.endDate);
+        }
+
+        const endDate = new Date(baseDate);
+        endDate.setMonth(endDate.getMonth() + monthsToAdd);
 
         user.emblosAccess.status = 'active';
-        user.emblosAccess.startDate = startDate;
+        user.emblosAccess.startDate = user.emblosAccess.startDate || new Date();
         user.emblosAccess.endDate = endDate;
         user.role = 'emblos';
         user.isFrozen = false;
