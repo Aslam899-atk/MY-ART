@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare } from 'lucide-react';
+import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare, Image as ImageIcon } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
@@ -113,7 +113,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     loop
                                     playsInline
                                 />
-                            ) : (
+                            ) : (liveItem.url || liveItem.image) ? (
                                 <motion.img
                                     initial={{ scale: 1.1, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
@@ -123,6 +123,11 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     className="img-fluid w-100 h-100 object-fit-contain p-2 p-md-4 position-relative"
                                     style={{ zIndex: 1 }}
                                 />
+                            ) : (
+                                <div className="d-flex flex-column align-items-center opacity-20 text-white">
+                                    <ImageIcon size={64} />
+                                    <p className="mt-2 fw-bold uppercase tracking-widest">No Reference Image</p>
+                                </div>
                             )}
 
                             {/* Overlay Controls (Mobile) */}

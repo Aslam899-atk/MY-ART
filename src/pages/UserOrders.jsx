@@ -22,13 +22,23 @@ const UserOrders = () => {
                     <div key={order._id} className="col-12 col-md-6">
                         <div className="glass p-4 rounded-4 border border-white border-opacity-10 h-100 shadow-lg group">
                             <div className="d-flex gap-4">
-                                <img
-                                    src={order.image}
-                                    className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                    style={{ width: '120px', height: '120px', objectFit: 'cover' }}
-                                    alt=""
-                                    onClick={() => setSelectedOrder(order)}
-                                />
+                                {order.image ? (
+                                    <img
+                                        src={order.image}
+                                        className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                                        alt=""
+                                        onClick={() => setSelectedOrder(order)}
+                                    />
+                                ) : (
+                                    <div
+                                        className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer transition-all hover-scale"
+                                        style={{ width: '120px', height: '120px' }}
+                                        onClick={() => setSelectedOrder(order)}
+                                    >
+                                        <ShoppingBag size={32} className="opacity-20" />
+                                    </div>
+                                )}
                                 <div className="flex-grow-1">
                                     <div className="d-flex justify-content-between align-items-start">
                                         <div>

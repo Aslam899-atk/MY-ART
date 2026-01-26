@@ -527,13 +527,23 @@ const Admin = () => {
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
-                                                        <img
-                                                            src={o.image}
-                                                            className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                                            style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                                            alt=""
-                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image })}
-                                                        />
+                                                        {o.image ? (
+                                                            <img
+                                                                src={o.image}
+                                                                className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                                                alt=""
+                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image })}
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer"
+                                                                style={{ width: '60px', height: '60px' }}
+                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: null })}
+                                                            >
+                                                                <ImageIcon size={20} className="opacity-20" />
+                                                            </div>
+                                                        )}
                                                         <div>
                                                             <div className="fw-bold text-white fs-6">{o.productName}</div>
                                                             <div className="extra-small opacity-50">{o.date}</div>
@@ -1193,13 +1203,23 @@ const Admin = () => {
                                                     <tr key={order._id} className="border-bottom border-white border-opacity-5">
                                                         <td className="border-0 py-3">
                                                             <div className="d-flex align-items-center gap-2">
-                                                                <img
-                                                                    src={order.image}
-                                                                    className="rounded-circle cursor-pointer"
-                                                                    style={{ width: '30px', height: '30px', objectFit: 'cover' }}
-                                                                    alt=""
-                                                                    onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image })}
-                                                                />
+                                                                {order.image ? (
+                                                                    <img
+                                                                        src={order.image}
+                                                                        className="rounded-circle cursor-pointer"
+                                                                        style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                                                                        alt=""
+                                                                        onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image })}
+                                                                    />
+                                                                ) : (
+                                                                    <div
+                                                                        className="glass rounded-circle d-flex align-items-center justify-content-center cursor-pointer"
+                                                                        style={{ width: '30px', height: '30px' }}
+                                                                        onClick={() => setCommentModalItem({ ...order, title: order.productName, url: null })}
+                                                                    >
+                                                                        <ImageIcon size={12} className="opacity-20" />
+                                                                    </div>
+                                                                )}
                                                                 <div className="fw-bold extra-small">{order.productName}</div>
                                                             </div>
                                                         </td>
