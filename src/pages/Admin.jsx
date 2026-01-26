@@ -28,6 +28,8 @@ const Admin = () => {
     const [editingProduct, setEditingProduct] = useState(null);
     const [editingGalleryItem, setEditingGalleryItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [orderFilter, setOrderFilter] = useState('all'); // 'all' or 'tasks'
+    const [claimPrices, setClaimPrices] = useState({});
     const [selectedUser, setSelectedUser] = useState(null);
     const [msgInput, setMsgInput] = useState('');
     const [planMonths, setPlanMonths] = useState('1');
@@ -76,6 +78,8 @@ const Admin = () => {
 
         const emblosCount = users?.filter(u => u.role === 'emblos').length || 0;
 
+        const totalRequests = orders.filter(o => !o.creatorId && !o.productId).length;
+
         return {
             revenue: totalRevenue,
             pending: pendingOrders,
@@ -83,9 +87,23 @@ const Admin = () => {
             users: users?.length || 0,
             emblos: emblosCount,
             requests: pendingRequests,
+            tasks: totalRequests,
             growth: '+12.5%'
         };
     }, [orders, products, galleryItems, users]);
+
+    // Sidebar items update
+    const menuItems = useMemo(() => [
+        { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+        { id: 'requests', label: 'Requests', icon: AlertCircle, count: stats.requests },
+        { id: 'orders', label: 'Orders', icon: ShoppingBag, count: orders.length, tasks: stats.tasks },
+        { id: 'products', label: 'Inventory', icon: Package, count: products.length },
+        { id: 'gallery', label: 'Gallery', icon: ImageIcon, count: galleryItems.length },
+        { id: 'messages', label: 'Inbox', icon: MessageSquare, count: messages.filter(m => !m.isInternal).length },
+        { id: 'emblos', label: 'Artists (Emblos)', icon: Brush, count: users?.filter(u => u.role === 'emblos').length || 0 },
+        { id: 'collectors', label: 'Art Collectors', icon: UsersIcon, count: users?.filter(u => u.role !== 'emblos').length || 0 },
+        { id: 'settings', label: 'Settings', icon: Settings },
+    ], [stats, orders, products, galleryItems, messages, users]);
 
     // Enhanced Search & Filtering Logic
     const q = searchQuery.toLowerCase();
@@ -377,19 +395,6 @@ const Admin = () => {
         alert('Configuration Updated Successfully!');
     };
 
-    // Sidebar items
-    const menuItems = [
-        { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-        { id: 'requests', label: 'Requests', icon: AlertCircle, count: stats.requests },
-        { id: 'orders', label: 'Orders', icon: ShoppingBag, count: orders.length },
-        { id: 'products', label: 'Inventory', icon: Package, count: products.length },
-        { id: 'gallery', label: 'Gallery', icon: ImageIcon, count: galleryItems.length },
-        { id: 'messages', label: 'Inbox', icon: MessageSquare, count: messages.filter(m => !m.isInternal).length },
-        { id: 'emblos', label: 'Artists (Emblos)', icon: Brush, count: users?.filter(u => u.role === 'emblos').length || 0 },
-        { id: 'collectors', label: 'Art Collectors', icon: UsersIcon, count: users?.filter(u => u.role !== 'emblos').length || 0 },
-        { id: 'settings', label: 'Settings', icon: Settings },
-    ];
-
     return (
         <div className="d-flex min-vh-100" style={{ background: '#050505', color: '#fff' }}>
 
@@ -416,41 +421,50 @@ const Admin = () => {
                                             <span className="fw-medium small">{item.label}</span>
                                         </div>
                                         {item.count > 0 && (
-                                            <span className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-danger text-white'}`} style={{ fontSize: '0.7rem' }}>
-                                                {item.count}
-                                            </span>
+                                            <div className="d-flex gap-1">
+                                                {item.tasks > 0 && (
+                                                    <span className="badge rounded-pill bg-danger text-white blink shadow-glow" style={{ fontSize: '0.65rem' }}>
+                                                        {item.tasks} TASK
+                                                    </span>
+                                                )}
+                                                <span className={`badge rounded-pill ${isActive ? 'bg-white text-primary' : 'bg-primary bg-opacity-10 text-primary'}`} style={{ fontSize: '0.7rem' }}>
+                                                    {item.count}
+                                                </span>
+                                            </div>
                                         )}
-                                    </button>
-                                </li>
+                                    </button >
+                                </li >
                             );
                         })}
-                    </ul>
-                </nav>
+                    </ul >
+                </nav >
 
                 <div className="p-4 border-top border-secondary border-opacity-10">
                     <button onClick={handleLogout} className="btn w-100 glass text-danger border-0 py-2 d-flex align-items-center gap-3 justify-content-center rounded-3">
                         <LogOut size={16} /> <span className="fw-bold small text-uppercase">Logout</span>
                     </button>
                 </div>
-            </aside>
+            </aside >
 
             {/* Mobile Bottom Nav */}
             <nav className="d-lg-none fixed-bottom glass border-top border-secondary border-opacity-10 py-2 px-3 d-flex justify-content-between align-items-center h-navbar shadow-2xl" style={{ zIndex: 1000 }}>
-                {menuItems.slice(0, 5).map(item => {
-                    const Icon = item.icon;
-                    const isActive = activeTab === item.id;
-                    return (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={`btn border-0 p-2 rounded-3 d-flex flex-column align-items-center gap-1 transition-all ${isActive ? 'text-primary' : 'text-white-50'}`}
-                        >
-                            <Icon size={20} />
-                            <span style={{ fontSize: '0.6rem' }} className="fw-bold text-uppercase">{item.label}</span>
-                        </button>
-                    );
-                })}
-            </nav>
+                {
+                    menuItems.slice(0, 5).map(item => {
+                        const Icon = item.icon;
+                        const isActive = activeTab === item.id;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`btn border-0 p-2 rounded-3 d-flex flex-column align-items-center gap-1 transition-all ${isActive ? 'text-primary' : 'text-white-50'}`}
+                            >
+                                <Icon size={20} />
+                                <span style={{ fontSize: '0.6rem' }} className="fw-bold text-uppercase">{item.label}</span>
+                            </button>
+                        );
+                    })
+                }
+            </nav >
 
             {/* Main Content Area */}
             <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '12rem', paddingBottom: '100px' }}>
@@ -601,410 +615,458 @@ const Admin = () => {
                                 </table>
                             </div>
                         </Motion.div>
-                    )}
+                    )
+                    }
 
-                    {activeTab === 'orders' && (
-                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="d-flex flex-column gap-4">
-                            <div className="table-responsive">
-                                <table className="table table-dark table-hover align-middle">
-                                    <thead>
-                                        <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20 uppercase small">
-                                            <th className="py-3 px-4 border-0">Item</th>
-                                            <th className="py-3 px-4 border-0">Reference</th>
-                                            <th className="py-3 px-4 border-0">Creator (Emblos)</th>
-                                            <th className="py-3 px-4 border-0">Customer</th>
-                                            <th className="py-3 px-4 border-0">Price</th>
-                                            <th className="py-3 px-4 border-0">Status</th>
-                                            <th className="py-3 px-4 border-0 text-end">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredOrders.map(o => (
-                                            <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
-                                                <td className="py-4 px-4 border-0 small">
-                                                    <div className="d-flex align-items-center gap-3">
-                                                        {o.image ? (
-                                                            <div className="position-relative group" onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}>
-                                                                <img
-                                                                    src={o.image}
-                                                                    className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                                                    alt=""
-                                                                />
-                                                                <div className="position-absolute top-50 start-50 translate-middle opacity-0 group-hover-opacity-100 transition-all pointer-events-none">
-                                                                    <Eye size={20} className="text-white shadow-lg" />
+                    {
+                        activeTab === 'orders' && (
+                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="d-flex flex-column gap-4">
+                                {/* Orders / Task Center Toggle */}
+                                <div className="d-flex gap-3 mb-2">
+                                    <button
+                                        onClick={() => setOrderFilter('all')}
+                                        className={`btn rounded-pill px-4 py-2 small fw-bold border-0 transition-all ${orderFilter === 'all' ? 'btn-primary shadow-glow' : 'glass text-white opacity-50'}`}
+                                    >
+                                        All Orders
+                                    </button>
+                                    <button
+                                        onClick={() => setOrderFilter('tasks')}
+                                        className={`btn rounded-pill px-4 py-2 small fw-bold border-0 transition-all ${orderFilter === 'tasks' ? 'btn-primary shadow-glow' : 'glass text-white opacity-50'}`}
+                                    >
+                                        <Clock size={16} className="me-2" /> Task Center (Requests)
+                                    </button>
+                                </div>
+
+                                <div className="table-responsive">
+                                    <table className="table table-dark table-hover align-middle">
+                                        <thead>
+                                            <tr className="text-muted opacity-50 border-bottom border-secondary border-opacity-20 uppercase small">
+                                                <th className="py-3 px-4 border-0">Item</th>
+                                                <th className="py-3 px-4 border-0">Reference</th>
+                                                <th className="py-3 px-4 border-0">Creator (Emblos)</th>
+                                                <th className="py-3 px-4 border-0">Customer</th>
+                                                <th className="py-3 px-4 border-0">Price</th>
+                                                <th className="py-3 px-4 border-0">Status</th>
+                                                <th className="py-3 px-4 border-0 text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredOrders.filter(o => {
+                                                if (orderFilter === 'tasks') return !o.creatorId && !o.productId;
+                                                return true;
+                                            }).map(o => (
+                                                <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
+                                                    <td className="py-4 px-4 border-0 small">
+                                                        <div className="d-flex align-items-center gap-3">
+                                                            {o.image ? (
+                                                                <div className="position-relative group" onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}>
+                                                                    <img
+                                                                        src={o.image}
+                                                                        className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
+                                                                        style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                                                        alt=""
+                                                                    />
+                                                                    <div className="position-absolute top-50 start-50 translate-middle opacity-0 group-hover-opacity-100 transition-all pointer-events-none">
+                                                                        <Eye size={20} className="text-white shadow-lg" />
+                                                                    </div>
                                                                 </div>
+                                                            ) : (
+                                                                <div
+                                                                    className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer"
+                                                                    style={{ width: '60px', height: '60px' }}
+                                                                    onClick={() => setCommentModalItem({ ...o, title: o.productName, url: null })}
+                                                                >
+                                                                    <ImageIcon size={20} className="opacity-20" />
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <div className="fw-bold text-white fs-6">{o.productName}</div>
+                                                                <div className="extra-small opacity-50">{o.date}</div>
+                                                                {o.productId && <div className="extra-small text-primary fw-bold" style={{ fontSize: '0.6rem' }}>Shop Link: Active</div>}
+                                                                {!o.productId && <div className="extra-small text-warning fw-bold" style={{ fontSize: '0.6rem' }}>External Request</div>}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        {o.image ? (
+                                                            <button
+                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}
+                                                                className="btn btn-sm btn-primary py-1 px-3 rounded-pill extra-small fw-bold d-flex align-items-center gap-2"
+                                                            >
+                                                                <ImageIcon size={12} /> View Reference
+                                                            </button>
+                                                        ) : (
+                                                            <span className="extra-small text-muted italic">No Image</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0 small">
+                                                        {o.creatorId ? (
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <span className="fw-bold text-white">{users.find(u => (u._id || u.id) === o.creatorId)?.username || 'Unknown Artist'}</span>
+                                                                {isAdmin && (
+                                                                    <button onClick={() => updateOrderStatus(o._id, null, false, true)} className="btn btn-link p-0 text-muted" title="Unassign">
+                                                                        <X size={12} />
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         ) : (
-                                                            <div
-                                                                className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer"
-                                                                style={{ width: '60px', height: '60px' }}
-                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: null })}
-                                                            >
-                                                                <ImageIcon size={20} className="opacity-20" />
-                                                            </div>
-                                                        )}
-                                                        <div>
-                                                            <div className="fw-bold text-white fs-6">{o.productName}</div>
-                                                            <div className="extra-small opacity-50">{o.date}</div>
-                                                            {o.productId && <div className="extra-small text-primary fw-bold" style={{ fontSize: '0.6rem' }}>Shop Link: Active</div>}
-                                                            {!o.productId && <div className="extra-small text-warning fw-bold" style={{ fontSize: '0.6rem' }}>External Request</div>}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4 border-0">
-                                                    {o.image ? (
-                                                        <button
-                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}
-                                                            className="btn btn-sm btn-primary py-1 px-3 rounded-pill extra-small fw-bold d-flex align-items-center gap-2"
-                                                        >
-                                                            <ImageIcon size={12} /> View Reference
-                                                        </button>
-                                                    ) : (
-                                                        <span className="extra-small text-muted italic">No Image</span>
-                                                    )}
-                                                </td>
-                                                <td className="py-4 px-4 border-0 small">
-                                                    {o.creatorId ? (
-                                                        <div className="d-flex align-items-center gap-2">
-                                                            <span className="fw-bold text-white">{users.find(u => (u._id || u.id) === o.creatorId)?.username || 'Unknown Artist'}</span>
-                                                            {isAdmin && (
-                                                                <button onClick={() => updateOrderStatus(o._id, null, false, true)} className="btn btn-link p-0 text-muted" title="Unassign">
-                                                                    <X size={12} />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="d-flex flex-column gap-2">
-                                                            {o.productId ? (
-                                                                <span className="fw-bold text-white small opacity-75">Art Void (Main)</span>
-                                                            ) : (
-                                                                <>
-                                                                    <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
-                                                                    {isAdmin ? (
-                                                                        <select
-                                                                            className="form-select form-select-sm glass border-0 text-primary fw-bold"
-                                                                            style={{ width: '150px', fontSize: '0.7rem' }}
-                                                                            onChange={async (e) => {
-                                                                                if (e.target.value) {
-                                                                                    await claimOrder(o._id, null, e.target.value);
-                                                                                }
-                                                                            }}
-                                                                            defaultValue=""
-                                                                        >
-                                                                            <option value="" className="bg-dark">Assign Artist...</option>
-                                                                            {users.filter(u => u.role === 'emblos').map(artist => (
-                                                                                <option key={artist._id} value={artist._id} className="bg-dark">
-                                                                                    {artist.username}
-                                                                                </option>
-                                                                            ))}
-                                                                        </select>
-                                                                    ) : (
-                                                                        user?.role === 'emblos' && (
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    if (window.confirm('Claim this order? You will be responsible for fulfilling it.')) {
-                                                                                        claimOrder(o._id);
+                                                            <div className="d-flex flex-column gap-2">
+                                                                {o.productId ? (
+                                                                    <span className="fw-bold text-white small opacity-75">Art Void (Main)</span>
+                                                                ) : (
+                                                                    <>
+                                                                        <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
+                                                                        {isAdmin ? (
+                                                                            <select
+                                                                                className="form-select form-select-sm glass border-0 text-primary fw-bold"
+                                                                                style={{ width: '150px', fontSize: '0.7rem' }}
+                                                                                onChange={async (e) => {
+                                                                                    if (e.target.value) {
+                                                                                        await claimOrder(o._id, null, e.target.value);
                                                                                     }
                                                                                 }}
-                                                                                className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
+                                                                                defaultValue=""
                                                                             >
-                                                                                Claim Order
-                                                                            </button>
-                                                                        )
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </td>
-                                                <td className="py-4 px-4 border-0">
-                                                    <div className="d-flex flex-column">
-                                                        <span className="text-white-50 small fw-medium">{o.customer || 'Guest'}</span>
-                                                        <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{o.phone}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4 border-0">
-                                                    {o.price ? <span className="text-primary fw-bold">₹{o.price}</span> : <span className="text-warning small italic">Waiting for Emblos</span>}
-                                                </td>
-                                                <td className="py-4 px-4 border-0">
-                                                    <select
-                                                        className={`form-select form-select-sm glass border-0 text-white fw-bold ${(!isAdmin && o.creatorId?.toString() === (user?._id || user?.id)?.toString()) ? 'shadow-glow-blue' : ''}`}
-                                                        style={{ width: '140px', fontSize: '0.75rem', cursor: 'pointer' }}
-                                                        value={o.deliveryStatus || 'Pending'}
-                                                        onChange={(e) => updateOrderStatus(o._id, e.target.value, true)}
-                                                        disabled={!isAdmin && o.creatorId?.toString() !== (user?._id || user?.id)?.toString()}
-                                                    >
-                                                        <option value="Pending" className="bg-dark">⏳ Pending</option>
-                                                        <option value="Shipped" className="bg-dark">🚚 Shipped</option>
-                                                        <option value="Completed" className="bg-dark">✅ Completed</option>
-                                                    </select>
-                                                </td>
-                                                <td className="py-4 px-4 border-0 text-end">
-                                                    <div className="d-flex gap-2 justify-content-end">
-                                                        {o.status === 'Price Submitted' && isAdmin && (
-                                                            <button onClick={() => approveOrderPrice(o._id)} className="btn btn-sm btn-primary rounded-pill px-3">Approve Price</button>
+                                                                                <option value="" className="bg-dark">Assign Artist...</option>
+                                                                                {users.filter(u => u.role === 'emblos').map(artist => (
+                                                                                    <option key={artist._id} value={artist._id} className="bg-dark">
+                                                                                        {artist.username}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </select>
+                                                                        ) : (
+                                                                            (isAdmin || user?.role === 'emblos') && (
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        const price = claimPrices[o._id];
+                                                                                        if (!price || price <= 0) {
+                                                                                            alert('Please enter a valid price before claiming.');
+                                                                                            return;
+                                                                                        }
+                                                                                        if (window.confirm(`Claim this order for ₹${price}? You will be responsible for fulfilling it.`)) {
+                                                                                            claimOrder(o._id, price);
+                                                                                        }
+                                                                                    }}
+                                                                                    className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
+                                                                                >
+                                                                                    Claim Order
+                                                                                </button>
+                                                                            )
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         )}
-                                                        <button onClick={() => { if (window.confirm('Delete order?')) deleteOrder(o._id) }} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Motion.div>
-                    )}
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        <div className="d-flex flex-column">
+                                                            <span className="text-white-50 small fw-medium">{o.customer || 'Guest'}</span>
+                                                            <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{o.phone}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        {o.price ? (
+                                                            <span className="text-primary fw-bold">₹{o.price}</span>
+                                                        ) : (
+                                                            <div className="input-group input-group-sm" style={{ maxWidth: '120px' }}>
+                                                                <span className="input-group-text bg-transparent border-secondary border-opacity-20 text-primary">₹</span>
+                                                                <input
+                                                                    type="number"
+                                                                    className="form-control glass border-secondary border-opacity-20 text-white"
+                                                                    placeholder="Price"
+                                                                    value={claimPrices[o._id] || ''}
+                                                                    onChange={(e) => setClaimPrices({ ...claimPrices, [o._id]: e.target.value })}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0">
+                                                        <select
+                                                            className={`form-select form-select-sm glass border-0 text-white fw-bold ${(!isAdmin && o.creatorId?.toString() === (user?._id || user?.id)?.toString()) ? 'shadow-glow-blue' : ''}`}
+                                                            style={{ width: '140px', fontSize: '0.75rem', cursor: 'pointer' }}
+                                                            value={o.deliveryStatus || 'Pending'}
+                                                            onChange={(e) => updateOrderStatus(o._id, e.target.value, true)}
+                                                            disabled={!isAdmin && o.creatorId?.toString() !== (user?._id || user?.id)?.toString()}
+                                                        >
+                                                            <option value="Pending" className="bg-dark">⏳ Pending</option>
+                                                            <option value="Shipped" className="bg-dark">🚚 Shipped</option>
+                                                            <option value="Completed" className="bg-dark">✅ Completed</option>
+                                                        </select>
+                                                    </td>
+                                                    <td className="py-4 px-4 border-0 text-end">
+                                                        <div className="d-flex gap-2 justify-content-end">
+                                                            {o.status === 'Price Submitted' && isAdmin && (
+                                                                <button onClick={() => approveOrderPrice(o._id)} className="btn btn-sm btn-primary rounded-pill px-3">Approve Price</button>
+                                                            )}
+                                                            <button onClick={() => { if (window.confirm('Delete order?')) deleteOrder(o._id) }} className="btn btn-sm glass text-danger border-0 p-2"><Trash2 size={16} /></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </Motion.div>
+                        )
+                    }
 
-                    {activeTab === 'products' && (
-                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            <div className="row g-4">
-                                {filteredProducts.map(p => (
-                                    <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
-                                        <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
-                                            <div className="position-relative cursor-pointer" style={{ height: '220px' }} onClick={() => setCommentModalItem(p)}>
-                                                <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
-                                                <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
-                                                    <button onClick={() => setCommentModalItem(p)} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Comments"><MessageSquare size={16} /></button>
-                                                    <button onClick={() => {
-                                                        setUploadType('shop');
-                                                        setEditingProduct(p);
-                                                        setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '', category: '', medium: '' });
-                                                        setIsModalOpen(true);
-                                                    }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
-                                                    <button onClick={() => {
-                                                        if (window.confirm(`Are you sure you want to delete "${p.name}"?`)) {
-                                                            deleteProduct(p._id || p.id);
-                                                        }
-                                                    }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                    {
+                        activeTab === 'products' && (
+                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="row g-4">
+                                    {filteredProducts.map(p => (
+                                        <div key={p._id || p.id} className="col-12 col-md-4 col-xl-3">
+                                            <div className="glass rounded-4 overflow-hidden border-0 group transition-all hover-translate-y">
+                                                <div className="position-relative cursor-pointer" style={{ height: '220px' }} onClick={() => setCommentModalItem(p)}>
+                                                    <img src={p.image} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
+                                                    <div className="position-absolute top-0 end-0 p-3 d-flex gap-2 transition-all">
+                                                        <button onClick={() => setCommentModalItem(p)} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Comments"><MessageSquare size={16} /></button>
+                                                        <button onClick={() => {
+                                                            setUploadType('shop');
+                                                            setEditingProduct(p);
+                                                            setFormData({ name: p.name, price: p.price, image: p.image, description: p.description || '', category: '', medium: '' });
+                                                            setIsModalOpen(true);
+                                                        }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                                        <button onClick={() => {
+                                                            if (window.confirm(`Are you sure you want to delete "${p.name}"?`)) {
+                                                                deleteProduct(p._id || p.id);
+                                                            }
+                                                        }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                                                    </div>
+                                                    <div className="position-absolute top-0 start-0 p-3">
+                                                        <div className={`badge ${p.status === 'active' ? 'bg-success' : (p.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`}>{p.status}</div>
+                                                    </div>
+                                                    <div className="position-absolute bottom-0 start-0 p-3 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                                                        <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="position-absolute top-0 start-0 p-3">
-                                                    <div className={`badge ${p.status === 'active' ? 'bg-success' : (p.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`}>{p.status}</div>
-                                                </div>
-                                                <div className="position-absolute bottom-0 start-0 p-3 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
-                                                    <div className="badge bg-white text-dark rounded-pill shadow-sm">₹{p.price}</div>
+                                                <div className="p-4">
+                                                    <h5 className="fw-bold text-white mb-1 truncate">{p.name}</h5>
+                                                    <div className="d-flex align-items-center gap-2 text-white-50 small">
+                                                        <User size={12} /> {users.find(u => u._id === p.creatorId)?.username || 'Admin'}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="p-4">
-                                                <h5 className="fw-bold text-white mb-1 truncate">{p.name}</h5>
-                                                <div className="d-flex align-items-center gap-2 text-white-50 small">
-                                                    <User size={12} /> {users.find(u => u._id === p.creatorId)?.username || 'Admin'}
+                                        </div>
+                                    ))}
+                                </div>
+                            </Motion.div>
+                        )
+                    }
+
+                    {
+                        activeTab === 'gallery' && (
+                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
+                                {filteredGalleryItems.map(item => (
+                                    <div key={item._id || item.id} className="col-6 col-md-3">
+                                        <div className="glass rounded-4 overflow-hidden border-0 position-relative group cursor-pointer" style={{ height: '200px' }} onClick={() => setCommentModalItem(item)}>
+                                            {item.type === 'video' ? (
+                                                <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
+                                            ) : (
+                                                <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
+                                            )}
+                                            <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 transition-all">
+                                                <button onClick={() => setCommentModalItem(item)} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Comments"><MessageSquare size={16} /></button>
+                                                <button onClick={() => {
+                                                    setUploadType('gallery');
+                                                    setEditingGalleryItem(item);
+                                                    setFormData({
+                                                        name: item.title,
+                                                        price: '',
+                                                        image: item.url,
+                                                        description: item.description || '',
+                                                        category: item.category || 'Other',
+                                                        medium: item.medium || 'Handcrafted'
+                                                    });
+                                                    setIsModalOpen(true);
+                                                }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
+                                                <button onClick={() => { if (window.confirm(`Are you sure you want to delete this artwork?`)) deleteGalleryItem(item._id || item.id); }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
+                                            </div>
+                                            <div className="position-absolute top-0 start-0 p-2">
+                                                <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`} style={{ fontSize: '0.6rem' }}>{item.status}</div>
+                                            </div>
+                                            <div className="position-absolute bottom-0 start-0 p-2 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <span className="text-white-50 small truncate" style={{ maxWidth: '70%', fontSize: '0.65rem' }}>{item.title}</span>
+                                                    <div className="d-flex align-items-center gap-1 text-danger" style={{ fontSize: '0.65rem' }}>
+                                                        <Heart size={10} fill="currentColor" /> <span className="fw-bold text-white">{item.likes || 0}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                            </div>
-                        </Motion.div>
-                    )}
+                            </Motion.div>
+                        )
+                    }
 
-                    {activeTab === 'gallery' && (
-                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-3">
-                            {filteredGalleryItems.map(item => (
-                                <div key={item._id || item.id} className="col-6 col-md-3">
-                                    <div className="glass rounded-4 overflow-hidden border-0 position-relative group cursor-pointer" style={{ height: '200px' }} onClick={() => setCommentModalItem(item)}>
-                                        {item.type === 'video' ? (
-                                            <video src={item.url} className="w-100 h-100 object-fit-cover" muted loop autoPlay playsInline />
-                                        ) : (
-                                            <img src={item.url} className="w-100 h-100 object-fit-cover transition-all group-hover-scale" alt="" />
-                                        )}
-                                        <div className="position-absolute top-0 end-0 p-2 d-flex gap-2 transition-all">
-                                            <button onClick={() => setCommentModalItem(item)} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Comments"><MessageSquare size={16} /></button>
-                                            <button onClick={() => {
-                                                setUploadType('gallery');
-                                                setEditingGalleryItem(item);
-                                                setFormData({
-                                                    name: item.title,
-                                                    price: '',
-                                                    image: item.url,
-                                                    description: item.description || '',
-                                                    category: item.category || 'Other',
-                                                    medium: item.medium || 'Handcrafted'
-                                                });
-                                                setIsModalOpen(true);
-                                            }} className="btn btn-sm btn-white rounded-circle shadow p-2" title="Edit"><Edit3 size={16} /></button>
-                                            <button onClick={() => { if (window.confirm(`Are you sure you want to delete this artwork?`)) deleteGalleryItem(item._id || item.id); }} className="btn btn-sm btn-danger rounded-circle shadow p-2" title="Delete"><Trash2 size={16} /></button>
-                                        </div>
-                                        <div className="position-absolute top-0 start-0 p-2">
-                                            <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')} rounded-pill`} style={{ fontSize: '0.6rem' }}>{item.status}</div>
-                                        </div>
-                                        <div className="position-absolute bottom-0 start-0 p-2 w-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
-                                            <div className="d-flex align-items-center justify-content-between">
-                                                <span className="text-white-50 small truncate" style={{ maxWidth: '70%', fontSize: '0.65rem' }}>{item.title}</span>
-                                                <div className="d-flex align-items-center gap-1 text-danger" style={{ fontSize: '0.65rem' }}>
-                                                    <Heart size={10} fill="currentColor" /> <span className="fw-bold text-white">{item.likes || 0}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </Motion.div>
-                    )}
+                    {
+                        activeTab === 'messages' && (
+                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
+                                {filteredMessages.map(m => {
+                                    const sender = m.senderId ? users.find(u => (u._id || u.id) === m.senderId) : null;
+                                    const senderName = sender ? sender.username : (m.name || 'System');
 
-                    {activeTab === 'messages' && (
-                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row g-4">
-                            {filteredMessages.map(m => {
-                                const sender = m.senderId ? users.find(u => (u._id || u.id) === m.senderId) : null;
-                                const senderName = sender ? sender.username : (m.name || 'System');
-
-                                return (
-                                    <div key={m._id || m.id} className="col-12">
-                                        <div className="glass p-4 rounded-4 border-0">
-                                            <div className="d-flex justify-content-between align-items-start mb-4">
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
-                                                        {m.isInternal ? <MessageSquare size={20} /> : <User size={20} />}
-                                                    </div>
-                                                    <div>
-                                                        <div className="d-flex align-items-center gap-2">
-                                                            <h6 className="fw-bold mb-0 text-white">{senderName}</h6>
-                                                            {m.isInternal && <span className="badge bg-primary bg-opacity-10 text-primary extra-small">Internal</span>}
-                                                            {!m.isInternal && <span className="badge bg-success bg-opacity-10 text-success extra-small">Public Inquiry</span>}
+                                    return (
+                                        <div key={m._id || m.id} className="col-12">
+                                            <div className="glass p-4 rounded-4 border-0">
+                                                <div className="d-flex justify-content-between align-items-start mb-4">
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+                                                            {m.isInternal ? <MessageSquare size={20} /> : <User size={20} />}
                                                         </div>
-                                                        <span className="text-muted small">{m.date}</span>
+                                                        <div>
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <h6 className="fw-bold mb-0 text-white">{senderName}</h6>
+                                                                {m.isInternal && <span className="badge bg-primary bg-opacity-10 text-primary extra-small">Internal</span>}
+                                                                {!m.isInternal && <span className="badge bg-success bg-opacity-10 text-success extra-small">Public Inquiry</span>}
+                                                            </div>
+                                                            <span className="text-muted small">{m.date}</span>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
+                                                </div>
+                                                <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
+                                                    <div className="d-flex flex-column gap-3">
+                                                        {m.image && (
+                                                            <img src={m.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                                        )}
+                                                        <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => deleteMessage(m._id || m.id)} className="btn text-danger p-0 border-0"><Trash2 size={18} /></button>
-                                            </div>
-                                            <div className="bg-white bg-opacity-5 p-4 rounded-4 border border-secondary border-opacity-10">
-                                                <div className="d-flex flex-column gap-3">
-                                                    {m.image && (
-                                                        <img src={m.image} className="rounded-3 shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} alt="" />
+                                                <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
+                                                    {m.email && <span>Email: {m.email}</span>}
+                                                    {m.phone && <span>Phone: {m.phone}</span>}
+                                                    {m.isInternal && m.receiverId === 'all_emblos' && <span className="text-primary fw-bold">Target: All Emblos Artists</span>}
+                                                    {m.isInternal && m.receiverId !== 'all_emblos' && (
+                                                        <span className="text-primary fw-bold">Target: {users.find(u => (u._id || u.id) === m.receiverId)?.username || 'Direct Message'}</span>
                                                     )}
-                                                    <p className="mb-0 text-white-50" style={{ whiteSpace: 'pre-wrap' }}>{m.message}</p>
                                                 </div>
-                                            </div>
-                                            <div className="mt-4 d-flex flex-wrap gap-4 small opacity-70">
-                                                {m.email && <span>Email: {m.email}</span>}
-                                                {m.phone && <span>Phone: {m.phone}</span>}
-                                                {m.isInternal && m.receiverId === 'all_emblos' && <span className="text-primary fw-bold">Target: All Emblos Artists</span>}
-                                                {m.isInternal && m.receiverId !== 'all_emblos' && (
-                                                    <span className="text-primary fw-bold">Target: {users.find(u => (u._id || u.id) === m.receiverId)?.username || 'Direct Message'}</span>
-                                                )}
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </Motion.div>
-                    )}
+                                    );
+                                })}
+                            </Motion.div>
+                        )
+                    }
 
-                    {(activeTab === 'emblos' || activeTab === 'collectors') && (
-                        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
-                            <div className="d-flex justify-content-between align-items-center mb-4 px-2">
-                                <h5 className="fw-bold mb-0">{activeTab === 'emblos' ? 'Artist Registry' : 'Collector Database'}</h5>
-                                {activeTab === 'emblos' && (
-                                    <button
-                                        onClick={() => setMessageTarget({ id: 'all_emblos', name: 'All Emblos Artists' })}
-                                        className="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2"
-                                    >
-                                        <Send size={14} /> Global Broadcast
-                                    </button>
-                                )}
-                            </div>
-                            <table className="table table-dark table-hover align-middle">
-                                <thead>
-                                    <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
-                                        <th className="py-3 px-4 border-0">Identity</th>
-                                        <th className="py-3 px-4 border-0">Role</th>
-                                        <th className="py-3 px-4 border-0">Status</th>
-                                        <th className="py-3 px-4 border-0 text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).map(u => (
-                                        <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
-                                            <td className="py-4 px-4 border-0">
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
-                                                    <div className="d-flex flex-column">
-                                                        <span className="text-white fw-bold small">{u.username}</span>
-                                                        <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{u.email}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-4 border-0">
-                                                <span className={`badge rounded-pill ${u.role === 'emblos' ? 'bg-primary' : 'bg-secondary'} bg-opacity-10 text-${u.role === 'emblos' ? 'primary' : 'muted'} small`}>
-                                                    {u.role?.toUpperCase()}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-4 border-0">
-                                                <div className="d-flex flex-column gap-1">
-                                                    <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'} d-inline-block`} style={{ width: 'fit-content' }}>
-                                                        {u.isFrozen ? 'Frozen' : 'Active'}
-                                                    </span>
-                                                    {u.role === 'emblos' && u.emblosAccess?.endDate && (
-                                                        <span className="extra-small text-muted" style={{ fontSize: '0.6rem' }}>
-                                                            Terminates: {new Date(u.emblosAccess.endDate).toLocaleDateString()}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-4 border-0 text-end">
-                                                <div className="d-flex gap-2 justify-content-end align-items-center">
-                                                    {u.role === 'emblos' && (
-                                                        <button
-                                                            onClick={() => setMessageTarget({ id: u._id || u.id, name: u.username })}
-                                                            className="btn btn-sm glass text-primary border-0 rounded-circle p-2"
-                                                            title="Message Artist"
-                                                        >
-                                                            <MessageSquare size={16} />
-                                                        </button>
-                                                    )}
-                                                    {activeTab !== 'collectors' && (
-                                                        <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0" title="View Identity Details">
-                                                            <Eye size={16} />
-                                                        </button>
-                                                    )}
-                                                    {u.role === 'emblos' && (
-                                                        <div className="d-flex gap-1 align-items-center bg-white bg-opacity-5 p-1 rounded-pill">
-                                                            {u.isFrozen && (
-                                                                <select
-                                                                    className="form-select form-select-sm bg-transparent border-0 text-white extra-small py-0"
-                                                                    style={{ width: '85px', fontSize: '0.65rem', boxShadow: 'none' }}
-                                                                    onChange={(e) => setPlanMonths(e.target.value)}
-                                                                    value={planMonths}
-                                                                >
-                                                                    <option className="bg-dark" value="1">1 Mon</option>
-                                                                    <option className="bg-dark" value="2">2 Mon</option>
-                                                                    <option className="bg-dark" value="3">3 Mon</option>
-                                                                    <option className="bg-dark" value="5">5 Mon</option>
-                                                                    <option className="bg-dark" value="6">6 Mon</option>
-                                                                    <option className="bg-dark" value="12">1 Year</option>
-                                                                </select>
-                                                            )}
-                                                            <button
-                                                                onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen', months: planMonths })}
-                                                                className={`btn btn-sm ${u.isFrozen ? 'btn-success shadow-glow' : 'btn-danger'} rounded-pill extra-small px-3 py-1 fw-bold`}
-                                                            >
-                                                                {u.isFrozen ? 'Unfreeze' : 'Freeze'}
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                    <button
-                                                        onClick={async () => {
-                                                            if (window.confirm(`Are you sure you want to PERMANENTLY delete user "${u.username}" (${u.email}) and all their artworks? This cannot be undone.`)) {
-                                                                const res = await deleteUserByEmail(u.email);
-                                                                if (!res.success) alert(res.message);
-                                                            }
-                                                        }}
-                                                        className="btn btn-sm btn-outline-danger rounded-circle p-2"
-                                                        title="Delete User"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).length === 0 && (
-                                        <tr><td colSpan="4" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
+                    {
+                        (activeTab === 'emblos' || activeTab === 'collectors') && (
+                            <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="table-responsive">
+                                <div className="d-flex justify-content-between align-items-center mb-4 px-2">
+                                    <h5 className="fw-bold mb-0">{activeTab === 'emblos' ? 'Artist Registry' : 'Collector Database'}</h5>
+                                    {activeTab === 'emblos' && (
+                                        <button
+                                            onClick={() => setMessageTarget({ id: 'all_emblos', name: 'All Emblos Artists' })}
+                                            className="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2"
+                                        >
+                                            <Send size={14} /> Global Broadcast
+                                        </button>
                                     )}
-                                </tbody>
-                            </table>
-                        </Motion.div>
-                    )}
+                                </div>
+                                <table className="table table-dark table-hover align-middle">
+                                    <thead>
+                                        <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
+                                            <th className="py-3 px-4 border-0">Identity</th>
+                                            <th className="py-3 px-4 border-0">Role</th>
+                                            <th className="py-3 px-4 border-0">Status</th>
+                                            <th className="py-3 px-4 border-0 text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).map(u => (
+                                            <tr key={u._id} className="border-bottom border-secondary border-opacity-10">
+                                                <td className="py-4 px-4 border-0">
+                                                    <div className="d-flex align-items-center gap-3">
+                                                        <img src={u.avatar || '/icon.png'} className="rounded-circle" style={{ width: '40px', height: '40px' }} alt="" />
+                                                        <div className="d-flex flex-column">
+                                                            <span className="text-white fw-bold small">{u.username}</span>
+                                                            <span className="text-muted small" style={{ fontSize: '0.65rem' }}>{u.email}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    <span className={`badge rounded-pill ${u.role === 'emblos' ? 'bg-primary' : 'bg-secondary'} bg-opacity-10 text-${u.role === 'emblos' ? 'primary' : 'muted'} small`}>
+                                                        {u.role?.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    <div className="d-flex flex-column gap-1">
+                                                        <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'} d-inline-block`} style={{ width: 'fit-content' }}>
+                                                            {u.isFrozen ? 'Frozen' : 'Active'}
+                                                        </span>
+                                                        {u.role === 'emblos' && u.emblosAccess?.endDate && (
+                                                            <span className="extra-small text-muted" style={{ fontSize: '0.6rem' }}>
+                                                                Terminates: {new Date(u.emblosAccess.endDate).toLocaleDateString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-4 border-0 text-end">
+                                                    <div className="d-flex gap-2 justify-content-end align-items-center">
+                                                        {u.role === 'emblos' && (
+                                                            <button
+                                                                onClick={() => setMessageTarget({ id: u._id || u.id, name: u.username })}
+                                                                className="btn btn-sm glass text-primary border-0 rounded-circle p-2"
+                                                                title="Message Artist"
+                                                            >
+                                                                <MessageSquare size={16} />
+                                                            </button>
+                                                        )}
+                                                        {activeTab !== 'collectors' && (
+                                                            <button onClick={() => setSelectedUser(u)} className="btn btn-sm glass text-white border-0" title="View Identity Details">
+                                                                <Eye size={16} />
+                                                            </button>
+                                                        )}
+                                                        {u.role === 'emblos' && (
+                                                            <div className="d-flex gap-1 align-items-center bg-white bg-opacity-5 p-1 rounded-pill">
+                                                                {u.isFrozen && (
+                                                                    <select
+                                                                        className="form-select form-select-sm bg-transparent border-0 text-white extra-small py-0"
+                                                                        style={{ width: '85px', fontSize: '0.65rem', boxShadow: 'none' }}
+                                                                        onChange={(e) => setPlanMonths(e.target.value)}
+                                                                        value={planMonths}
+                                                                    >
+                                                                        <option className="bg-dark" value="1">1 Mon</option>
+                                                                        <option className="bg-dark" value="2">2 Mon</option>
+                                                                        <option className="bg-dark" value="3">3 Mon</option>
+                                                                        <option className="bg-dark" value="5">5 Mon</option>
+                                                                        <option className="bg-dark" value="6">6 Mon</option>
+                                                                        <option className="bg-dark" value="12">1 Year</option>
+                                                                    </select>
+                                                                )}
+                                                                <button
+                                                                    onClick={() => updateEmblosStatus(u._id, { status: u.isFrozen ? 'unfreeze' : 'frozen', months: planMonths })}
+                                                                    className={`btn btn-sm ${u.isFrozen ? 'btn-success shadow-glow' : 'btn-danger'} rounded-pill extra-small px-3 py-1 fw-bold`}
+                                                                >
+                                                                    {u.isFrozen ? 'Unfreeze' : 'Freeze'}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                        <button
+                                                            onClick={async () => {
+                                                                if (window.confirm(`Are you sure you want to PERMANENTLY delete user "${u.username}" (${u.email}) and all their artworks? This cannot be undone.`)) {
+                                                                    const res = await deleteUserByEmail(u.email);
+                                                                    if (!res.success) alert(res.message);
+                                                                }
+                                                            }}
+                                                            className="btn btn-sm btn-outline-danger rounded-circle p-2"
+                                                            title="Delete User"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).length === 0 && (
+                                            <tr><td colSpan="4" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </Motion.div>
+                        )
+                    }
 
                     {activeTab === 'settings' && (
                         <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="row">
@@ -1101,9 +1163,10 @@ const Admin = () => {
                                 </section>
                             </div>
                         </Motion.div>
-                    )}
-                </AnimatePresence>
-            </main>
+                    )
+                    }
+                </AnimatePresence >
+            </main >
 
             {/* Modal - Common for Product and Gallery uploads */}
             {
@@ -1524,18 +1587,20 @@ const Admin = () => {
                 )}
             </AnimatePresence>
 
-            {/* Premium Preview Modal */}
-            <ItemPreview
-                item={commentModalItem}
-                isOpen={!!commentModalItem}
-                onClose={() => setCommentModalItem(null)}
-                isLiked={commentModalItem && likedIds.includes(commentModalItem._id || commentModalItem.id)}
-                toggleLike={() => {
-                    const id = commentModalItem._id || commentModalItem.id;
-                    if (products.find(p => (p._id || p.id) === id)) toggleLike(id);
-                    else toggleGalleryLike(id);
-                }}
-            />
+        </main>
+
+            {/* Premium Preview Modal */ }
+    <ItemPreview
+        item={commentModalItem}
+        isOpen={!!commentModalItem}
+        onClose={() => setCommentModalItem(null)}
+        isLiked={commentModalItem && likedIds.includes(commentModalItem._id || commentModalItem.id)}
+        toggleLike={() => {
+            const id = commentModalItem._id || commentModalItem.id;
+            if (products.find(p => (p._id || p.id) === id)) toggleLike(id);
+            else toggleGalleryLike(id);
+        }}
+    />
         </div >
     );
 };
