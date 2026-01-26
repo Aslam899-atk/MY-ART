@@ -98,6 +98,7 @@ const orderSchema = new mongoose.Schema({
     notes: String,
     type: { type: String, default: 'product' },
     status: { type: String, default: 'Pending Price' }, // 'Pending Price', 'Price Submitted', 'Approved', 'Cancelled'
+    deliveryStatus: { type: String, default: 'Pending' }, // 'Pending', 'Shipped', 'Completed'
     date: String,
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
@@ -540,8 +541,11 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/orders/:id/status', asyncHandler(async (req, res) => {
-    const { status } = req.body;
-    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const { status, deliveryStatus } = req.body;
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (deliveryStatus) updateData.deliveryStatus = deliveryStatus;
+    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json(updatedOrder);
 }));
 

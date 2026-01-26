@@ -554,7 +554,23 @@ const Admin = () => {
                                                     {o.creatorId ? (
                                                         <span className="fw-bold text-white">{users.find(u => u._id === o.creatorId)?.username}</span>
                                                     ) : (
-                                                        <span className="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">Commission Task</span>
+                                                        <select
+                                                            className="form-select form-select-sm glass border-0 text-primary fw-bold"
+                                                            style={{ width: '150px', fontSize: '0.7rem' }}
+                                                            onChange={async (e) => {
+                                                                if (e.target.value) {
+                                                                    await claimOrder(o._id, e.target.value, null);
+                                                                }
+                                                            }}
+                                                            defaultValue=""
+                                                        >
+                                                            <option value="" className="bg-dark">Assign Artist...</option>
+                                                            {users.filter(u => u.role === 'emblos').map(artist => (
+                                                                <option key={artist._id} value={artist._id} className="bg-dark">
+                                                                    {artist.username}
+                                                                </option>
+                                                            ))}
+                                                        </select>
                                                     )}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
@@ -567,9 +583,16 @@ const Admin = () => {
                                                     {o.price ? <span className="text-primary fw-bold">₹{o.price}</span> : <span className="text-warning small italic">Waiting for Emblos</span>}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
-                                                    <span className={`badge rounded-pill px-3 py-1 ${o.status === 'Approved' ? 'bg-success' : 'bg-warning'} bg-opacity-10 text-${o.status === 'Approved' ? 'success' : 'warning'}`}>
-                                                        {o.status}
-                                                    </span>
+                                                    <select
+                                                        className="form-select form-select-sm glass border-0 text-white fw-bold"
+                                                        style={{ width: '140px', fontSize: '0.75rem' }}
+                                                        value={o.deliveryStatus || 'Pending'}
+                                                        onChange={(e) => updateOrderStatus(o._id, e.target.value, true)}
+                                                    >
+                                                        <option value="Pending" className="bg-dark">⏳ Pending</option>
+                                                        <option value="Shipped" className="bg-dark">🚚 Shipped</option>
+                                                        <option value="Completed" className="bg-dark">✅ Completed</option>
+                                                    </select>
                                                 </td>
                                                 <td className="py-4 px-4 border-0 text-end">
                                                     <div className="d-flex gap-2 justify-content-end">
