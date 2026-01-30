@@ -50,6 +50,7 @@ const Admin = () => {
     const [isDeletingUser, setIsDeletingUser] = useState(false);
     const [deleteStatus, setDeleteStatus] = useState({ error: '', success: '' });
     const [emblosRate, setEmblosRate] = useState('');
+    const [commissionRate, setCommissionRate] = useState('10');
     const [emblosRules, setEmblosRules] = useState('');
     const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
     const [commentModalItem, setCommentModalItem] = useState(null);
@@ -63,6 +64,7 @@ const Admin = () => {
     useEffect(() => {
         if (appSettings.emblos_config) {
             setEmblosRate(appSettings.emblos_config.monthlyFee || '');
+            setCommissionRate(appSettings.emblos_config.commissionRate || '10');
             setEmblosRules(appSettings.emblos_config.rules?.join('\n') || '');
         }
     }, [appSettings.emblos_config]);
@@ -71,7 +73,8 @@ const Admin = () => {
 
     // Statistics Calculation
     const stats = useMemo(() => {
-        const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+        const totalVolume = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+        const adminEarnings = orders.reduce((sum, o) => sum + (Number(o.adminCommission) || 0), 0);
         const pendingOrders = orders.filter(o => o.status === 'Pending' || o.status === 'Pending Price').length;
         const totalLikes = products.reduce((sum, p) => sum + (p.likes || 0), 0) + galleryItems.reduce((sum, g) => sum + (g.likes || 0), 0);
         const pendingRequests = users?.filter(u => u.emblosAccess?.status === 'pending').length || 0;
@@ -81,7 +84,8 @@ const Admin = () => {
         const totalRequests = orders.filter(o => !o.creatorId && !o.productId).length;
 
         return {
-            revenue: totalRevenue,
+            revenue: totalVolume,
+            adminEarnings: adminEarnings,
             pending: pendingOrders,
             likes: totalLikes,
             users: users?.length || 0,
@@ -389,6 +393,7 @@ const Admin = () => {
         const rulesArray = emblosRules.split('\n').filter(r => r.trim());
         await updateAppSetting('emblos_config', {
             monthlyFee: emblosRate,
+            commissionRate: commissionRate,
             rules: rulesArray
         });
         setIsUpdatingConfig(false);
@@ -522,11 +527,11 @@ const Admin = () => {
                         >
                             {/* Stat Cards */}
                             {[
-                                { label: 'Total Revenue', value: `₹${stats.revenue}`, icon: DollarSign, color: 'primary', trend: '+5.4%' },
-                                { label: 'Active Orders', value: stats.pending, icon: ShoppingBag, color: 'success', trend: 'Critical' },
-                                { label: 'Engagement', value: stats.likes, icon: Heart, color: 'danger', trend: '+18%' },
-                                { label: 'Total Emblos', value: stats.emblos, icon: Brush, color: 'warning', trend: 'Active' },
-                                { label: 'Art Collectors', value: stats.users, icon: UsersIcon, color: 'info', trend: stats.growth },
+                                { label: 'Total Volume', value: `₹${stats.revenue}`, icon: DollarSign, color: 'primary', trend: '+5.4%' },
+                                { label: 'Admin Commission', value: `₹${stats.adminEarnings}`, icon: TrendingUp, color: 'success', trend: 'Direct Profit' },
+                                { label: 'Active Orders', value: stats.pending, icon: ShoppingBag, color: 'info', trend: 'In Progress' },
+                                { label: 'Total Emblos', value: stats.emblos, icon: Brush, color: 'warning', trend: 'Verified' },
+                                { label: 'Collectors', value: stats.users, icon: UsersIcon, color: 'danger', trend: stats.growth },
                             ].map((stat, idx) => (
                                 <div key={idx} className="col-12 col-md-6 col-xl">
                                     <div className="glass p-4 rounded-4 border-0 h-100 transition-all hover-translate-y">
@@ -589,20 +594,15 @@ const Admin = () => {
                                                     </div>
                                                 </td>
                                                 <td className="border-0">
-                                                    <span className="badge bg-primary bg-opacity-10 text-primary">{u.emblosAccess?.plan} Month(s)</span>
+                                                    <span className="badge bg-primary bg-opacity-10 text-primary">New Artist</span>
                                                 </td>
                                                 <td className="border-0 small opacity-70">
                                                     {u.emblosAccess?.message || 'No message'}
                                                 </td>
                                                 <td className="border-0 text-end">
                                                     <div className="d-flex gap-2 justify-content-end">
-                                                        <select className="form-select form-select-sm glass border-0 w-auto" value={planMonths} onChange={(e) => setPlanMonths(e.target.value)}>
-                                                            <option value="1">1 Mo</option>
-                                                            <option value="3">3 Mo</option>
-                                                            <option value="6">6 Mo</option>
-                                                        </select>
-                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'active', months: planMonths })} className="btn btn-success btn-sm rounded-pill px-3 fw-bold">Accept</button>
-                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'none' })} className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Reject</button>
+                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'active' })} className="btn btn-success btn-sm rounded-pill px-4 fw-bold">Approve Artist</button>
+                                                        <button onClick={() => updateEmblosStatus(u._id, { status: 'none' })} className="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold">Reject</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -643,6 +643,7 @@ const Admin = () => {
                                             <th className="py-3 px-4 border-0">Creator (Emblos)</th>
                                             <th className="py-3 px-4 border-0">Customer</th>
                                             <th className="py-3 px-4 border-0">Price</th>
+                                            <th className="py-3 px-4 border-0">{isAdmin ? 'Commission' : 'Earning'}</th>
                                             <th className="py-3 px-4 border-0">Status</th>
                                             <th className="py-3 px-4 border-0 text-end">Actions</th>
                                         </tr>
@@ -776,6 +777,13 @@ const Admin = () => {
                                                             />
                                                         </div>
                                                     )}
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    {o.price ? (
+                                                        <span className={isAdmin ? 'text-danger' : 'text-success'}>
+                                                            ₹{isAdmin ? (o.adminCommission || 0).toFixed(2) : (o.artistEarnings || 0).toFixed(2)}
+                                                        </span>
+                                                    ) : '-'}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
                                                     <select
@@ -984,11 +992,6 @@ const Admin = () => {
                                                     <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'} d-inline-block`} style={{ width: 'fit-content' }}>
                                                         {u.isFrozen ? 'Frozen' : 'Active'}
                                                     </span>
-                                                    {u.role === 'emblos' && u.emblosAccess?.endDate && (
-                                                        <span className="extra-small text-muted" style={{ fontSize: '0.6rem' }}>
-                                                            Terminates: {new Date(u.emblosAccess.endDate).toLocaleDateString()}
-                                                        </span>
-                                                    )}
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4 border-0 text-end">
@@ -1004,36 +1007,15 @@ const Admin = () => {
                                                             </button>
 
                                                             <div className="d-flex gap-2 align-items-center bg-white bg-opacity-5 p-1 px-2 rounded-pill shadow-sm border border-white border-opacity-5">
-                                                                <div className="d-flex align-items-center gap-1 border-end border-white border-opacity-10 pe-2 me-1">
-                                                                    <Clock size={12} className="text-muted" />
-                                                                    <select
-                                                                        className="form-select form-select-sm bg-transparent border-0 text-white extra-small py-0"
-                                                                        style={{ width: '85px', fontSize: '0.65rem', boxShadow: 'none' }}
-                                                                        onChange={(e) => setPlanMonths(e.target.value)}
-                                                                        value={planMonths}
-                                                                    >
-                                                                        {[1, 2, 3, 4, 5, 6, 12].map(m => (
-                                                                            <option key={m} className="bg-dark" value={m}>{m} {m === 12 ? 'Year' : 'Mon'}</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </div>
-
                                                                 {u.isFrozen ? (
                                                                     <button
-                                                                        onClick={() => updateEmblosStatus(u._id, { status: 'unfreeze', months: planMonths })}
+                                                                        onClick={() => updateEmblosStatus(u._id, { status: 'unfreeze' })}
                                                                         className="btn btn-sm btn-success rounded-pill extra-small px-3 py-1 fw-bold shadow-glow"
                                                                     >
                                                                         Unfreeze
                                                                     </button>
                                                                 ) : (
                                                                     <div className="d-flex gap-1">
-                                                                        <button
-                                                                            onClick={() => { if (window.confirm(`Extend access for ${u.username} by ${planMonths} months?`)) updateEmblosStatus(u._id, { status: 'active', months: planMonths }); }}
-                                                                            className="btn btn-sm glass text-primary rounded-pill extra-small px-3 py-1 fw-bold border-0"
-                                                                            title="Extend Access"
-                                                                        >
-                                                                            Extend
-                                                                        </button>
                                                                         <button
                                                                             onClick={() => { if (window.confirm(`Freeze access for ${u.username}?`)) updateEmblosStatus(u._id, { status: 'frozen' }); }}
                                                                             className="btn btn-sm btn-danger rounded-pill extra-small px-3 py-1 fw-bold"
@@ -1138,18 +1120,35 @@ const Admin = () => {
                                         <Brush size={20} className="text-primary" /> Emblos Configuration
                                     </h4>
                                     <form onSubmit={handleUpdateEmblosConfig}>
-                                        <div className="mb-4">
-                                            <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Monthly Artist Fee (₹)</label>
-                                            <div className="input-group glass rounded-4 border-0 overflow-hidden">
-                                                <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
-                                                <input
-                                                    required
-                                                    type="number"
-                                                    placeholder="e.g. 500"
-                                                    className="form-control bg-transparent border-0 text-white py-3"
-                                                    value={emblosRate}
-                                                    onChange={e => setEmblosRate(e.target.value)}
-                                                />
+                                        <div className="row g-3 mb-4">
+                                            <div className="col-12 col-md-6">
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Monthly Entry Fee (₹)</label>
+                                                <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                    <span className="input-group-text bg-transparent border-0 text-primary ps-4">₹</span>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="e.g. 0"
+                                                        className="form-control bg-transparent border-0 text-white py-3"
+                                                        value={emblosRate}
+                                                        onChange={e => setEmblosRate(e.target.value)}
+                                                    />
+                                                </div>
+                                                <p className="extra-small text-muted mt-1 ps-1">Set to 0 if only commission based.</p>
+                                            </div>
+                                            <div className="col-12 col-md-6">
+                                                <label className="small fw-bold text-muted text-uppercase mb-2 d-block">Admin Commission (%)</label>
+                                                <div className="input-group glass rounded-4 border-0 overflow-hidden">
+                                                    <span className="input-group-text bg-transparent border-0 text-success ps-4">%</span>
+                                                    <input
+                                                        required
+                                                        type="number"
+                                                        placeholder="e.g. 10"
+                                                        className="form-control bg-transparent border-0 text-white py-3"
+                                                        value={commissionRate}
+                                                        onChange={e => setCommissionRate(e.target.value)}
+                                                    />
+                                                </div>
+                                                <p className="extra-small text-muted mt-1 ps-1">Percentage taken from every order.</p>
                                             </div>
                                         </div>
                                         <div className="mb-4">

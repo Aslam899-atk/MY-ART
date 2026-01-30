@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { ShoppingBag, Clock, CheckCircle, Trash2, X, Eye } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle, Trash2, X, Eye, Search } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import ItemPreview from '../components/ItemPreview';
 
@@ -84,6 +84,12 @@ const UserOrders = () => {
                                     ) : (
                                         <div className="text-warning small italic mb-3 d-flex align-items-center gap-2">
                                             <Clock size={14} /> Waiting for price agreement...
+                                        </div>
+                                    )}
+
+                                    {order.estimatedDays > 0 && (
+                                        <div className="small text-info mb-3 d-flex align-items-center gap-2">
+                                            <Clock size={14} /> Estimated Completion: {order.estimatedDays} Days
                                         </div>
                                     )}
 

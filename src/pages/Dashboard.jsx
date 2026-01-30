@@ -78,8 +78,8 @@ const Dashboard = () => {
     const userId = user?._id || user?.id;
     const myProducts = products.filter(p => p.creatorId === userId);
     const myGallery = galleryItems.filter(g => g.creatorId === userId);
-    const myOrders = orders.filter(o => o.creatorId === userId || o.customerId === userId);
-    const publicTasks = orders.filter(o => o.type === 'service' && !o.creatorId);
+    const myOrders = orders.filter(o => o.creatorId === userId);
+    const publicTasks = orders.filter(o => !o.creatorId && o.status !== 'Completed' && o.deliveryStatus !== 'Completed');
     const myMessages = messages.filter(m => m.receiverId === userId || m.senderId === userId);
 
     const adminMessages = useMemo(() => {
@@ -104,7 +104,12 @@ const Dashboard = () => {
             return alert("ദയവായി ഒരു സാധുവായ തുക നൽകുക.");
         }
 
-        const res = await claimOrder(orderId, price);
+        const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (Ex: 5)");
+        if (!days || isNaN(days)) {
+            return alert("ദയവായി ദിവസങ്ങളുടെ എണ്ണം കൃത്യമായി നൽകുക.");
+        }
+
+        const res = await claimOrder(orderId, price, days);
         if (res.success) {
             alert("Task Claimed! കസ്റ്റമർക്ക് ഇപ്പോൾ പ്രൈസ് കാണാൻ സാധിക്കും. കസ്റ്റമർ കൺഫേം ചെയ്താൽ ലിസ്റ്റ് പബ്ലിക് ആകും.");
         } else {
@@ -199,33 +204,16 @@ const Dashboard = () => {
                     <div>
                         <h4 className="fw-bold mb-1 text-gradient">{user?.username}</h4>
                         <div className="d-flex align-items-center gap-2">
-                            <span className={`badge rounded-pill ${isFrozen ? 'bg-danger' : 'bg-success'} px-3 py-1`}>
-                                {isFrozen ? 'Account Frozen' : 'Active Emblos'}
+                            <span className={`badge rounded-pill bg-success px-3 py-1`}>
+                                Active Artist
                             </span>
-                            {user?.emblosAccess?.endDate && (
-                                <span className="extra-small text-muted fw-bold">
-                                    {isFrozen ? 'Expired:' : 'Renews:'} {new Date(user.emblosAccess.endDate).toLocaleDateString()}
-                                </span>
-                            )}
                         </div>
                     </div>
                 </div>
                 <div className="d-flex gap-3 align-items-center">
-                    {!isFrozen && (
-                        <button onClick={() => setIsUploadModalOpen(true)} className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-glow d-flex align-items-center gap-2">
-                            <Plus size={18} /> New Upload
-                        </button>
-                    )}
-                    {isFrozen && (
-                        <div className="d-flex align-items-center gap-3 text-danger bg-danger bg-opacity-10 p-4 rounded-4 w-100">
-                            <AlertCircle size={32} />
-                            <div>
-                                <div className="fw-bold h5 mb-1">Account Frozen</div>
-                                <div className="small opacity-75">നിങ്ങളുടെ സബ്സ്ക്രിപ്ഷൻ കാലാവധി കഴിഞ്ഞിരിക്കുന്നു. പഴയ വർക്കുകൾ ഇപ്പോൾ പബ്ലിക് സൈറ്റിൽ കാണില്ല.</div>
-                                <div className="small fw-bold mt-1">Contact Admin to activate again.</div>
-                            </div>
-                        </div>
-                    )}
+                    <button onClick={() => setIsUploadModalOpen(true)} className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-glow d-flex align-items-center gap-2">
+                        <Plus size={18} /> New Creation
+                    </button>
                 </div>
             </div>
 
@@ -333,11 +321,14 @@ const Dashboard = () => {
                         <button onClick={() => setActiveTab('overview')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'overview' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
                             <LayoutDashboard size={18} /> Overview
                         </button>
-                        <button onClick={() => setActiveTab('inventory')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'inventory' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
-                            <ImageIcon size={18} /> My Artworks
+                        <button onClick={() => setActiveTab('gallery')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'gallery' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
+                            <ImageIcon size={18} /> My Gallery
+                        </button>
+                        <button onClick={() => setActiveTab('shop')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'shop' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
+                            <Package size={18} /> Shop Inventory
                         </button>
                         <button onClick={() => setActiveTab('orders')} className={`btn text-nowrap text-start rounded-3 py-3 d-flex align-items-center gap-3 flex-shrink-0 ${activeTab === 'orders' ? 'btn-primary shadow-glow' : 'glass text-white opacity-70 border-0'} ${window.innerWidth < 992 ? 'px-4' : 'w-100'}`}>
-                            <ShoppingBag size={18} /> Orders
+                            <ShoppingBag size={18} /> Active Orders
                             {myOrders.filter(o => o.status === 'Pending Price').length > 0 &&
                                 <span className="badge bg-danger ms-auto">{myOrders.filter(o => o.status === 'Pending Price').length}</span>
                             }
@@ -402,60 +393,55 @@ const Dashboard = () => {
                         </div>
                     )}
 
-                    {activeTab === 'inventory' && (
+                    {activeTab === 'gallery' && (
                         <div className="glass p-4 rounded-4">
-                            <h5 className="fw-bold mb-4">My Uploaded Items</h5>
-                            {isFrozen && <div className="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger mb-4">Your account is frozen. All your items are hidden from public.</div>}
+                            <h5 className="fw-bold mb-4">My Gallery Artworks</h5>
                             <div className="row g-3">
-                                {[...myProducts.map(p => ({ ...p, itemType: 'product' })), ...myGallery.map(g => ({ ...g, itemType: 'gallery' }))].map((item, idx) => (
+                                {myGallery.map((item, idx) => (
                                     <div key={idx} className="col-md-4">
-                                        <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '200px' }}>
-                                            {(item.type === 'video' || (item.url || item.image)?.includes('.mp4')) ? (
-                                                <video src={item.url || item.image} className="w-100 h-100 object-fit-cover cursor-pointer" muted loop autoPlay playsInline onClick={() => setCommentModalItem(item)} />
+                                        <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '220px' }}>
+                                            {(item.type === 'video' || item.url?.includes('.mp4')) ? (
+                                                <video src={item.url} className="w-100 h-100 object-fit-cover cursor-pointer" muted loop autoPlay playsInline onClick={() => setCommentModalItem({ ...item, itemType: 'gallery' })} />
                                             ) : (
-                                                <LazyImage src={item.url || item.image} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem(item)} />
+                                                <LazyImage src={item.url} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'gallery' })} />
                                             )}
-
                                             <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
-                                                <div className={`badge ${item.status === 'active' ? 'bg-success' : (item.status === 'frozen' ? 'bg-danger' : 'bg-warning')}`}>
-                                                    {item.status}
-                                                </div>
+                                                <div className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'}`}>{item.status}</div>
                                             </div>
-
                                             <div className="position-absolute top-0 end-0 m-2 opacity-0 group-hover-opacity-100 transition-all d-flex gap-2" style={{ zIndex: 5 }}>
-                                                <button
-                                                    onClick={() => setCommentModalItem(item)}
-                                                    className="btn btn-primary btn-sm rounded-circle p-2 shadow-lg"
-                                                    title="View Full Preview"
-                                                >
-                                                    <Eye size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={async () => {
-                                                        if (window.confirm(`Are you sure you want to delete "${item.title || item.name}"?`)) {
-                                                            if (item.itemType === 'product') {
-                                                                await deleteProduct(item._id || item.id);
-                                                            } else {
-                                                                await deleteGalleryItem(item._id || item.id);
-                                                            }
-                                                        }
-                                                    }}
-                                                    className="btn btn-danger btn-sm rounded-circle p-2 shadow-lg"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
+                                                <button onClick={() => setCommentModalItem({ ...item, itemType: 'gallery' })} className="btn btn-primary btn-sm rounded-circle p-2 shadow-lg"><Eye size={14} /></button>
+                                                <button onClick={async () => { if (window.confirm(`Delete "${item.title}"?`)) await deleteGalleryItem(item._id || item.id); }} className="btn btn-danger btn-sm rounded-circle p-2 shadow-lg"><Trash2 size={14} /></button>
                                             </div>
-
-                                            <div className="position-absolute bottom-0 start-0 w-100 p-2 glass border-0 text-truncate small fw-bold" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                                                {item.title || item.name}
-                                            </div>
+                                            <div className="position-absolute bottom-0 start-0 w-100 p-2 glass border-0 text-truncate small fw-bold" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>{item.title}</div>
                                         </div>
                                     </div>
                                 ))}
-                                {myGallery.length === 0 && myProducts.length === 0 && (
-                                    <div className="text-center py-5 w-100 text-white opacity-30">No items found</div>
-                                )}
+                                {myGallery.length === 0 && <div className="text-center py-5 w-100 text-white opacity-30">No gallery items uploaded</div>}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'shop' && (
+                        <div className="glass p-4 rounded-4">
+                            <h5 className="fw-bold mb-4">My Shop Products</h5>
+                            <div className="row g-3">
+                                {myProducts.map((item, idx) => (
+                                    <div key={idx} className="col-md-4">
+                                        <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '220px' }}>
+                                            <LazyImage src={item.image} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'product' })} />
+                                            <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
+                                                <div className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'}`}>{item.status}</div>
+                                                <div className="badge bg-primary">₹{item.price}</div>
+                                            </div>
+                                            <div className="position-absolute top-0 end-0 m-2 opacity-0 group-hover-opacity-100 transition-all d-flex gap-2" style={{ zIndex: 5 }}>
+                                                <button onClick={() => setCommentModalItem({ ...item, itemType: 'product' })} className="btn btn-primary btn-sm rounded-circle p-2 shadow-lg"><Eye size={14} /></button>
+                                                <button onClick={async () => { if (window.confirm(`Delete "${item.name}"?`)) await deleteProduct(item._id || item.id); }} className="btn btn-danger btn-sm rounded-circle p-2 shadow-lg"><Trash2 size={14} /></button>
+                                            </div>
+                                            <div className="position-absolute bottom-0 start-0 w-100 p-2 glass border-0 text-truncate small fw-bold" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>{item.name}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {myProducts.length === 0 && <div className="text-center py-5 w-100 text-white opacity-30">No shop products added</div>}
                             </div>
                         </div>
                     )}
@@ -595,8 +581,8 @@ const Dashboard = () => {
 
                     {activeTab === 'tasks' && (
                         <div className="glass p-4 rounded-4">
-                            <h5 className="fw-bold mb-4">Task Center (Public Requests)</h5>
-                            <p className="text-muted small mb-4">These are custom requests from the contact page. Any artist can claim these to start a commission.</p>
+                            <h5 className="fw-bold mb-4 text-gradient">Global Task Center</h5>
+                            <p className="text-muted small mb-4">ഇവിടെ എല്ലാ unclaimed ഓർഡറുകളും കാണാം (അഡ്മിന്റേതായാലും ആരുടേതായാലും). ആദ്യം ക്ലെയിം ചെയ്യുന്നവർക്ക് ആ ഓർഡർ പൂർത്തിയാക്കാം.</p>
                             <div className="table-responsive">
                                 <table className="table table-dark table-hover align-middle border-0">
                                     <thead>
@@ -667,16 +653,6 @@ const Dashboard = () => {
                                 <Send size={12} className="me-1" /> Contact Admin
                             </button>
                         </div>
-                        {user?.emblosAccess?.endDate && (
-                            <div className="mb-4 p-3 rounded-4 bg-primary bg-opacity-5 border border-primary border-opacity-10 d-flex justify-content-between align-items-center">
-                                <div className="d-flex align-items-center gap-2 text-primary small fw-bold">
-                                    <Clock size={14} /> Subscription {isFrozen ? 'Expired' : 'Status'}
-                                </div>
-                                <div className="small text-white-50 fw-bold">
-                                    {isFrozen ? 'Termination' : 'Validity'}: {new Date(user.emblosAccess.endDate).toLocaleDateString()}
-                                </div>
-                            </div>
-                        )}
                         <div className="d-flex flex-column gap-3">
                             {adminMessages.length > 0 ? (
                                 adminMessages.map((msg, idx) => (

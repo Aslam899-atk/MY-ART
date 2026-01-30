@@ -87,19 +87,22 @@ const Message = mongoose.model('Message', messageSchema);
 const orderSchema = new mongoose.Schema({
     productName: String,
     productId: String,
-    image: String, // Store reference image or shop item thumbnail
+    image: String,
     price: Number,
     priceGiven: { type: Boolean, default: false },
     customer: String,
     customerId: String,
-    creatorId: String, // Emblos ID
+    creatorId: String,
     phone: String,
     email: String,
     address: String,
     notes: String,
     type: { type: String, default: 'product' },
-    status: { type: String, default: 'Pending Price' }, // 'Pending Price', 'Price Submitted', 'Approved', 'Cancelled'
-    deliveryStatus: { type: String, default: 'Pending' }, // 'Pending', 'Shipped', 'Completed'
+    status: { type: String, default: 'Pending Price' },
+    deliveryStatus: { type: String, default: 'Pending' },
+    adminCommission: { type: Number, default: 0 },
+    artistEarnings: { type: Number, default: 0 },
+    estimatedDays: { type: Number, default: 0 },
     date: String,
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
@@ -127,10 +130,8 @@ const userSchema = new mongoose.Schema({
     avatar: String,
     emblosAccess: {
         status: { type: String, default: 'none' }, // 'none', 'pending', 'active'
-        plan: String, // '1', '3', '6'
         message: String,
-        startDate: Date,
-        endDate: Date
+        phone: String
     },
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
@@ -195,36 +196,6 @@ app.get('/api/products', asyncHandler(async (req, res) => {
     res.json(products);
 }));
 
-// Automatic Subscription Management (Freeze Expired Users)
-const handleSubscriptionExpiries = async () => {
-    try {
-        const now = new Date();
-        const expiredUsers = await User.find({
-            role: 'emblos',
-            isFrozen: false,
-            'emblosAccess.endDate': { $lt: now }
-        });
-
-        if (expiredUsers.length > 0) {
-            console.log(`❄️ Freezing ${expiredUsers.length} expired accounts...`);
-            for (const user of expiredUsers) {
-                user.isFrozen = true;
-                await user.save();
-                // Hide their items
-                await Promise.all([
-                    Product.updateMany({ creatorId: user._id }, { status: 'frozen' }),
-                    Gallery.updateMany({ creatorId: user._id }, { status: 'frozen' })
-                ]);
-            }
-        }
-    } catch (e) {
-        console.error("Auto-freeze error:", e);
-    }
-};
-
-// Run subscription check every hour
-setInterval(handleSubscriptionExpiries, 3600000);
-
 // Self-healing migration for existing data
 const runMigration = async () => {
     try {
@@ -238,9 +209,6 @@ const runMigration = async () => {
             await Product.updateMany({ creatorId: user._id }, { status: 'frozen' });
             await Gallery.updateMany({ creatorId: user._id }, { status: 'frozen' });
         }
-
-        // 3. Run initial expiry check
-        await handleSubscriptionExpiries();
 
         console.log("✅ Data integrity check & migration complete.");
     } catch (e) {
@@ -424,42 +392,28 @@ app.delete('/api/messages/:id', asyncHandler(async (req, res) => {
 
 // --- EMBLOS ACCESS ROUTES ---
 app.post('/api/users/:id/request-emblos', asyncHandler(async (req, res) => {
-    const { plan, message, phone } = req.body;
+    const { message, phone } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     user.phone = phone;
+    // Auto-approve join, but uploads still need approval
+    user.role = 'emblos';
     user.emblosAccess = {
-        status: 'pending',
-        plan,
-        message,
-        startDate: null,
-        endDate: null
+        status: 'active',
+        message
     };
     await user.save();
     res.json(user);
 }));
 
 app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
-    const { status, plan, months, password } = req.body;
+    const { status, password } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (status === 'active' || status === 'unfreeze') {
-        const monthsToAdd = parseInt(months || plan || 1);
-        let baseDate = new Date();
-
-        // If they already have an end date that is in the future, extend from there
-        if (user.emblosAccess?.endDate && new Date(user.emblosAccess.endDate) > baseDate) {
-            baseDate = new Date(user.emblosAccess.endDate);
-        }
-
-        const endDate = new Date(baseDate);
-        endDate.setMonth(endDate.getMonth() + monthsToAdd);
-
         user.emblosAccess.status = 'active';
-        user.emblosAccess.startDate = user.emblosAccess.startDate || new Date();
-        user.emblosAccess.endDate = endDate;
         user.role = 'emblos';
         user.isFrozen = false;
 
@@ -468,8 +422,9 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
         }
     } else if (status === 'frozen') {
         user.isFrozen = true;
-    } else if (status === 'unfreeze') {
-        user.isFrozen = false;
+    } else if (status === 'none' || status === 'rejected') {
+        user.emblosAccess.status = 'none';
+        user.role = 'user';
     } else {
         user.emblosAccess.status = status;
     }
@@ -477,7 +432,7 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
     await user.save();
 
     // Update all their items status based on frozen state
-    const itemStatus = user.isFrozen ? 'frozen' : 'active';
+    const itemStatus = user.isFrozen ? 'frozen' : (user.role === 'emblos' ? 'active' : 'pending');
     await Promise.all([
         Product.updateMany({ creatorId: user._id }, { status: itemStatus }),
         Gallery.updateMany({ creatorId: user._id }, { status: itemStatus })
@@ -489,10 +444,20 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
 // --- ORDER PRICE ROUTES ---
 app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
     const { price } = req.body;
+
+    // Fetch commission rate from settings (default to 10%)
+    const config = await AppSetting.findOne({ key: 'emblos_config' });
+    const commissionRate = config?.value?.commissionRate || 10;
+
+    const adminCommission = (price * commissionRate) / 100;
+    const artistEarnings = price - adminCommission;
+
     const order = await Order.findByIdAndUpdate(req.params.id, {
         price,
         priceGiven: true,
-        status: 'Approved'
+        status: 'Approved',
+        adminCommission,
+        artistEarnings
     }, { new: true });
     res.json(order);
 }));
@@ -505,13 +470,21 @@ app.put('/api/orders/:id/approve-price', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
-    const { creatorId, price } = req.body;
+    const { creatorId, price, estimatedDays } = req.body;
     const updateData = { creatorId };
+    if (estimatedDays) updateData.estimatedDays = estimatedDays;
 
     if (price) {
         updateData.price = price;
         updateData.priceGiven = true;
         updateData.status = 'Approved';
+
+        // Fetch commission rate
+        const config = await AppSetting.findOne({ key: 'emblos_config' });
+        const commissionRate = config?.value?.commissionRate || 10;
+
+        updateData.adminCommission = (price * commissionRate) / 100;
+        updateData.artistEarnings = price - updateData.adminCommission;
     } else {
         updateData.status = 'Pending Price';
     }
@@ -543,21 +516,35 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
     let creatorId = req.body.creatorId || null;
     let image = req.body.image || null;
     let status = type === 'service' ? 'Pending Price' : 'Approved';
+    let price = req.body.price || 0;
+    let adminCommission = 0;
+    let artistEarnings = 0;
 
-    // If order is linked to a shop/gallery item, auto-assign to the uploader and sync image
+    // If order is linked to a shop/gallery item, sync image but DO NOT auto-assign creator
     if (productId) {
         const item = (await Product.findById(productId)) || (await Gallery.findById(productId));
         if (item) {
-            if (item.creatorId) creatorId = item.creatorId.toString();
+            // creatorId = item.creatorId ? item.creatorId.toString() : null; // Removed auto-assign
             image = item.image || item.url;
+            price = item.price || price;
         }
+    }
+
+    if (price > 0) {
+        const config = await AppSetting.findOne({ key: 'emblos_config' });
+        const commissionRate = config?.value?.commissionRate || 10;
+        adminCommission = (price * commissionRate) / 100;
+        artistEarnings = price - adminCommission;
     }
 
     const newOrder = new Order({
         ...req.body,
+        price,
         creatorId,
         image,
         status,
+        adminCommission,
+        artistEarnings,
         date: new Date().toLocaleDateString()
     });
     await newOrder.save();

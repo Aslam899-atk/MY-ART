@@ -154,13 +154,14 @@ export const AppProvider = ({ children }) => {
         if (res.ok) fetchData();
     };
 
-    const claimOrder = async (orderId, price = null, artistId = null) => {
+    const claimOrder = async (orderId, price = null, estimatedDays = null, artistId = null) => {
         const res = await fetch(`${API_URL}/orders/${orderId}/claim`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 creatorId: artistId || user?._id || user?.id,
-                price: price ? Number(price) : null
+                price: price ? Number(price) : null,
+                estimatedDays: estimatedDays ? Number(estimatedDays) : null
             })
         });
         if (res.ok) {
