@@ -25,7 +25,7 @@ const RequestAccess = () => {
                 <div className="glass p-5 rounded-4 d-inline-block border border-white border-opacity-10 shadow-2xl">
                     <CheckCircle size={64} className="text-success mb-4" />
                     <h2 className="fw-bold text-gradient mb-3">Welcome to Emblos!</h2>
-                    <p className="text-white opacity-70 mb-4">നിങ്ങളുടെ അക്കൗണ്ട് ആക്റ്റീവ് ആയിട്ടുണ്ട്. ഇപ്പോൾ തന്നെ നിങ്ങൾക്ക് വർക്കുകൾ അപ്‌ലോഡ് ചെയ്തു തുടങ്ങാം. പക്ഷെ പബ്ലിക് ആകുന്നതിന് മുൻപ് അഡ്മിൻ അപ്രൂവ് ചെയ്യേണ്ടതുണ്ട്.</p>
+                    <p className="text-white opacity-70 mb-4">നിങ്ങളുടെ അക്കൗണ്ട് ആക്റ്റീവ് ആയിട്ടുണ്ട്. ഇപ്പോൾ തന്നെ നിങ്ങൾക്ക് വർക്കുകൾ അപ്‌ലോഡ് ചെയ്യാം, അത് ഉടൻ തന്നെ സൈറ്റിൽ കാണുന്നതാണ്.</p>
                     <button onClick={() => navigate('/dashboard')} className="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-glow border-0">Go to Dashboard</button>
                 </div>
             </div>
@@ -73,7 +73,7 @@ const RequestAccess = () => {
                                         </li>
                                         <li className="small opacity-75 d-flex gap-2">
                                             <span className="text-primary fw-bold">2. Uploading:</span>
-                                            നിങ്ങളുടെ വർക്കുകൾ (Gallery / Shop) അപ്‌ലോഡ് ചെയ്യാം. അഡ്മിൻ അപ്രൂവ് ചെയ്താൽ അത് പബ്ലിക് ആകും.
+                                            നിങ്ങളുടെ വർക്കുകൾ (Gallery / Shop) അപ്‌ലോഡ് ചെയ്താൽ ഉടൻ തന്നെ പബ്ലിക് ആകുന്നതാണ്. അഡ്മിൻ അപ്രൂവൽ ആവശ്യമില്ല.
                                         </li>
                                         <li className="small opacity-75 d-flex gap-2">
                                             <span className="text-primary fw-bold">3. Orders:</span>
