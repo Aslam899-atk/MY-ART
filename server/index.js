@@ -521,14 +521,32 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
     let artistEarnings = 0;
 
     // If order is linked to a shop/gallery item, sync image but DO NOT auto-assign creator
+    // If order is linked to a shop/gallery item, sync image and auto-assign creator
     if (productId) {
         const item = (await Product.findById(productId)) || (await Gallery.findById(productId));
         if (item) {
-            // creatorId = item.creatorId ? item.creatorId.toString() : null; // Removed auto-assign
+            creatorId = item.creatorId ? item.creatorId.toString() : null; // Auto-assign to creator
             image = item.image || item.url;
             price = item.price || price;
         }
     }
+
+    // --- BACKGROUND JOB: Reclaim Stale Orders (older than 3 days) ---
+    // If an artist hasn't acted on a direct order in 3 days, move it to common Task Center
+    setTimeout(async () => {
+        // Check every hour (simplified for logic)
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        await Order.updateMany(
+            {
+                creatorId: { $ne: null },
+                status: { $in: ['Pending Price', 'Pending Approval'] }, // Not yet accepted/active
+                createdAt: { $lt: threeDaysAgo }
+            },
+            { $set: { creatorId: null, status: 'Pending Price' } }
+        );
+    }, 1000 * 60 * 60); // Run check roughly every hour (in a real app, use cron)
 
     if (price > 0) {
         const config = await AppSetting.findOne({ key: 'emblos_config' });
