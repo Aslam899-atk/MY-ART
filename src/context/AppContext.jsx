@@ -391,10 +391,11 @@ export const AppProvider = ({ children }) => {
         setOrders((prev) => prev.filter((o) => (o._id || o.id) !== id));
     };
 
-    const updateOrderStatus = async (id, statusOrDeliveryStatus, isDeliveryStatus = false, unassign = false) => {
-        const body = unassign ? { unassign: true } : (isDeliveryStatus
-            ? { deliveryStatus: statusOrDeliveryStatus }
-            : { status: statusOrDeliveryStatus });
+    const updateOrderStatus = async (id, statusOrDeliveryStatus, isDeliveryStatus = false, unassign = false, extraData = {}) => {
+        const body = { ...extraData };
+        if (unassign) body.unassign = true;
+        else if (isDeliveryStatus) body.deliveryStatus = statusOrDeliveryStatus;
+        else body.status = statusOrDeliveryStatus;
 
         const res = await fetch(`${API_URL}/orders/${id}/status`, {
             method: 'PUT',

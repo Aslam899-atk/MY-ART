@@ -584,10 +584,11 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/orders/:id/status', asyncHandler(async (req, res) => {
-    const { status, deliveryStatus, unassign } = req.body;
+    const { status, deliveryStatus, unassign, estimatedDays } = req.body;
     const updateData = {};
     if (status) updateData.status = status;
     if (deliveryStatus) updateData.deliveryStatus = deliveryStatus;
+    if (estimatedDays) updateData.estimatedDays = estimatedDays;
     if (unassign) {
         updateData.creatorId = null;
         updateData.status = 'Pending Price';

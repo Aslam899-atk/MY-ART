@@ -81,7 +81,7 @@ const Admin = () => {
 
         const emblosCount = users?.filter(u => u.role === 'emblos').length || 0;
 
-        const totalRequests = orders.filter(o => !o.creatorId && !o.productId).length;
+        const totalRequests = orders.filter(o => !o.creatorId).length;
 
         return {
             revenue: totalVolume,
@@ -643,6 +643,7 @@ const Admin = () => {
                                             <th className="py-3 px-4 border-0">Creator (Emblos)</th>
                                             <th className="py-3 px-4 border-0">Customer</th>
                                             <th className="py-3 px-4 border-0">Price</th>
+                                            <th className="py-3 px-4 border-0">Est. Days</th>
                                             <th className="py-3 px-4 border-0">{isAdmin ? 'Commission' : 'Earning'}</th>
                                             <th className="py-3 px-4 border-0">Status</th>
                                             <th className="py-3 px-4 border-0 text-end">Actions</th>
@@ -650,7 +651,7 @@ const Admin = () => {
                                     </thead>
                                     <tbody>
                                         {filteredOrders.filter(o => {
-                                            if (orderFilter === 'tasks') return !o.creatorId && !o.productId;
+                                            if (orderFilter === 'tasks') return !o.creatorId;
                                             return true;
                                         }).map(o => (
                                             <tr key={o._id} className="border-bottom border-secondary border-opacity-10">
@@ -776,6 +777,13 @@ const Admin = () => {
                                                                 onChange={(e) => setClaimPrices({ ...claimPrices, [o._id]: e.target.value })}
                                                             />
                                                         </div>
+                                                    )}
+                                                </td>
+                                                <td className="py-4 px-4 border-0">
+                                                    {o.estimatedDays ? (
+                                                        <span className="badge bg-info bg-opacity-10 text-info">{o.estimatedDays} Days</span>
+                                                    ) : (
+                                                        <span className="text-muted">-</span>
                                                     )}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">

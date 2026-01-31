@@ -516,6 +516,21 @@ const Dashboard = () => {
                                                             </button>
                                                         )}
                                                         {/* Status transitions */}
+                                                        {/* Fix for direct orders that might be missing estimated days */}
+                                                        {order.status === 'Approved' && !order.estimatedDays && (
+                                                            <button
+                                                                onClick={async () => {
+                                                                    const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (Ex: 5)");
+                                                                    if (days && !isNaN(days)) {
+                                                                        await updateOrderStatus(order._id, 'Approved', false, false, { estimatedDays: Number(days) });
+                                                                    }
+                                                                }}
+                                                                className="btn btn-warning btn-sm ms-2 small fw-bold"
+                                                            >
+                                                                Set Expected Days
+                                                            </button>
+                                                        )}
+
                                                         {/* Courier/Delivery Status */}
                                                         {order.status === 'Approved' && (
                                                             <>
