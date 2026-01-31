@@ -515,12 +515,10 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
     const { productId, type } = req.body;
     let creatorId = req.body.creatorId || null;
     let image = req.body.image || null;
-    let status = type === 'service' ? 'Pending Price' : 'Approved';
     let price = req.body.price || 0;
     let adminCommission = 0;
     let artistEarnings = 0;
 
-    // If order is linked to a shop/gallery item, sync image but DO NOT auto-assign creator
     // If order is linked to a shop/gallery item, sync image and auto-assign creator
     if (productId) {
         const item = (await Product.findById(productId)) || (await Gallery.findById(productId));
@@ -530,6 +528,8 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
             price = item.price || price;
         }
     }
+
+    let status = (price && price > 0) ? 'Approved' : (type === 'service' ? 'Pending Price' : 'Approved');
 
     // --- BACKGROUND JOB: Reclaim Stale Orders (older than 3 days) ---
     // If an artist hasn't acted on a direct order in 3 days, move it to common Task Center
@@ -541,10 +541,14 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
         await Order.updateMany(
             {
                 creatorId: { $ne: null },
-                status: { $in: ['Pending Price', 'Pending Approval'] }, // Not yet accepted/active
+                $or: [
+                    { status: 'Pending Price' },
+                    { status: 'Pending Approval' },
+                    { status: 'Approved', estimatedDays: { $in: [0, null, undefined] } }
+                ],
                 createdAt: { $lt: threeDaysAgo }
             },
-            { $set: { creatorId: null, status: 'Pending Price' } }
+            { $set: { creatorId: null, status: 'Pending Price', estimatedDays: 0 } }
         );
     }, 1000 * 60 * 60); // Run check roughly every hour (in a real app, use cron)
 

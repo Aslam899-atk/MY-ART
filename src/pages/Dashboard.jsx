@@ -516,23 +516,32 @@ const Dashboard = () => {
                                                             </button>
                                                         )}
                                                         {/* Status transitions */}
-                                                        {order.status === 'Pending' && (
-                                                            <button
-                                                                onClick={() => handleStatusChange(order._id, 'Shipped')}
-                                                                className="btn btn-outline-info btn-sm ms-2"
-                                                            >
-                                                                Mark Shipped
-                                                            </button>
+                                                        {/* Courier/Delivery Status */}
+                                                        {order.status === 'Approved' && (
+                                                            <>
+                                                                {(!order.deliveryStatus || order.deliveryStatus === 'Pending') && (
+                                                                    <button
+                                                                        onClick={() => updateOrderStatus(order._id, 'Shipped', true)}
+                                                                        className="btn btn-outline-info btn-sm ms-2 small fw-bold"
+                                                                    >
+                                                                        Market as Shipped
+                                                                    </button>
+                                                                )}
+                                                                {order.deliveryStatus === 'Shipped' && (
+                                                                    <button
+                                                                        onClick={() => updateOrderStatus(order._id, 'Completed', true)}
+                                                                        className="btn btn-outline-success btn-sm ms-2 small fw-bold"
+                                                                    >
+                                                                        Mark Completed
+                                                                    </button>
+                                                                )}
+                                                                {order.deliveryStatus === 'Completed' && (
+                                                                    <div className="text-success small fw-bold ms-2 d-flex align-items-center gap-1">
+                                                                        <CheckCircle size={16} /> Delivered
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
-                                                        {order.status === 'Shipped' && (
-                                                            <button
-                                                                onClick={() => handleStatusChange(order._id, 'Completed')}
-                                                                className="btn btn-outline-success btn-sm ms-2"
-                                                            >
-                                                                Mark Completed
-                                                            </button>
-                                                        )}
-                                                        {order.status === 'Approved' && <CheckCircle size={18} className="text-success" />}
                                                     </td>
                                                 </tr>
                                             ))}
