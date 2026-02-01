@@ -137,11 +137,11 @@ export const AppProvider = ({ children }) => {
     };
 
     // --- ORDER ACTIONS ---
-    const submitOrderPrice = async (orderId, price) => {
+    const submitOrderPrice = async (orderId, price, estimatedDays) => {
         const res = await fetch(`${API_URL}/orders/${orderId}/price`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ price })
+            body: JSON.stringify({ price, estimatedDays })
         });
         if (res.ok) fetchData();
     };

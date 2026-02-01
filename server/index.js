@@ -443,7 +443,11 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
 
 // --- ORDER PRICE ROUTES ---
 app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
-    const { price } = req.body;
+    const { price, estimatedDays } = req.body;
+
+    if (estimatedDays && (estimatedDays < 1 || estimatedDays > 30)) {
+        return res.status(400).json({ message: "Estimated days must be between 1 and 30" });
+    }
 
     // Fetch commission rate from settings (default to 10%)
     const config = await AppSetting.findOne({ key: 'emblos_config' });
@@ -454,6 +458,7 @@ app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
 
     const order = await Order.findByIdAndUpdate(req.params.id, {
         price,
+        estimatedDays,
         priceGiven: true,
         status: 'Approved',
         adminCommission,
@@ -472,7 +477,13 @@ app.put('/api/orders/:id/approve-price', asyncHandler(async (req, res) => {
 app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
     const { creatorId, price, estimatedDays } = req.body;
     const updateData = { creatorId };
-    if (estimatedDays) updateData.estimatedDays = estimatedDays;
+
+    if (estimatedDays) {
+        if (estimatedDays < 1 || estimatedDays > 30) {
+            return res.status(400).json({ message: "Estimated days must be between 1 and 30" });
+        }
+        updateData.estimatedDays = estimatedDays;
+    }
 
     if (price) {
         updateData.price = price;
@@ -578,17 +589,17 @@ app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
     res.json({ message: 'Deleted' });
 }));
 
-app.delete('/api/orders/:id', asyncHandler(async (req, res) => {
-    await Order.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
-}));
-
 app.put('/api/orders/:id/status', asyncHandler(async (req, res) => {
     const { status, deliveryStatus, unassign, estimatedDays } = req.body;
     const updateData = {};
     if (status) updateData.status = status;
     if (deliveryStatus) updateData.deliveryStatus = deliveryStatus;
-    if (estimatedDays) updateData.estimatedDays = estimatedDays;
+    if (estimatedDays) {
+        if (estimatedDays < 1 || estimatedDays > 30) {
+            return res.status(400).json({ message: "Estimated days must be between 1 and 30" });
+        }
+        updateData.estimatedDays = estimatedDays;
+    }
     if (unassign) {
         updateData.creatorId = null;
         updateData.status = 'Pending Price';

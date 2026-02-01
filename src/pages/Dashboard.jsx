@@ -92,7 +92,13 @@ const Dashboard = () => {
     const handlePriceSubmit = async (orderId) => {
         const price = priceInput[orderId];
         if (!price) return;
-        await submitOrderPrice(orderId, price);
+
+        const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (1 - 30 ദിവസങ്ങൾക്കിടയിൽ നൽകുക)");
+        if (!days || isNaN(days) || Number(days) < 1 || Number(days) > 30) {
+            return alert("ദയവായി 1 മുതൽ 30 വരെയുള്ള ഒരു സംഖ്യ ദിവസമായി നൽകുക.");
+        }
+
+        await submitOrderPrice(orderId, price, Number(days));
         setPriceInput({ ...priceInput, [orderId]: '' });
     };
 
@@ -104,9 +110,9 @@ const Dashboard = () => {
             return alert("ദയവായി ഒരു സാധുവായ തുക നൽകുക.");
         }
 
-        const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (Ex: 5)");
-        if (!days || isNaN(days)) {
-            return alert("ദയവായി ദിവസങ്ങളുടെ എണ്ണം കൃത്യമായി നൽകുക.");
+        const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (1 - 30 ദിവസങ്ങൾക്കിടയിൽ നൽകുക)");
+        if (!days || isNaN(days) || Number(days) < 1 || Number(days) > 30) {
+            return alert("ദയവായി 1 മുതൽ 30 വരെയുള്ള ഒരു സംഖ്യ ദിവസമായി നൽകുക.");
         }
 
         const res = await claimOrder(orderId, price, days);
@@ -520,9 +526,14 @@ const Dashboard = () => {
                                                         {order.status === 'Approved' && !order.estimatedDays && (
                                                             <button
                                                                 onClick={async () => {
-                                                                    const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (Ex: 5)");
+                                                                    const days = window.prompt("എത്ര ദിവസം കൊണ്ട് ഈ വർക്ക് തീർത്തു നൽകാൻ സാധിക്കും? (1 - 30 ദിവസങ്ങൾക്കിടയിൽ നൽകുക)");
                                                                     if (days && !isNaN(days)) {
-                                                                        await updateOrderStatus(order._id, 'Approved', false, false, { estimatedDays: Number(days) });
+                                                                        const d = Number(days);
+                                                                        if (d >= 1 && d <= 30) {
+                                                                            await updateOrderStatus(order._id, 'Approved', false, false, { estimatedDays: d });
+                                                                        } else {
+                                                                            alert("ദയവായി 1 മുതൽ 30 വരെയുള്ള ഒരു സംഖ്യ ദിവസമായി നൽകുക.");
+                                                                        }
                                                                     }
                                                                 }}
                                                                 className="btn btn-warning btn-sm ms-2 small fw-bold"

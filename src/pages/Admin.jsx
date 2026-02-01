@@ -743,7 +743,15 @@ const Admin = () => {
                                                                                         return;
                                                                                     }
                                                                                     if (window.confirm(`Claim this order for ₹${price}? You will be responsible for fulfilling it.`)) {
-                                                                                        claimOrder(o._id, price);
+                                                                                        const days = window.prompt("How many days will it take to complete? (1 - 30)");
+                                                                                        if (days && !isNaN(days)) {
+                                                                                            const d = Number(days);
+                                                                                            if (d >= 1 && d <= 30) {
+                                                                                                claimOrder(o._id, price, d);
+                                                                                            } else {
+                                                                                                alert("Please enter a number between 1 and 30.");
+                                                                                            }
+                                                                                        }
                                                                                     }
                                                                                 }}
                                                                                 className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-glow"
