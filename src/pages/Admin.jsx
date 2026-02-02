@@ -719,13 +719,10 @@ const Admin = () => {
                                                                         {(isAdmin || user?.role === 'emblos') && (
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    const price = claimPrices[o._id];
-                                                                                    if (!price || price <= 0) {
-                                                                                        alert('Please enter a valid price before claiming.');
-                                                                                        return;
-                                                                                    }
-                                                                                    if (window.confirm(`Claim this order for ₹${price}? You will be responsible for fulfilling it.`)) {
-                                                                                        const days = window.prompt("How many days will it take to complete? (1 - 30)");
+                                                                                    const suggestedPrice = claimPrices[o._id] || "";
+                                                                                    const price = window.prompt("Claim Order: Enter your price (₹)", suggestedPrice);
+                                                                                    if (price && !isNaN(price)) {
+                                                                                        const days = window.prompt("Claim Order: How many days will it take? (1 - 30)");
                                                                                         if (days && !isNaN(days)) {
                                                                                             const d = Number(days);
                                                                                             if (d >= 1 && d <= 30) {
@@ -750,10 +747,12 @@ const Admin = () => {
                                                                                     style={{ width: '150px', fontSize: '0.7rem' }}
                                                                                     onChange={async (e) => {
                                                                                         if (e.target.value) {
-                                                                                            const price = claimPrices[o._id] || 0;
-                                                                                            const days = window.prompt("Force assign: How many days for this artist? (1 - 30)");
-                                                                                            if (days && !isNaN(days)) {
-                                                                                                await claimOrder(o._id, price, Number(days), e.target.value);
+                                                                                            const price = window.prompt("Force Assign: Enter Price (₹)", claimPrices[o._id] || "");
+                                                                                            if (price && !isNaN(price)) {
+                                                                                                const days = window.prompt("Force Assign: How many days for this artist? (1 - 30)");
+                                                                                                if (days && !isNaN(days)) {
+                                                                                                    await claimOrder(o._id, price, Number(days), e.target.value);
+                                                                                                }
                                                                                             }
                                                                                         }
                                                                                     }}
