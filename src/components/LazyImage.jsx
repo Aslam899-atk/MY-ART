@@ -34,9 +34,15 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
             className={`${className} position-relative ${!isLoaded ? 'skeleton' : ''}`}
             style={{
                 ...style,
-                backgroundColor: 'rgba(255,255,255,0.05)',
+                backgroundColor: isLoaded ? 'transparent' : 'rgba(255,255,255,0.05)',
+                transition: 'background-color 0.4s ease-out',
                 overflow: 'hidden',
-                aspectRatio: props.aspectRatio || 'unset'
+                aspectRatio: props.aspectRatio || 'unset',
+                // Anti-flicker
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+                WebkitTransform: 'translateZ(0)'
             }}
             onClick={onClick}
         >
@@ -48,7 +54,13 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                     style={{
                         objectFit: 'cover',
                         opacity: isLoaded ? 1 : 0,
-                        transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'opacity 0.4s ease-out',
+                        // Anti-flicker for images
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                        transform: 'translate3d(0, 0, 0)',
+                        WebkitTransform: 'translate3d(0, 0, 0)',
+                        imageRendering: '-webkit-optimize-contrast',
                         ...style
                     }}
                     onLoad={() => setIsLoaded(true)}
