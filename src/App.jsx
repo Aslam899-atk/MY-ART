@@ -6,16 +6,17 @@ import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoginPopup from './components/LoginPopup';
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
-import Login from './pages/Login';
-import Admin from './pages/Admin';
-import RequestAccess from './pages/RequestAccess';
-import Dashboard from './pages/Dashboard';
-import UserOrders from './pages/UserOrders';
-import SupabaseHelp from './pages/SupabaseHelp';
+// Lazy load pages for better performance
+const Home = React.lazy(() => import('./pages/Home'));
+const Shop = React.lazy(() => import('./pages/Shop'));
+const Gallery = React.lazy(() => import('./pages/Gallery'));
+const Contact = React.lazy(() => import('./pages/Contact'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+const RequestAccess = React.lazy(() => import('./pages/RequestAccess'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const UserOrders = React.lazy(() => import('./pages/UserOrders'));
+const SupabaseHelp = React.lazy(() => import('./pages/SupabaseHelp'));
 
 
 const MeshBackground = () => (
@@ -92,20 +93,22 @@ function AppContent() {
 
       <LoginPopup />
       <Navbar />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-          <Route path="/shop" element={<PageWrapper><Shop /></PageWrapper>} />
-          <Route path="/gallery" element={<PageWrapper><Gallery /></PageWrapper>} />
-          <Route path="/galleryView" element={<PageWrapper><Gallery /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
-          <Route path="/request-access" element={<PageWrapper><RequestAccess /></PageWrapper>} />
-          <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-          <Route path="/orders" element={<PageWrapper><UserOrders /></PageWrapper>} />
-        </Routes>
-      </AnimatePresence>
+      <React.Suspense fallback={<Preloader />}>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+            <Route path="/shop" element={<PageWrapper><Shop /></PageWrapper>} />
+            <Route path="/gallery" element={<PageWrapper><Gallery /></PageWrapper>} />
+            <Route path="/galleryView" element={<PageWrapper><Gallery /></PageWrapper>} />
+            <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+            <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
+            <Route path="/request-access" element={<PageWrapper><RequestAccess /></PageWrapper>} />
+            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+            <Route path="/orders" element={<PageWrapper><UserOrders /></PageWrapper>} />
+          </Routes>
+        </AnimatePresence>
+      </React.Suspense>
       <Footer />
     </div>
   );
