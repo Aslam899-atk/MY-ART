@@ -94,15 +94,15 @@ const Home = () => {
                                 </div>
                             </Motion.div>
                         </div>
-                        <div className="col-lg-5 d-none d-lg-block">
+                        <div className="col-lg-5">
                             <Motion.div
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 1, delay: 0.2 }}
-                                className="position-relative"
+                                className="position-relative mt-5 mt-lg-0"
                             >
                                 <div id="heroCarousel" className="carousel slide carousel-fade" data-bs-ride="carousel">
-                                    <div className="carousel-inner glass rounded-4 p-2 border-0 rotate-3 shadow-2xl overflow-hidden">
+                                    <div className="carousel-inner glass rounded-4 p-2 border-0 shadow-2xl overflow-hidden" style={{ transform: window.innerWidth > 991 ? 'rotate(3deg)' : 'none' }}>
                                         {(featuredGallery.length > 0 ? featuredGallery : projects).map((item, index) => (
                                             <div
                                                 key={index}
@@ -115,9 +115,9 @@ const Home = () => {
                                                     src={item.url || item.image}
                                                     className="d-block w-100 rounded-4"
                                                     alt={item.title}
-                                                    style={{ height: '400px' }}
+                                                    style={{ height: window.innerWidth < 768 ? '300px' : '400px' }}
                                                 />
-                                                <div className="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
+                                                <div className="carousel-caption d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
                                                     <div className="d-flex align-items-center gap-2 mb-1 justify-content-center">
                                                         <Sparkles size={14} className="text-primary" />
                                                         <span className="extra-small fw-bold text-uppercase tracking-widest">Featured Collection</span>
@@ -137,7 +137,13 @@ const Home = () => {
                                     </button>
                                 </div>
 
-                                <div className="position-absolute -bottom-10 -start-10 glass p-3 rounded-4 border-0 -rotate-6 shadow-xl" style={{ zIndex: 10 }}>
+                                <div className="position-absolute glass p-3 rounded-4 border-0 shadow-xl d-none d-sm-block"
+                                    style={{
+                                        zIndex: 10,
+                                        bottom: '-20px',
+                                        left: '-20px',
+                                        transform: window.innerWidth > 991 ? 'rotate(-6deg)' : 'none'
+                                    }}>
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bg-success rounded-circle animate-pulse" style={{ width: 12, height: 12 }}></div>
                                         <span className="small fw-bold">Accepting Orders Worldwide</span>

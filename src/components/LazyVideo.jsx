@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const LazyVideo = ({ src, className, style, ...props }) => {
     const [isInView, setIsInView] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -13,7 +14,7 @@ const LazyVideo = ({ src, className, style, ...props }) => {
                 }
             },
             {
-                rootMargin: '100px', // Start loading 100px before it enters viewport
+                rootMargin: '100px',
             }
         );
 
@@ -29,7 +30,7 @@ const LazyVideo = ({ src, className, style, ...props }) => {
     return (
         <div
             ref={videoRef}
-            className={`${className} position-relative skeleton`}
+            className={`${className} position-relative ${!isLoaded ? 'skeleton' : ''}`}
             style={{
                 ...style,
                 backgroundColor: 'rgba(255,255,255,0.05)',
@@ -40,17 +41,16 @@ const LazyVideo = ({ src, className, style, ...props }) => {
                 <video
                     src={src}
                     className="w-100 h-100"
+                    onLoadedData={() => setIsLoaded(true)}
                     style={{
                         objectFit: 'cover',
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 0.8s ease',
                         ...style
                     }}
                     {...props}
                 />
-            ) : (
-                <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                    {/* Optional: Add a play icon or placeholder */}
-                </div>
-            )}
+            ) : null}
         </div>
     );
 };

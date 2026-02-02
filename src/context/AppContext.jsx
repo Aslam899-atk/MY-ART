@@ -40,9 +40,9 @@ export const AppProvider = ({ children }) => {
         : 'https://my-art-void-server.onrender.com/api';
 
     // --- FETCH DATA ---
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (isSilent = false) => {
         try {
-            setIsLoadingData(true);
+            if (!isSilent) setIsLoadingData(true);
             const canSeeAll = isAdmin || (user && user.role === 'emblos');
             const query = canSeeAll ? '?all=true' : '';
 
@@ -67,7 +67,7 @@ export const AppProvider = ({ children }) => {
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
-            setIsLoadingData(false);
+            if (!isSilent) setIsLoadingData(false);
         }
     }, [API_URL, isAdmin, user]);
 
@@ -417,7 +417,7 @@ export const AppProvider = ({ children }) => {
         const intervalTime = isAdmin ? 8000 : 15000;
         const interval = setInterval(() => {
             if (document.visibilityState === 'visible') {
-                fetchData();
+                fetchData(true);
             }
         }, intervalTime);
         return () => clearInterval(interval);

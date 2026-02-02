@@ -47,19 +47,19 @@ const UserOrders = () => {
                 {myOrders.map(order => (
                     <div key={order._id} className="col-12 col-md-6">
                         <div className="glass p-4 rounded-4 border border-white border-opacity-10 h-100 shadow-lg group">
-                            <div className="d-flex gap-4">
+                            <div className="d-flex flex-column flex-sm-row gap-4">
                                 {order.image ? (
                                     <img
                                         src={order.image}
                                         className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
-                                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                                        style={{ width: window.innerWidth < 576 ? '100%' : '120px', height: '120px', objectFit: 'cover' }}
                                         alt=""
                                         onClick={() => setSelectedOrder(order)}
                                     />
                                 ) : (
                                     <div
                                         className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer transition-all hover-scale"
-                                        style={{ width: '120px', height: '120px' }}
+                                        style={{ width: window.innerWidth < 576 ? '100%' : '120px', height: '120px' }}
                                         onClick={() => setSelectedOrder(order)}
                                     >
                                         <ShoppingBag size={32} className="opacity-20" />

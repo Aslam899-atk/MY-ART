@@ -31,7 +31,7 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
     return (
         <div
             ref={imgRef}
-            className={`${className} position-relative skeleton`}
+            className={`${className} position-relative ${!isLoaded ? 'skeleton' : ''}`}
             style={{
                 ...style,
                 backgroundColor: 'rgba(255,255,255,0.05)',
