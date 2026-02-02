@@ -128,7 +128,7 @@ const Shop = () => {
                                     <LazyImage
                                         src={product.image}
                                         alt={product.name}
-                                        className="w-100 h-100 transition-all hover-zoom"
+                                        className="w-100 h-100"
                                         onClick={() => { setSelectedProduct(product); setShowPreview(true); }}
                                         style={{ objectFit: 'cover', cursor: 'pointer' }}
                                     />

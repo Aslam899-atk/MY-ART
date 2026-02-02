@@ -115,7 +115,10 @@ const Home = () => {
                                                     src={item.url || item.image}
                                                     className="d-block w-100 rounded-4"
                                                     alt={item.title}
-                                                    style={{ height: window.innerWidth < 768 ? '300px' : '400px' }}
+                                                    style={{
+                                                        height: window.innerWidth < 768 ? '300px' : '400px',
+                                                        objectFit: 'cover'
+                                                    }}
                                                 />
                                                 <div className="carousel-caption d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
                                                     <div className="d-flex align-items-center gap-2 mb-1 justify-content-center">

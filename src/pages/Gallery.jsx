@@ -128,7 +128,7 @@ const Gallery = () => {
                                         <LazyImage
                                             src={item.url}
                                             alt={item.title || 'Artwork'}
-                                            className="w-100 h-100 transition-transform duration-700 hover-zoom"
+                                            className="w-100 h-100"
                                             style={{ objectFit: 'cover' }}
                                         />
                                     )}

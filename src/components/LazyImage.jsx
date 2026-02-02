@@ -36,7 +36,13 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                 ...style,
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 overflow: 'hidden',
-                aspectRatio: props.aspectRatio || 'unset'
+                aspectRatio: props.aspectRatio || 'unset',
+                // Anti-flicker optimizations
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+                WebkitTransform: 'translateZ(0)',
+                willChange: 'transform'
             }}
             onClick={onClick}
         >
@@ -48,7 +54,14 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                     style={{
                         objectFit: 'cover',
                         opacity: isLoaded ? 1 : 0,
-                        transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'opacity 0.5s ease-out',
+                        // Anti-flicker for images
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                        transform: 'translate3d(0, 0, 0)',
+                        WebkitTransform: 'translate3d(0, 0, 0)',
+                        imageRendering: '-webkit-optimize-contrast',
+                        willChange: 'opacity',
                         ...style
                     }}
                     onLoad={() => setIsLoaded(true)}
