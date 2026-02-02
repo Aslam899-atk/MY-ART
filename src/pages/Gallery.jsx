@@ -3,6 +3,7 @@ import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import LazyVideo from '../components/LazyVideo';
 import ItemPreview from '../components/ItemPreview';
+import Preloader from '../components/Preloader';
 import { Heart, Search, Share2, ZoomIn, X, Play, Filter, MessageSquare, Send } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -28,7 +29,10 @@ const Gallery = () => {
         );
     });
 
-
+    // Initial load preloader - wait for first data fetch
+    if (isLoadingData && galleryItems.length === 0) {
+        return <Preloader />;
+    }
 
     return (
         <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
@@ -96,98 +100,89 @@ const Gallery = () => {
             {/* Gallery Grid */}
             <div className="row g-4">
                 <AnimatePresence mode="popLayout">
-                    {isLoadingData ? (
-                        // Skeleton Loader
-                        [...Array(6)].map((_, i) => (
-                            <div key={`skel-${i}`} className="col-12 col-md-6 col-lg-4">
-                                <div className="glass border-0 rounded-4 overflow-hidden skeleton" style={{ height: '400px' }}></div>
-                            </div>
-                        ))
-                    ) : (
-                        filteredItems.map((item) => (
-                            <div key={item._id || item.id} className="col-12 col-md-6 col-lg-4">
-                                <Motion.div
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    transition={{ duration: 0.4 }}
-                                    className="glass border-0 rounded-4 overflow-hidden position-relative group shadow-lg"
-                                    style={{ height: '400px' }}
-                                >
-                                    {item.type === 'video' ? (
-                                        <LazyVideo
-                                            src={item.url}
-                                            className="w-100 h-100"
-                                            muted
-                                            loop
-                                            autoPlay
-                                            playsInline
-                                        />
-                                    ) : (
-                                        <LazyImage
-                                            src={item.url}
-                                            alt={item.title || 'Artwork'}
-                                            className="w-100 h-100 hover-zoom"
-                                            style={{ objectFit: 'cover' }}
-                                        />
-                                    )}
+                    {filteredItems.map((item) => (
+                        <div key={item._id || item.id} className="col-12 col-md-6 col-lg-4">
+                            <Motion.div
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.4 }}
+                                className="glass border-0 rounded-4 overflow-hidden position-relative group shadow-lg"
+                                style={{ height: '400px' }}
+                            >
+                                {item.type === 'video' ? (
+                                    <LazyVideo
+                                        src={item.url}
+                                        className="w-100 h-100"
+                                        muted
+                                        loop
+                                        autoPlay
+                                        playsInline
+                                    />
+                                ) : (
+                                    <LazyImage
+                                        src={item.url}
+                                        alt={item.title || 'Artwork'}
+                                        className="w-100 h-100 hover-zoom"
+                                        style={{ objectFit: 'cover' }}
+                                    />
+                                )}
 
-                                    {/* Overlay Label */}
-                                    <div className="position-absolute top-0 start-0 m-3 px-3 py-1 glass rounded-pill small fw-bold text-white opacity-75">
-                                        {item.category || 'Artwork'}
-                                    </div>
+                                {/* Overlay Label */}
+                                <div className="position-absolute top-0 start-0 m-3 px-3 py-1 glass rounded-pill small fw-bold text-white opacity-75">
+                                    {item.category || 'Artwork'}
+                                </div>
 
-                                    {/* Actions Overlay */}
-                                    <div className="position-absolute bottom-0 start-0 w-100 p-4 d-flex justify-content-between align-items-end"
-                                        style={{ background: 'linear-gradient(to top, rgba(7, 11, 20, 0.9), transparent)' }}>
-                                        <div className="text-start">
-                                            <h5 className="fw-bold mb-1">{item.title || 'Untitled Masterpiece'}</h5>
-                                            <div className="d-flex gap-2">
-                                                <span className="small text-primary fw-bold">{item.medium || 'Handcrafted'}</span>
-                                            </div>
-                                        </div>
-
+                                {/* Actions Overlay */}
+                                <div className="position-absolute bottom-0 start-0 w-100 p-4 d-flex justify-content-between align-items-end"
+                                    style={{ background: 'linear-gradient(to top, rgba(7, 11, 20, 0.9), transparent)' }}>
+                                    <div className="text-start">
+                                        <h5 className="fw-bold mb-1">{item.title || 'Untitled Masterpiece'}</h5>
                                         <div className="d-flex gap-2">
-                                            <button
-                                                onClick={() => toggleGalleryLike(item._id || item.id)}
-                                                className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
-                                            >
-                                                <Heart size={18} fill={likedIds.includes(item._id || item.id) ? "var(--primary)" : "none"} className={likedIds.includes(item._id || item.id) ? "text-primary border-0" : ""} />
-                                            </button>
-                                            <button
-                                                onClick={() => { setSelectedItem(item); setShowComments(true); }}
-                                                className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
-                                            >
-                                                <MessageSquare size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    if (navigator.share) {
-                                                        navigator.share({ title: item.title, url: window.location.href });
-                                                    } else {
-                                                        alert('Link copied!');
-                                                        navigator.clipboard.writeText(window.location.href);
-                                                    }
-                                                }}
-                                                className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
-                                            >
-                                                <Share2 size={18} />
-                                            </button>
+                                            <span className="small text-primary fw-bold">{item.medium || 'Handcrafted'}</span>
                                         </div>
                                     </div>
 
-                                    {item.type === 'video' && (
-                                        <div className="position-absolute top-50 start-50 translate-middle pointer-events-none group-hover-opacity-0 transition-all">
-                                            <div className="glass rounded-circle p-3">
-                                                <Play fill="white" className="text-white" size={24} />
-                                            </div>
+                                    <div className="d-flex gap-2">
+                                        <button
+                                            onClick={() => toggleGalleryLike(item._id || item.id)}
+                                            className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
+                                        >
+                                            <Heart size={18} fill={likedIds.includes(item._id || item.id) ? "var(--primary)" : "none"} className={likedIds.includes(item._id || item.id) ? "text-primary border-0" : ""} />
+                                        </button>
+                                        <button
+                                            onClick={() => { setSelectedItem(item); setShowComments(true); }}
+                                            className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
+                                        >
+                                            <MessageSquare size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (navigator.share) {
+                                                    navigator.share({ title: item.title, url: window.location.href });
+                                                } else {
+                                                    alert('Link copied!');
+                                                    navigator.clipboard.writeText(window.location.href);
+                                                }
+                                            }}
+                                            className="btn p-2 rounded-circle glass text-white border-0 shadow-sm"
+                                        >
+                                            <Share2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {item.type === 'video' && (
+                                    <div className="position-absolute top-50 start-50 translate-middle pointer-events-none group-hover-opacity-0 transition-all">
+                                        <div className="glass rounded-circle p-3">
+                                            <Play fill="white" className="text-white" size={24} />
                                         </div>
-                                    )}
-                                </Motion.div>
-                            </div>
-                        ))
-                    )}
+                                    </div>
+                                )}
+                            </Motion.div>
+                        </div>
+                    ))}
                 </AnimatePresence>
             </div>
 

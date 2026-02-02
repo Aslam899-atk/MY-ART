@@ -745,6 +745,71 @@ video {
   outline: none;
 }
 
+/* ============================================================
+   ULTRA-STABLE ANTI-FLICKER & BLINK PROTECTION
+   ============================================================ */
+
+/* 1. Global Media Stability */
+img,
+video,
+.view-item-media {
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  transform: translate3d(0, 0, 0) !important;
+  -webkit-transform: translate3d(0, 0, 0) !important;
+  perspective: 1000px !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  will-change: opacity, transform !important;
+}
+
+/* 2. Prevent Layout Shift Blinking */
+.glass,
+.card,
+.carousel-item {
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+  contain: paint !important;
+  /* Performance & Stability */
+}
+
+/* 3. Skeleton to Image Transition Fix */
+.skeleton {
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  z-index: 1 !important;
+}
+
+/* 4. Motion/Animation Flicker Prevention */
+[class*="motion"],
+.animate-fade-in {
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+}
+
+/* 5. Specific Carousel Fix */
+.carousel-inner {
+  overflow: visible !important;
+  /* Prevents clipping flickers */
+}
+
+.carousel-fade .carousel-item {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 0.6s;
+  transition-timing-function: ease-in-out;
+}
+
+.carousel-fade .carousel-item.active {
+  opacity: 1;
+}
+
+/* 6. Disable aggressive hover filters that cause GPU lag/blink */
+.hover-zoom:hover {
+  transform: scale(1.03) translateZ(0) !important;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
 @keyframes blink {
   0% {
     opacity: 1;

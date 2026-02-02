@@ -54,7 +54,7 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                     style={{
                         objectFit: 'cover',
                         opacity: isLoaded ? 1 : 0,
-                        transition: 'opacity 0.4s ease-out',
+                        transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                         // Anti-flicker for images
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
