@@ -46,16 +46,17 @@ html {
 /* Skeleton Animation */
 @keyframes skeleton-loading {
   0% {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   100% {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.12);
   }
 }
 
 .skeleton {
-  animation: skeleton-loading 1.5s linear infinite alternate;
+  animation: skeleton-loading 1s linear infinite alternate;
+  border-radius: 20px;
 }
 
 /* Mesh Background Animation */

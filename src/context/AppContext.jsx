@@ -29,6 +29,7 @@ export const AppProvider = ({ children }) => {
     }, [user]);
 
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+    const [isLoadingData, setIsLoadingData] = useState(true);
     const [isAdmin, setIsAdmin] = useState(() => {
         return localStorage.getItem('art_admin_active') === 'true';
     });
@@ -41,6 +42,7 @@ export const AppProvider = ({ children }) => {
     // --- FETCH DATA ---
     const fetchData = useCallback(async () => {
         try {
+            setIsLoadingData(true);
             const canSeeAll = isAdmin || (user && user.role === 'emblos');
             const query = canSeeAll ? '?all=true' : '';
 
@@ -64,6 +66,8 @@ export const AppProvider = ({ children }) => {
             setAppSettings(prev => ({ ...prev, emblos_config: configData.value }));
         } catch (error) {
             console.error("Error fetching data:", error);
+        } finally {
+            setIsLoadingData(false);
         }
     }, [API_URL, isAdmin, user]);
 
@@ -563,7 +567,7 @@ export const AppProvider = ({ children }) => {
             users, requestEmblosAccess, updateEmblosStatus, deleteUserByEmail,
             appSettings, updateAppSetting,
             isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
-            loginWithGoogle, isLoadingAuth,
+            loginWithGoogle, isLoadingAuth, isLoadingData,
             user, loginUser, registerUser, logoutUser
         }}>
             {children}
