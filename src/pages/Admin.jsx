@@ -715,26 +715,8 @@ const Admin = () => {
                                                             ) : (
                                                                 <>
                                                                     <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1 fw-bold" style={{ width: 'fit-content', fontSize: '0.65rem' }}>OPEN REQUEST</span>
-                                                                    {isAdmin ? (
-                                                                        <select
-                                                                            className="form-select form-select-sm glass border-0 text-primary fw-bold"
-                                                                            style={{ width: '150px', fontSize: '0.7rem' }}
-                                                                            onChange={async (e) => {
-                                                                                if (e.target.value) {
-                                                                                    await claimOrder(o._id, null, e.target.value);
-                                                                                }
-                                                                            }}
-                                                                            defaultValue=""
-                                                                        >
-                                                                            <option value="" className="bg-dark">Assign Artist...</option>
-                                                                            {users.filter(u => u.role === 'emblos').map(artist => (
-                                                                                <option key={artist._id} value={artist._id} className="bg-dark">
-                                                                                    {artist.username}
-                                                                                </option>
-                                                                            ))}
-                                                                        </select>
-                                                                    ) : (
-                                                                        (isAdmin || user?.role === 'emblos') && (
+                                                                    <div className="d-flex flex-column gap-2">
+                                                                        {(isAdmin || user?.role === 'emblos') && (
                                                                             <button
                                                                                 onClick={() => {
                                                                                     const price = claimPrices[o._id];
@@ -758,8 +740,35 @@ const Admin = () => {
                                                                             >
                                                                                 Claim Order
                                                                             </button>
-                                                                        )
-                                                                    )}
+                                                                        )}
+
+                                                                        {isAdmin && (
+                                                                            <div className="mt-2 border-top border-secondary border-opacity-10 pt-2">
+                                                                                <div className="extra-small text-muted mb-1">Admin: Force Assign</div>
+                                                                                <select
+                                                                                    className="form-select form-select-sm glass border-0 text-primary fw-bold"
+                                                                                    style={{ width: '150px', fontSize: '0.7rem' }}
+                                                                                    onChange={async (e) => {
+                                                                                        if (e.target.value) {
+                                                                                            const price = claimPrices[o._id] || 0;
+                                                                                            const days = window.prompt("Force assign: How many days for this artist? (1 - 30)");
+                                                                                            if (days && !isNaN(days)) {
+                                                                                                await claimOrder(o._id, price, Number(days), e.target.value);
+                                                                                            }
+                                                                                        }
+                                                                                    }}
+                                                                                    defaultValue=""
+                                                                                >
+                                                                                    <option value="" className="bg-dark">Select Artist...</option>
+                                                                                    {users.filter(u => u.role === 'emblos').map(artist => (
+                                                                                        <option key={artist._id} value={artist._id} className="bg-dark">
+                                                                                            {artist.username}
+                                                                                        </option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </>
                                                             )}
                                                         </div>
