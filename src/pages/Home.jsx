@@ -166,7 +166,7 @@ const Home = () => {
                                     <div className="row g-0 h-100">
                                         <div className={project.featured ? "col-lg-7" : "col-12"}>
                                             <div className="position-relative h-100" style={{ minHeight: '300px' }}>
-                                                <img src={project.image} alt={project.title} className="w-100 h-100 object-fit-cover transition-all duration-700 group-hover-scale" />
+                                                <img src={project.image} alt={project.title} loading="lazy" className="w-100 h-100 object-fit-cover transition-all duration-700 group-hover-scale" />
                                                 <div className="position-absolute top-0 start-0 m-4">
                                                     <span className="glass px-3 py-1 rounded-pill small fw-bold text-white border-0">{project.category}</span>
                                                 </div>
@@ -201,7 +201,7 @@ const Home = () => {
                 <div className="container text-center">
                     <header className="mb-10 mx-auto" style={{ maxWidth: '600px' }}>
                         <h2 className="display-4 fw-bold mb-4">Artistic <span className="text-gradient">Mediums</span></h2>
-                        <p className="text-muted">Specialized techniques honed to bring imagination to life on paper and canvas.</p>
+                        <p className="text-white-50">Specialized techniques honed to bring imagination to life on paper and canvas.</p>
                     </header>
 
                     <div className="row g-4">
@@ -215,7 +215,7 @@ const Home = () => {
                                     <h4 className="fw-bold mb-3">{skill.name}</h4>
                                     <div className="d-flex flex-wrap gap-2 justify-content-center">
                                         {skill.tech.map(t => (
-                                            <span key={t} className="small opacity-50 fw-semibold">{t}</span>
+                                            <span key={t} className="small opacity-75 fw-semibold">{t}</span>
                                         ))}
                                     </div>
                                 </Motion.div>
@@ -230,7 +230,7 @@ const Home = () => {
                 <div className="container">
                     <header className="mb-8 text-center">
                         <h2 className="display-4 fw-bold mb-4">Common <span className="text-gradient">Inquiries</span></h2>
-                        <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>Everything you need to know about our process, services, and handcrafted art.</p>
+                        <p className="text-white-50 mx-auto" style={{ maxWidth: '600px' }}>Everything you need to know about our process, services, and handcrafted art.</p>
                     </header>
 
                     <div className="accordion accordion-flush glass p-2 rounded-5 border-0 overflow-hidden shadow-2xl mx-auto" id="faqAccordion" style={{ maxWidth: '800px' }}>
@@ -281,21 +281,21 @@ const Home = () => {
                         <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
                             <div className="col-lg-8">
                                 <h2 className="display-5 fw-bold mb-4">Commission your next <span className="text-gradient">Masterpiece</span>.</h2>
-                                <p className="lead text-muted mb-5">Whether it is a detailed portrait, a landscape, or a custom painting, we are dedicated to providing art that resonates with your soul.</p>
+                                <p className="lead text-white-75 mb-5">Whether it is a detailed portrait, a landscape, or a custom painting, we are dedicated to providing art that resonates with your soul.</p>
                                 <div className="d-flex flex-wrap gap-4">
                                     <Link to="/contact" className="btn btn-primary rounded-pill px-5 py-3 fw-bold border-0 shadow-glow">
                                         Send an Inquiry
                                     </Link>
                                     <div className="d-flex gap-3 align-items-center">
-                                        <a href="https://t.me/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Telegram"><Send size={24} /></a>
-                                        <a href="https://www.instagram.com/aslamtk35" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Instagram"><Instagram size={24} /></a>
-                                        <a href="mailto:aslamtk35@gmail.com" className="text-white opacity-50 hover-opacity-100 transition-all" aria-label="Email"><Mail size={24} /></a>
+                                        <a href="https://t.me/aslamtk35" className="text-white opacity-75 hover-opacity-100 transition-all" aria-label="Telegram"><Send size={24} /></a>
+                                        <a href="https://www.instagram.com/aslamtk35" className="text-white opacity-75 hover-opacity-100 transition-all" aria-label="Instagram"><Instagram size={24} /></a>
+                                        <a href="mailto:aslamtk35@gmail.com" className="text-white opacity-75 hover-opacity-100 transition-all" aria-label="Email"><Mail size={24} /></a>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-lg-4 text-center mt-5 mt-lg-0">
                                 <div className="display-1 fw-bold text-primary mb-0">50+</div>
-                                <div className="h5 fw-bold text-uppercase opacity-50 tracking-widest">Global Clients</div>
+                                <div className="h5 fw-bold text-uppercase opacity-75 tracking-widest">Global Clients</div>
                             </div>
                         </div>
                     </div>

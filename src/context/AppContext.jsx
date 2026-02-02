@@ -409,9 +409,15 @@ export const AppProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const interval = setInterval(fetchData, 5000);
+        // Only poll if tab is active
+        const intervalTime = isAdmin ? 8000 : 15000;
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchData();
+            }
+        }, intervalTime);
         return () => clearInterval(interval);
-    }, [fetchData]);
+    }, [fetchData, isAdmin]);
 
     // --- AUTH LISTENER FOR SUPABASE ---
     useEffect(() => {
