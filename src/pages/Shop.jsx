@@ -15,6 +15,22 @@ const Shop = () => {
     const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', email: '' });
     const [isSuccess, setIsSuccess] = useState(false);
 
+    // Auto-fill form if user is logged in
+    React.useEffect(() => {
+        if (user) {
+            setOrderForm(prev => ({
+                ...prev,
+                name: user.name || user.username || '',
+                email: user.email || ''
+            }));
+            setInquiryForm(prev => ({
+                ...prev,
+                name: user.name || user.username || '',
+                email: user.email || ''
+            }));
+        }
+    }, [user]);
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredProducts = products.filter(product => {

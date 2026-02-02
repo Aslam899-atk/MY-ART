@@ -6,8 +6,19 @@ import { motion as Motion } from 'framer-motion';
 const Contact = () => {
     const msgType = 'service'; // Always 'service' now
     const [formData, setFormData] = useState({ name: '', email: '', image: '', phone: '', address: '' });
-    const { addMessage, addOrder } = useContext(AppContext);
+    const { addMessage, addOrder, user } = useContext(AppContext);
     const [submitted, setSubmitted] = useState(false);
+
+    // Auto-fill form if user is logged in
+    React.useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || user.username || '',
+                email: user.email || ''
+            }));
+        }
+    }, [user]);
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
