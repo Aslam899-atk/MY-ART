@@ -277,17 +277,11 @@ a {
 }
 
 .hover-zoom {
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  will-change: transform;
+  transition: transform 0.5s ease;
 }
 
 .hover-zoom:hover {
-  transform: scale(1.05) translateZ(0);
-  -webkit-transform: scale(1.05) translateZ(0);
+  transform: scale(1.1);
 }
 
 /* Portfolio Utilities & Brutal Polish */
@@ -743,82 +737,4 @@ video {
 
 .blink {
   animation: blink 2s infinite;
-}
-
-/* ========================================
-   ANTI-FLICKER & BLINK FIX - COMPREHENSIVE
-   ======================================== */
-
-/* Carousel Anti-Flicker */
-.carousel-item,
-.carousel-item img,
-.carousel-item video {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  will-change: opacity;
-}
-
-.carousel-fade .carousel-item {
-  opacity: 0;
-  transition: opacity 0.6s ease-in-out;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.carousel-fade .carousel-item.active {
-  opacity: 1;
-}
-
-/* Gallery & Shop Card Anti-Flicker */
-.glass img,
-.glass video,
-.card img,
-.card video {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  image-rendering: -webkit-optimize-contrast;
-}
-
-/* Prevent flicker on hover */
-.glass:hover img,
-.glass:hover video {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Motion/Animation Anti-Flicker */
-[class*="Motion"],
-[class*="motion"],
-.animate-fade-in {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-/* Skeleton Loader Stability */
-.skeleton {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-/* Bootstrap Carousel Override for Stability */
-.carousel-inner {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Prevent layout shift during image load */
-img[loading="lazy"],
-video[loading="lazy"] {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }

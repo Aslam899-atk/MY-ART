@@ -34,13 +34,7 @@ const LazyVideo = ({ src, className, style, ...props }) => {
             style={{
                 ...style,
                 backgroundColor: 'rgba(255,255,255,0.05)',
-                overflow: 'hidden',
-                // Anti-flicker optimizations
-                backfaceVisibility: 'hidden',
-                WebkitBackfaceVisibility: 'hidden',
-                transform: 'translateZ(0)',
-                WebkitTransform: 'translateZ(0)',
-                willChange: 'transform'
+                overflow: 'hidden'
             }}
         >
             {isInView ? (
@@ -51,13 +45,7 @@ const LazyVideo = ({ src, className, style, ...props }) => {
                     style={{
                         objectFit: 'cover',
                         opacity: isLoaded ? 1 : 0,
-                        transition: 'opacity 0.5s ease-out',
-                        // Anti-flicker for videos
-                        backfaceVisibility: 'hidden',
-                        WebkitBackfaceVisibility: 'hidden',
-                        transform: 'translate3d(0, 0, 0)',
-                        WebkitTransform: 'translate3d(0, 0, 0)',
-                        willChange: 'opacity',
+                        transition: 'opacity 0.8s ease',
                         ...style
                     }}
                     {...props}
