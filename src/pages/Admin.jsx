@@ -61,13 +61,17 @@ const Admin = () => {
 
     const { deleteUserByEmail, appSettings, updateAppSetting } = useContext(AppContext);
 
+    // Flag to track if we should sync settings from global state
+    const [isConfigSynced, setIsConfigSynced] = useState(false);
+
     useEffect(() => {
-        if (appSettings.emblos_config) {
+        if (appSettings.emblos_config && !isConfigSynced && !isUpdatingConfig) {
             setEmblosRate(appSettings.emblos_config.monthlyFee || '');
             setCommissionRate(appSettings.emblos_config.commissionRate || '10');
             setEmblosRules(appSettings.emblos_config.rules?.join('\n') || '');
+            setIsConfigSynced(true);
         }
-    }, [appSettings.emblos_config]);
+    }, [appSettings.emblos_config, isConfigSynced, isUpdatingConfig]);
 
     const navigate = useNavigate();
 
@@ -391,13 +395,19 @@ const Admin = () => {
         e.preventDefault();
         setIsUpdatingConfig(true);
         const rulesArray = emblosRules.split('\n').filter(r => r.trim());
-        await updateAppSetting('emblos_config', {
+        const result = await updateAppSetting('emblos_config', {
             monthlyFee: emblosRate,
             commissionRate: commissionRate,
             rules: rulesArray
         });
         setIsUpdatingConfig(false);
-        alert('Configuration Updated Successfully!');
+
+        if (result?.success) {
+            alert('Configuration Updated Successfully!');
+            setIsConfigSynced(false); // Allow resync if needed
+        } else {
+            alert('Failed to update configuration. Please try again.');
+        }
     };
 
     return (
