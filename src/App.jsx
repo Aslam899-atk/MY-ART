@@ -50,8 +50,8 @@ function AppContent() {
 
       const promises = [];
 
-      // 2. Minimum display time for smoothness (1.5s)
-      promises.push(new Promise(resolve => setTimeout(resolve, 1500)));
+      // 2. Minimum display time for smoothness (600ms)
+      promises.push(new Promise(resolve => setTimeout(resolve, 600)));
 
       // 3. Preload Home Banner
       const bannerUrl = `${import.meta.env.BASE_URL}banner.png`;

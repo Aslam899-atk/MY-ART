@@ -3,6 +3,7 @@ import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Mail, Sparkles, Send, ChevronRight, Palette, Instagram, Code2, PenTool, Brush } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';
 
 const Home = () => {
@@ -110,11 +111,11 @@ const Home = () => {
                                                 onClick={() => setSelectedItem(item)}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <img
+                                                <LazyImage
                                                     src={item.url || item.image}
                                                     className="d-block w-100 rounded-4"
                                                     alt={item.title}
-                                                    style={{ objectFit: 'cover', height: '400px' }}
+                                                    style={{ height: '400px' }}
                                                 />
                                                 <div className="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-4 p-3 mb-2 mx-2">
                                                     <div className="d-flex align-items-center gap-2 mb-1 justify-content-center">
@@ -166,7 +167,7 @@ const Home = () => {
                                     <div className="row g-0 h-100">
                                         <div className={project.featured ? "col-lg-7" : "col-12"}>
                                             <div className="position-relative h-100" style={{ minHeight: '300px' }}>
-                                                <img src={project.image} alt={project.title} loading="lazy" className="w-100 h-100 object-fit-cover transition-all duration-700 group-hover-scale" />
+                                                <LazyImage src={project.image} alt={project.title} className="w-100 h-100" style={{ height: '100%' }} />
                                                 <div className="position-absolute top-0 start-0 m-4">
                                                     <span className="glass px-3 py-1 rounded-pill small fw-bold text-white border-0">{project.category}</span>
                                                 </div>

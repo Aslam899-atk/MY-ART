@@ -1,11 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+    const imgRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsInView(true);
+                    observer.disconnect();
+                }
+            },
+            {
+                rootMargin: '200px', // Start loading earlier than videos
+            }
+        );
+
+        if (imgRef.current) {
+            observer.observe(imgRef.current);
+        }
+
+        return () => {
+            if (observer) observer.disconnect();
+        };
+    }, []);
 
     return (
         <div
+            ref={imgRef}
             className={`${className} position-relative skeleton`}
             style={{
                 ...style,
@@ -15,21 +40,22 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
             }}
             onClick={onClick}
         >
-            <img
-                src={src}
-                alt={alt}
-                className="w-100 h-100"
-                style={{
-                    objectFit: 'cover',
-                    opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                    ...style
-                }}
-                loading="lazy"
-                onLoad={() => setIsLoaded(true)}
-                onError={() => setHasError(true)}
-                {...props}
-            />
+            {isInView && (
+                <img
+                    src={src}
+                    alt={alt}
+                    className="w-100 h-100"
+                    style={{
+                        objectFit: 'cover',
+                        opacity: isLoaded ? 1 : 0,
+                        transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                        ...style
+                    }}
+                    onLoad={() => setIsLoaded(true)}
+                    onError={() => setHasError(true)}
+                    {...props}
+                />
+            )}
 
             {/* Error state */}
             {hasError && (

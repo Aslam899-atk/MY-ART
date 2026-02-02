@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
+import LazyVideo from '../components/LazyVideo';
 import ItemPreview from '../components/ItemPreview';
 import { Heart, Search, Share2, ZoomIn, X, Play, Filter, MessageSquare, Send } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
@@ -121,9 +122,9 @@ const Gallery = () => {
                                 style={{ height: '400px' }}
                             >
                                 {item.type === 'video' ? (
-                                    <video
+                                    <LazyVideo
                                         src={item.url}
-                                        className="w-100 h-100 object-fit-cover"
+                                        className="w-100 h-100"
                                         muted
                                         loop
                                         autoPlay
