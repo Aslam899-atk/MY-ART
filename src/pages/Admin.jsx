@@ -16,7 +16,7 @@ const Admin = () => {
         products, addProduct, deleteProduct, updateProduct,
         galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem,
         messages, deleteMessage, sendInternalMessage,
-        orders, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,
+        orders, deleteOrder, updateOrderStatus, approveOrderPrice, claimOrder,
         users, updateEmblosStatus,
         isAdmin, setIsAdmin, verifyAdminPassword,
         toggleLike, toggleGalleryLike, likedIds, user
@@ -31,8 +31,6 @@ const Admin = () => {
     const [orderFilter, setOrderFilter] = useState('all'); // 'all' or 'tasks'
     const [claimPrices, setClaimPrices] = useState({});
     const [selectedUser, setSelectedUser] = useState(null);
-    const [msgInput, setMsgInput] = useState('');
-    const [planMonths, setPlanMonths] = useState('1');
 
     // Admin Login State
     const [_uploadProgress, setUploadProgress] = useState(0);

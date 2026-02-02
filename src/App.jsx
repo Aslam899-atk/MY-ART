@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { AppProvider, AppContext } from './context/AppContext';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
@@ -27,42 +27,41 @@ const MeshBackground = () => (
 );
 
 const PageWrapper = ({ children }) => (
-  <motion.div
+  <Motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -10 }}
     transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
   >
     {children}
-  </motion.div>
+  </Motion.div>
 );
 
 
 function AppContent() {
-  const { isLoadingAuth, galleryItems } = React.useContext(AppContext);
+  const { isLoadingAuth } = React.useContext(AppContext);
   const [loading, setLoading] = React.useState(true);
   const location = useLocation();
 
   React.useEffect(() => {
     const loadResources = async () => {
-      // 1. Wait for Auth/Data Fetch to complete
       if (isLoadingAuth) return;
 
       const promises = [];
-
-      // 2. Minimum display time for smoothness (600ms)
+      // Minimum display time for smoothness
       promises.push(new Promise(resolve => setTimeout(resolve, 600)));
 
-      // 3. Preload Home Banner
-      const bannerUrl = `${import.meta.env.BASE_URL}banner.png`;
-      promises.push(new Promise((resolve) => {
-        const img = new Image();
-        img.src = bannerUrl;
-        img.onload = resolve;
-        img.onerror = resolve;
-      }));
+      // Only preload banner if on Home page
+      if (location.pathname === '/') {
+        const bannerUrl = `${import.meta.env.BASE_URL}banner.png`;
+        promises.push(new Promise((resolve) => {
+          const img = new Image();
+          img.src = bannerUrl;
+          img.onload = resolve;
+          img.onerror = resolve;
+        }));
+      }
 
-      // Wait for all resources
       await Promise.all(promises);
       setLoading(false);
     };
@@ -81,7 +80,7 @@ function AppContent() {
     document.title = titles[path] || 'ART VOID';
 
     loadResources();
-  }, [isLoadingAuth, galleryItems, location.pathname]);
+  }, [isLoadingAuth, location.pathname]);
 
   if (loading) {
     return <Preloader />;

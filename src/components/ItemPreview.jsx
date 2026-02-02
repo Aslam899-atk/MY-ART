@@ -1,12 +1,15 @@
 import React, { useContext, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, Share2, ShoppingBag, Calendar, Tag, User, ArrowRight, ArrowLeft, Send, MessageSquare, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 
 const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLiked, onOrder, onInquire }) => {
-    if (!item) return null;
-
     const { addGalleryComment, addProductComment, deleteGalleryComment, deleteProductComment, user, isAdmin, users, products, galleryItems } = useContext(AppContext);
+
+    const [commentText, setCommentText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (!item) return null;
 
     // Sync with global state to ensure live updates (comments/likes)
     const liveItem = isOpen ? (
@@ -14,9 +17,6 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
         galleryItems.find(g => (g._id || g.id) === (item.productId || item._id || item.id)) ||
         item
     ) : item;
-
-    const [commentText, setCommentText] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Auto-detect type if missing
     const mediaType = liveItem.type || ((liveItem.url || liveItem.image)?.includes('.mp4') ? 'video' : 'image');
@@ -53,7 +53,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -90,7 +90,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                         </button>
                     )}
 
-                    <motion.div
+                    <Motion.div
                         initial={{ scale: 0.9, y: 20, opacity: 0 }}
                         animate={{ scale: 1, y: 0, opacity: 1 }}
                         exit={{ scale: 0.9, y: 20, opacity: 0 }}
@@ -114,7 +114,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     playsInline
                                 />
                             ) : (liveItem.url || liveItem.image) ? (
-                                <motion.img
+                                <Motion.img
                                     initial={{ scale: 1.1, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ duration: 0.6 }}
@@ -142,7 +142,7 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
 
                         {/* Content Section */}
                         <div className="col-12 col-lg-4 p-4 p-md-5 d-flex flex-column bg-dark" style={{ borderLeft: '1px solid rgba(255,255,255,0.05)', overflowY: 'auto' }}>
-                            <motion.div
+                            <Motion.div
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
@@ -168,9 +168,9 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                         </div>
                                     </div>
                                 )}
-                            </motion.div>
+                            </Motion.div>
 
-                            <motion.div
+                            <Motion.div
                                 className="flex-grow-1"
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -253,9 +253,9 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                         </button>
                                     </form>
                                 </div>
-                            </motion.div>
+                            </Motion.div>
 
-                            <motion.div
+                            <Motion.div
                                 className="d-flex flex-column gap-3 pt-4 mt-auto border-top border-white border-opacity-10"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -293,10 +293,10 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                         </button>
                                     )
                                 )}
-                            </motion.div>
+                            </Motion.div>
                         </div>
-                    </motion.div>
-                </motion.div>
+                    </Motion.div>
+                </Motion.div>
             )}
         </AnimatePresence>
     );

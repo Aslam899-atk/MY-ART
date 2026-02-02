@@ -33,7 +33,6 @@ const Dashboard = () => {
         orders,
         messages,
         submitOrderPrice,
-        approveOrderPrice,
         claimOrder,
         sendInternalMessage,
         addProduct,
@@ -41,8 +40,6 @@ const Dashboard = () => {
         deleteProduct,
         deleteGalleryItem,
         updateOrderStatus,
-        updateProduct,
-        updateGalleryItem,
         toggleLike,
         toggleGalleryLike,
         likedIds,
@@ -59,7 +56,7 @@ const Dashboard = () => {
         }
     }, [user, isLoadingAuth, navigate]);
     const [priceInput, setPriceInput] = useState({});
-    const [orderFilter, setOrderFilter] = useState('All');
+    const [orderFilter] = useState('All');
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('gallery'); // 'gallery' or 'shop'
     const [uploadFormData, setUploadFormData] = useState({
@@ -122,11 +119,7 @@ const Dashboard = () => {
             alert("Claim Failed. Please try again.");
         }
     };
-    const handleStatusChange = async (orderId, newStatus) => {
-        await updateOrderStatus(orderId, { status: newStatus });
-        // Refresh local data – simple reload for demo purposes
-        window.location.reload();
-    };
+
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];

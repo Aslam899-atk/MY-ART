@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { ArrowRight, Mail, Sparkles, Send, ChevronRight, Palette, Instagram, Code2, PenTool, Brush } from 'lucide-react';
 import { Link } from 'react-router-dom';

@@ -7,12 +7,10 @@ import { Heart, Search, Share2, ZoomIn, X, Play, Filter, MessageSquare, Send } f
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Gallery = () => {
-    const { galleryItems, toggleGalleryLike, likedIds, addMessage, user, addGalleryComment } = useContext(AppContext);
+    const { galleryItems, toggleGalleryLike, likedIds } = useContext(AppContext);
     const [selectedItem, setSelectedItem] = useState(null);
     const [filter, setFilter] = useState('All');
     const [showComments, setShowComments] = useState(false);
-    const [commentText, setCommentText] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,19 +28,7 @@ const Gallery = () => {
         );
     });
 
-    const handleCommentSubmit = async (e) => {
-        e.preventDefault();
-        if (!commentText.trim() || !selectedItem) return;
-        setIsSubmitting(true);
-        const res = await addGalleryComment(selectedItem._id || selectedItem.id, commentText);
-        if (res?.success) {
-            setCommentText('');
-            // Refresh local selected item to show the new comment immediately
-            const updatedItem = galleryItems.find(i => (i._id || i.id) === (selectedItem._id || selectedItem.id));
-            if (updatedItem) setSelectedItem(updatedItem);
-        }
-        setIsSubmitting(false);
-    };
+
 
     return (
         <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>

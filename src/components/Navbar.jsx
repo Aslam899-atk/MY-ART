@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const Navbar = () => {
-    const { isAdmin, user, logoutUser } = useContext(AppContext);
+    const { user, logoutUser } = useContext(AppContext);
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top mx-auto mt-3 px-3"
