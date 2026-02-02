@@ -39,34 +39,10 @@ const PageWrapper = ({ children }) => (
 
 
 function AppContent() {
-  const { isLoadingAuth } = React.useContext(AppContext);
-  const [loading, setLoading] = React.useState(true);
   const location = useLocation();
 
   React.useEffect(() => {
-    const loadResources = async () => {
-      if (isLoadingAuth) return;
-
-      const promises = [];
-      // Minimum display time for smoothness
-      promises.push(new Promise(resolve => setTimeout(resolve, 600)));
-
-      // Only preload banner if on Home page
-      if (location.pathname === '/') {
-        const bannerUrl = `${import.meta.env.BASE_URL}banner.png`;
-        promises.push(new Promise((resolve) => {
-          const img = new Image();
-          img.src = bannerUrl;
-          img.onload = resolve;
-          img.onerror = resolve;
-        }));
-      }
-
-      await Promise.all(promises);
-      setLoading(false);
-    };
-
-    // 6. Dynamic Title Management
+    // Dynamic Title Management
     const path = window.location.pathname;
     const titles = {
       '/': 'ART VOID | Creative Masterpieces',
@@ -78,18 +54,11 @@ function AppContent() {
       '/admin': 'Admin Console | ART VOID'
     };
     document.title = titles[path] || 'ART VOID';
-
-    loadResources();
-  }, [isLoadingAuth, location.pathname]);
-
-  if (loading) {
-    return <Preloader />;
-  }
+  }, [location.pathname]);
 
   return (
     <div className="app">
       <MeshBackground />
-
       <LoginPopup />
       <Navbar />
       <React.Suspense fallback={<Preloader />}>
