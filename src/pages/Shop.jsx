@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';
-import Preloader from '../components/Preloader';
 import { ShoppingBag, X, Phone, Mail, MapPin, User, CheckCircle, Heart, Search, MessageSquare } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -66,11 +65,6 @@ const Shop = () => {
         }, 3000);
     };
 
-    // Show preloader while loading
-    if (isLoadingData) {
-        return <Preloader />;
-    }
-
     return (
         <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
             <header className="mb-5 text-center">
@@ -113,59 +107,74 @@ const Shop = () => {
             </header>
 
             <div className="row g-4">
-                {filteredProducts.map(product => (
-                    <div key={product._id || product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div className="glass animate-fade-in h-100 overflow-hidden d-flex flex-column border-0">
-                            <div className="position-relative overflow-hidden" style={{ height: '260px' }}>
-                                <LazyImage
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-100 h-100"
-                                    onClick={() => { setSelectedProduct(product); setShowPreview(true); }}
-                                    style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                />
-                                <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                                    <span className="badge glass text-white border-0 shadow-sm">₹{product.price}</span>
+                {isLoadingData ? (
+                    // Skeleton Loader for Shop
+                    [...Array(8)].map((_, i) => (
+                        <div key={`skel-shop-${i}`} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <div className="glass h-100 overflow-hidden d-flex flex-column border-0" style={{ minHeight: '400px' }}>
+                                <div className="skeleton w-100" style={{ height: '260px' }}></div>
+                                <div className="p-4 d-flex flex-column gap-3">
+                                    <div className="skeleton w-75" style={{ height: '24px' }}></div>
+                                    <div className="skeleton w-100 mt-auto" style={{ height: '40px' }}></div>
                                 </div>
-                                <div className="position-absolute bottom-0 end-0 m-3 d-flex gap-2">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setSelectedProduct(product);
-                                            setShowPreview(true);
-                                        }}
-                                        className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
-                                        title="View Details & Comments"
-                                    >
-                                        <MessageSquare size={18} />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleLike(product._id || product.id);
-                                        }}
-                                        className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
-                                    >
-                                        <Heart size={18} fill={likedIds.includes(product._id || product.id) ? "var(--accent)" : "none"} className={likedIds.includes(product._id || product.id) ? "text-danger" : ""} />
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
-                                <div className="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h3 className="h5 mt-1 mb-0">{product.name}</h3>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => { setSelectedProduct(product); setShowOrderForm(true); }}
-                                    className="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-3 border-0 mt-auto"
-                                >
-                                    <ShoppingBag size={18} /> Order Now
-                                </button>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    filteredProducts.map(product => (
+                        <div key={product._id || product.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <div className="glass animate-fade-in h-100 overflow-hidden d-flex flex-column border-0">
+                                <div className="position-relative overflow-hidden" style={{ height: '260px' }}>
+                                    <LazyImage
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-100 h-100"
+                                        onClick={() => { setSelectedProduct(product); setShowPreview(true); }}
+                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                    />
+                                    <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                                        <span className="badge glass text-white border-0 shadow-sm">₹{product.price}</span>
+                                    </div>
+                                    <div className="position-absolute bottom-0 end-0 m-3 d-flex gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedProduct(product);
+                                                setShowPreview(true);
+                                            }}
+                                            className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
+                                            title="View Details & Comments"
+                                        >
+                                            <MessageSquare size={18} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleLike(product._id || product.id);
+                                            }}
+                                            className="btn btn-sm glass border-0 rounded-circle p-2 text-white shadow-sm hover-scale"
+                                        >
+                                            <Heart size={18} fill={likedIds.includes(product._id || product.id) ? "var(--accent)" : "none"} className={likedIds.includes(product._id || product.id) ? "text-danger" : ""} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
+                                    <div className="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h3 className="h5 mt-1 mb-0">{product.name}</h3>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => { setSelectedProduct(product); setShowOrderForm(true); }}
+                                        className="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-3 border-0 mt-auto"
+                                    >
+                                        <ShoppingBag size={18} /> Order Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             {/* Removed ItemPreview from Shop to go direct-to-order as requested */}
