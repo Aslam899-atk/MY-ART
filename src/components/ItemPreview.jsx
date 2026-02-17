@@ -42,7 +42,11 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
         e.preventDefault();
         if (!commentText.trim()) return;
         setIsSubmitting(true);
-        const commentFn = liveItem.price ? addProductComment : addGalleryComment;
+        const commentFn = isInteractive ? (liveItem.price ? addProductComment : addGalleryComment) : null;
+        if (!commentFn) { // Prevent calling if not interactive
+            setIsSubmitting(false);
+            return;
+        }
         const res = await commentFn(liveItem._id || liveItem.id, commentText);
         if (res?.success) {
             setCommentText('');
@@ -196,63 +200,65 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     </div>
                                 </div>
 
-                                {/* Comments Section */}
-                                <div className="mt-4 pt-4 border-top border-white border-opacity-10">
-                                    <h5 className="small text-uppercase tracking-widest text-primary fw-bold mb-3 d-flex align-items-center gap-2">
-                                        <MessageSquare size={16} /> Community Comments
-                                    </h5>
+                                {/* Comments Section - Hide for Orders/Tasks */}
+                                {isInteractive && (
+                                    <div className="mt-4 pt-4 border-top border-white border-opacity-10">
+                                        <h5 className="small text-uppercase tracking-widest text-primary fw-bold mb-3 d-flex align-items-center gap-2">
+                                            <MessageSquare size={16} /> Community Comments
+                                        </h5>
 
-                                    <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
-                                        {liveItem.comments && liveItem.comments.length > 0 ? (
-                                            liveItem.comments.map((comment, idx) => (
-                                                <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5 position-relative group">
-                                                    <div className="d-flex justify-content-between align-items-center mb-1">
-                                                        <span className="fw-bold extra-small text-primary">{comment.username}</span>
-                                                        <div className="d-flex align-items-center gap-2">
-                                                            <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
-                                                            {isAdmin && (
-                                                                <button
-                                                                    onClick={async () => {
-                                                                        if (window.confirm("Delete this comment?")) {
-                                                                            const deleteFn = liveItem.price ? deleteProductComment : deleteGalleryComment;
-                                                                            await deleteFn(liveItem._id || liveItem.id, comment._id || comment.id);
-                                                                        }
-                                                                    }}
-                                                                    className="btn btn-link p-0 text-danger border-0 opacity-0 group-hover-opacity-100 transition-all"
-                                                                >
-                                                                    <Trash2 size={12} />
-                                                                </button>
-                                                            )}
+                                        <div className="comments-list mb-4 d-flex flex-column gap-3" style={{ maxHeight: '200px', overflowY: 'auto', paddingRight: '5px' }}>
+                                            {liveItem.comments && liveItem.comments.length > 0 ? (
+                                                liveItem.comments.map((comment, idx) => (
+                                                    <div key={idx} className="glass p-3 rounded-3 border-0 bg-opacity-5 position-relative group">
+                                                        <div className="d-flex justify-content-between align-items-center mb-1">
+                                                            <span className="fw-bold extra-small text-primary">{comment.username}</span>
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <span className="extra-small opacity-30">{new Date(comment.date).toLocaleDateString()}</span>
+                                                                {isAdmin && (
+                                                                    <button
+                                                                        onClick={async () => {
+                                                                            if (window.confirm("Delete this comment?")) {
+                                                                                const deleteFn = liveItem.price ? deleteProductComment : deleteGalleryComment;
+                                                                                await deleteFn(liveItem._id || liveItem.id, comment._id || comment.id);
+                                                                            }
+                                                                        }}
+                                                                        className="btn btn-link p-0 text-danger border-0 opacity-0 group-hover-opacity-100 transition-all"
+                                                                    >
+                                                                        <Trash2 size={12} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </div>
+                                                        <p className="extra-small mb-0 text-white-50">{comment.text}</p>
                                                     </div>
-                                                    <p className="extra-small mb-0 text-white-50">{comment.text}</p>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="text-center py-4 opacity-30 small italic">No comments yet. Be the first!</div>
-                                        )}
-                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-4 opacity-30 small italic">No comments yet. Be the first!</div>
+                                            )}
+                                        </div>
 
-                                    {/* Comment form */}
-                                    <form onSubmit={handleCommentSubmit} className="position-relative mt-2">
-                                        <input
-                                            type="text"
-                                            placeholder={user ? "Write a comment..." : "Login to comment"}
-                                            disabled={!user || isSubmitting}
-                                            className="form-control glass border-0 text-white extra-small py-3 ps-3 pe-5 rounded-pill"
-                                            value={commentText}
-                                            onChange={(e) => setCommentText(e.target.value)}
-                                        />
-                                        <button
-                                            type="submit"
-                                            disabled={!user || isSubmitting || !commentText.trim()}
-                                            className="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-1 p-2 rounded-circle border-0 d-flex align-items-center justify-content-center"
-                                            style={{ width: '32px', height: '32px' }}
-                                        >
-                                            <Send size={14} />
-                                        </button>
-                                    </form>
-                                </div>
+                                        {/* Comment form */}
+                                        <form onSubmit={handleCommentSubmit} className="position-relative mt-2">
+                                            <input
+                                                type="text"
+                                                placeholder={user ? "Write a comment..." : "Login to comment"}
+                                                disabled={!user || isSubmitting}
+                                                className="form-control glass border-0 text-white extra-small py-3 ps-3 pe-5 rounded-pill"
+                                                value={commentText}
+                                                onChange={(e) => setCommentText(e.target.value)}
+                                            />
+                                            <button
+                                                type="submit"
+                                                disabled={!user || isSubmitting || !commentText.trim()}
+                                                className="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-1 p-2 rounded-circle border-0 d-flex align-items-center justify-content-center"
+                                                style={{ width: '32px', height: '32px' }}
+                                            >
+                                                <Send size={14} />
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
                             </Motion.div>
 
                             <Motion.div
@@ -265,9 +271,11 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
                                     <button
                                         onClick={() => toggleLike(liveItem._id || liveItem.id)}
                                         className="btn glass flex-grow-1 py-3 px-4 rounded-3 text-white border-0 shadow-sm d-flex align-items-center justify-content-center gap-2 hover-scale"
+                                        disabled={!isInteractive}
+                                        style={{ opacity: isInteractive ? 1 : 0.5 }}
                                     >
                                         <Heart size={20} fill={isLiked ? "var(--primary)" : "none"} className={isLiked ? "text-primary" : ""} />
-                                        <span className="fw-bold">{isLiked ? 'Liked' : 'Like'}</span>
+                                        <span className="fw-bold">{isInteractive ? (isLiked ? 'Liked' : 'Like') : 'View Only'}</span>
                                     </button>
                                     <button
                                         onClick={handleShare}

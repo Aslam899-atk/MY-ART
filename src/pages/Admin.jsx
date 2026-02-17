@@ -722,7 +722,7 @@ const Admin = () => {
                                                 <td className="py-4 px-4 border-0 small">
                                                     <div className="d-flex align-items-center gap-3">
                                                         {o.image ? (
-                                                            <div className="position-relative group" onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}>
+                                                            <div className="position-relative group" onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference', type: 'order' })}>
                                                                 <img
                                                                     src={o.image}
                                                                     className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
@@ -737,7 +737,7 @@ const Admin = () => {
                                                             <div
                                                                 className="glass rounded-3 d-flex align-items-center justify-content-center cursor-pointer"
                                                                 style={{ width: '60px', height: '60px' }}
-                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: null })}
+                                                                onClick={() => setCommentModalItem({ ...o, title: o.productName, url: null, type: 'order' })}
                                                             >
                                                                 <ImageIcon size={20} className="opacity-20" />
                                                             </div>
@@ -753,7 +753,7 @@ const Admin = () => {
                                                 <td className="py-4 px-4 border-0">
                                                     {o.image ? (
                                                         <button
-                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference' })}
+                                                            onClick={() => setCommentModalItem({ ...o, title: o.productName, url: o.image, status: 'Drawing Reference', type: 'order' })}
                                                             className="btn btn-sm btn-primary py-1 px-3 rounded-pill extra-small fw-bold d-flex align-items-center gap-2"
                                                         >
                                                             <ImageIcon size={12} /> View Reference

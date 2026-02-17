@@ -400,9 +400,9 @@ const Dashboard = () => {
                                     <div key={idx} className="col-md-4">
                                         <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '220px' }}>
                                             {(item.type === 'video' || item.url?.includes('.mp4')) ? (
-                                                <video src={item.url} className="w-100 h-100 object-fit-cover cursor-pointer" muted loop autoPlay playsInline onClick={() => setCommentModalItem({ ...item, itemType: 'gallery' })} />
+                                                <video src={item.url} className="w-100 h-100 object-fit-cover cursor-pointer" muted loop autoPlay playsInline onClick={() => setCommentModalItem({ ...item, itemType: 'gallery', type: 'gallery' })} />
                                             ) : (
-                                                <LazyImage src={item.url} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'gallery' })} />
+                                                <LazyImage src={item.url} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'gallery', type: 'gallery' })} />
                                             )}
                                             <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
                                                 <div className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'}`}>{item.status}</div>
@@ -427,7 +427,7 @@ const Dashboard = () => {
                                 {myProducts.map((item, idx) => (
                                     <div key={idx} className="col-md-4">
                                         <div className="glass rounded-4 overflow-hidden position-relative group" style={{ height: '220px' }}>
-                                            <LazyImage src={item.image} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'product' })} />
+                                            <LazyImage src={item.image} className="w-100 h-100 object-fit-cover shadow-lg cursor-pointer" onClick={() => setCommentModalItem({ ...item, itemType: 'product', type: 'product' })} />
                                             <div className="position-absolute top-0 start-0 m-2 d-flex gap-2" style={{ zIndex: 5 }}>
                                                 <div className={`badge ${item.status === 'active' ? 'bg-success' : 'bg-warning'}`}>{item.status}</div>
                                                 <div className="badge bg-primary">₹{item.price}</div>
@@ -471,7 +471,7 @@ const Dashboard = () => {
                                                                 className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                                                 style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                                                 alt=""
-                                                                onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image })}
+                                                                onClick={() => setCommentModalItem({ ...order, title: order.productName, url: order.image, type: 'order' })}
                                                             />
                                                             <div>
                                                                 <div className="fw-bold small">{order.productName}</div>
@@ -630,7 +630,7 @@ const Dashboard = () => {
                                                             className="rounded-3 shadow-sm cursor-pointer transition-all hover-scale"
                                                             style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                                                             alt=""
-                                                            onClick={() => setCommentModalItem({ ...task, title: 'Commission Request', url: task.image })}
+                                                            onClick={() => setCommentModalItem({ ...task, title: 'Commission Request', url: task.image, type: 'task' })}
                                                         />
                                                     ) : (
                                                         <div className="glass rounded-3 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}><ImageIcon size={20} className="opacity-20" /></div>
