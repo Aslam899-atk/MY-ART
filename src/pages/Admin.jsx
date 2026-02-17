@@ -869,11 +869,28 @@ const Admin = () => {
                                                     )}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
-                                                    {o.price ? (
-                                                        <span className={isAdmin ? 'text-danger' : 'text-success'}>
-                                                            ₹{isAdmin ? (o.adminCommission || 0).toFixed(2) : (o.artistEarnings || 0).toFixed(2)}
-                                                        </span>
-                                                    ) : '-'}
+                                                    {o.price ? (() => {
+                                                        // Fallback calculation if backend doesn't provide split
+                                                        const creator = users.find(u => (u._id || u.id) === o.creatorId);
+                                                        const rate = creator?.customCommission !== undefined
+                                                            ? creator.customCommission
+                                                            : Number(appSettings.emblos_config?.commissionRate || 10);
+
+                                                        const calculatedAdminShare = (Number(o.price) * (rate / 100));
+                                                        const calculatedArtistShare = Number(o.price) - calculatedAdminShare;
+
+                                                        const displayAdmin = o.adminCommission !== undefined ? o.adminCommission : calculatedAdminShare;
+                                                        const displayArtist = o.artistEarnings !== undefined ? o.artistEarnings : calculatedArtistShare;
+
+                                                        return (
+                                                            <div className="d-flex flex-column">
+                                                                <span className={isAdmin ? 'text-danger fw-bold' : 'text-success fw-bold'}>
+                                                                    ₹{isAdmin ? Number(displayAdmin).toFixed(2) : Number(displayArtist).toFixed(2)}
+                                                                </span>
+                                                                {isAdmin && <span className="extra-small text-muted">Commission ({rate}%)</span>}
+                                                            </div>
+                                                        );
+                                                    })() : '-'}
                                                 </td>
                                                 <td className="py-4 px-4 border-0">
                                                     <select
