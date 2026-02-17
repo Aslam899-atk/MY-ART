@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import LazyVideo from '../components/LazyVideo';
@@ -17,17 +17,19 @@ const Gallery = () => {
 
     const categories = ['All', 'Painting', 'Pencil Drawing', 'Calligraphy', 'Other'];
 
-    const filteredItems = galleryItems.filter(item => {
-        const matchesCategory = filter === 'All' || item.category === filter;
-        if (!matchesCategory) return false;
-        if (!searchQuery) return true;
-        const q = searchQuery.toLowerCase();
-        return (
-            item.title?.toLowerCase().includes(q) ||
-            item.category?.toLowerCase().includes(q) ||
-            item.medium?.toLowerCase().includes(q)
-        );
-    });
+    const filteredItems = useMemo(() => {
+        return galleryItems.filter(item => {
+            const matchesCategory = filter === 'All' || item.category === filter;
+            if (!matchesCategory) return false;
+            if (!searchQuery) return true;
+            const q = searchQuery.toLowerCase();
+            return (
+                item.title?.toLowerCase().includes(q) ||
+                item.category?.toLowerCase().includes(q) ||
+                item.medium?.toLowerCase().includes(q)
+            );
+        });
+    }, [galleryItems, filter, searchQuery]);
 
     // Initial load preloader - wait for first data fetch
     if (isLoadingData && galleryItems.length === 0) {

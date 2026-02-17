@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import LazyImage from '../components/LazyImage';
 import ItemPreview from '../components/ItemPreview';
@@ -34,15 +34,15 @@ const Shop = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredProducts = products.filter(product => {
-        if (!searchQuery) return true;
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery) return products;
         const q = searchQuery.toLowerCase();
-        return (
+        return products.filter(product =>
             product.name?.toLowerCase().includes(q) ||
             product.category?.toLowerCase().includes(q) ||
             product.description?.toLowerCase().includes(q)
         );
-    });
+    }, [products, searchQuery]);
 
     const handleOrderSubmit = (e) => {
         e.preventDefault();
