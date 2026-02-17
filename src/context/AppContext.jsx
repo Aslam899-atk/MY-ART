@@ -125,6 +125,19 @@ export const AppProvider = ({ children }) => {
         }
     };
 
+    const updateUserCommission = async (userId, commissionRate) => {
+        const res = await fetch(`${API_URL}/users/${userId}/emblos-status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customCommission: commissionRate })
+        });
+        if (res.ok) {
+            fetchData();
+            return { success: true };
+        }
+        return { success: false };
+    };
+
     const deleteUserByEmail = async (email) => {
         const res = await fetch(`${API_URL}/users/delete-by-email`, {
             method: 'DELETE',
@@ -564,7 +577,7 @@ export const AppProvider = ({ children }) => {
             galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem, toggleGalleryLike, addGalleryComment, deleteGalleryComment,
             messages, addMessage, deleteMessage, sendInternalMessage,
             orders, addOrder, deleteOrder, updateOrderStatus, submitOrderPrice, approveOrderPrice, claimOrder,
-            users, requestEmblosAccess, updateEmblosStatus, deleteUserByEmail,
+            users, requestEmblosAccess, updateEmblosStatus, updateUserCommission, deleteUserByEmail,
             appSettings, updateAppSetting,
             isAdmin, setIsAdmin: handleSetIsAdmin, changePassword, verifyAdminPassword,
             loginWithGoogle, isLoadingAuth, isLoadingData,

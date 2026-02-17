@@ -16,7 +16,7 @@ const Admin = () => {
         galleryItems, addGalleryItem, deleteGalleryItem, updateGalleryItem,
         messages, deleteMessage, sendInternalMessage,
         orders, deleteOrder, updateOrderStatus, approveOrderPrice, claimOrder,
-        users, updateEmblosStatus,
+        users, updateEmblosStatus, updateUserCommission,
         isAdmin, setIsAdmin, verifyAdminPassword,
         toggleLike, toggleGalleryLike, likedIds, user
     } = useContext(AppContext);
@@ -56,6 +56,8 @@ const Admin = () => {
     const [internalMsg, setInternalMsg] = useState('');
     const [isSendingInternal, setIsSendingInternal] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [unfreezeTarget, setUnfreezeTarget] = useState(null); // For commission reset modal on unfreeze
+    const [editingCommission, setEditingCommission] = useState({}); // Per-artist commission editing
 
     const { deleteUserByEmail, appSettings, updateAppSetting } = useContext(AppContext);
 
@@ -1054,6 +1056,8 @@ const Admin = () => {
                                     <tr className="text-muted small text-uppercase border-bottom border-secondary border-opacity-10">
                                         <th className="py-3 px-4 border-0">Identity</th>
                                         <th className="py-3 px-4 border-0">Role</th>
+                                        {activeTab === 'emblos' && <th className="py-3 px-4 border-0">Commission %</th>}
+                                        {activeTab === 'emblos' && <th className="py-3 px-4 border-0">Earnings</th>}
                                         <th className="py-3 px-4 border-0">Status</th>
                                         <th className="py-3 px-4 border-0 text-end">Actions</th>
                                     </tr>
@@ -1075,6 +1079,59 @@ const Admin = () => {
                                                     {u.role?.toUpperCase()}
                                                 </span>
                                             </td>
+                                            {activeTab === 'emblos' && (
+                                                <td className="py-4 px-4 border-0">
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <div className="input-group input-group-sm" style={{ maxWidth: '100px' }}>
+                                                            <span className="input-group-text bg-transparent border-secondary border-opacity-20 text-success" style={{ fontSize: '0.7rem' }}>%</span>
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                max="100"
+                                                                className="form-control glass border-secondary border-opacity-20 text-white text-center fw-bold"
+                                                                style={{ fontSize: '0.8rem' }}
+                                                                value={editingCommission[u._id] !== undefined ? editingCommission[u._id] : (u.customCommission !== undefined ? u.customCommission : (appSettings.emblos_config?.commissionRate || 10))}
+                                                                onChange={(e) => setEditingCommission({ ...editingCommission, [u._id]: e.target.value })}
+                                                                onBlur={async (e) => {
+                                                                    const val = Number(e.target.value);
+                                                                    if (!isNaN(val) && val >= 0 && val <= 100) {
+                                                                        await updateUserCommission(u._id, val);
+                                                                    }
+                                                                    setEditingCommission(prev => { const p = { ...prev }; delete p[u._id]; return p; });
+                                                                }}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') e.target.blur();
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        {u.customCommission !== undefined && u.customCommission !== Number(appSettings.emblos_config?.commissionRate || 10) && (
+                                                            <span className="badge bg-warning bg-opacity-10 text-warning" style={{ fontSize: '0.55rem' }}>CUSTOM</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
+                                            {activeTab === 'emblos' && (() => {
+                                                const artistOrders = orders.filter(o => o.creatorId === (u._id || u.id));
+                                                const artistRate = u.customCommission !== undefined ? u.customCommission : Number(appSettings.emblos_config?.commissionRate || 10);
+                                                const totalVolume = artistOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+                                                const adminShare = totalVolume * (artistRate / 100);
+                                                const artistEarning = totalVolume - adminShare;
+                                                return (
+                                                    <td className="py-4 px-4 border-0">
+                                                        <div className="d-flex flex-column gap-1">
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <span className="text-success fw-bold small">₹{artistEarning.toFixed(0)}</span>
+                                                                <span className="extra-small text-muted">artist</span>
+                                                            </div>
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <span className="text-danger fw-bold" style={{ fontSize: '0.7rem' }}>₹{adminShare.toFixed(0)}</span>
+                                                                <span className="extra-small text-muted">admin</span>
+                                                            </div>
+                                                            <span className="extra-small text-muted opacity-50">{artistOrders.length} orders • ₹{totalVolume}</span>
+                                                        </div>
+                                                    </td>
+                                                );
+                                            })()}
                                             <td className="py-4 px-4 border-0">
                                                 <div className="d-flex flex-column gap-1">
                                                     <span className={`badge bg-${u.isFrozen ? 'danger' : 'success'} bg-opacity-10 text-${u.isFrozen ? 'danger' : 'success'} d-inline-block`} style={{ width: 'fit-content' }}>
@@ -1097,7 +1154,7 @@ const Admin = () => {
                                                             <div className="d-flex gap-2 align-items-center bg-white bg-opacity-5 p-1 px-2 rounded-pill shadow-sm border border-white border-opacity-5">
                                                                 {u.isFrozen ? (
                                                                     <button
-                                                                        onClick={() => updateEmblosStatus(u._id, { status: 'unfreeze' })}
+                                                                        onClick={() => setUnfreezeTarget(u)}
                                                                         className="btn btn-sm btn-success rounded-pill extra-small px-3 py-1 fw-bold shadow-glow"
                                                                     >
                                                                         Unfreeze
@@ -1500,37 +1557,77 @@ const Admin = () => {
                                 {/* Modal Body */}
                                 <div className="p-4 p-md-5 overflow-auto custom-scrollbar">
                                     {/* Stats Cards */}
-                                    <div className="row g-4 mb-5">
-                                        {[
-                                            {
-                                                label: 'Total Likes',
-                                                value: (products.filter(p => p.creatorId === selectedUser._id).reduce((sum, p) => sum + (p.likes || 0), 0) +
-                                                    galleryItems.filter(g => g.creatorId === selectedUser._id).reduce((sum, g) => sum + (g.likes || 0), 0)),
-                                                icon: Heart, color: 'danger'
-                                            },
-                                            {
-                                                label: 'Total Orders',
-                                                value: orders.filter(o => o.creatorId === selectedUser._id || o.creatorId === selectedUser.id).length,
-                                                icon: ShoppingBag, color: 'success'
-                                            },
-                                            {
-                                                label: 'Total Artworks',
-                                                value: (products.filter(p => p.creatorId === selectedUser._id || p.creatorId === selectedUser.id).length +
-                                                    galleryItems.filter(g => g.creatorId === selectedUser._id || g.creatorId === selectedUser.id).length),
-                                                icon: ImageIcon, color: 'primary'
-                                            },
-                                        ].map((stat, idx) => (
-                                            <div key={idx} className="col-12 col-md-4">
-                                                <div className="glass p-4 rounded-4 border-0 h-100 bg-opacity-5">
-                                                    <div className={`bg-${stat.color} bg-opacity-10 p-2 rounded-3 text-${stat.color} d-inline-block mb-3`}>
-                                                        <stat.icon size={20} />
+                                    {(() => {
+                                        const selId = selectedUser._id || selectedUser.id;
+                                        const selOrders = orders.filter(o => o.creatorId === selId);
+                                        const selRate = selectedUser.customCommission !== undefined ? selectedUser.customCommission : Number(appSettings.emblos_config?.commissionRate || 10);
+                                        const selVolume = selOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+                                        const selAdminShare = selVolume * (selRate / 100);
+                                        const selArtistEarning = selVolume - selAdminShare;
+                                        return (
+                                            <div className="row g-4 mb-5">
+                                                {[
+                                                    {
+                                                        label: 'Total Likes',
+                                                        value: (products.filter(p => p.creatorId === selId).reduce((sum, p) => sum + (p.likes || 0), 0) +
+                                                            galleryItems.filter(g => g.creatorId === selId).reduce((sum, g) => sum + (g.likes || 0), 0)),
+                                                        icon: Heart, color: 'danger'
+                                                    },
+                                                    {
+                                                        label: 'Total Orders',
+                                                        value: selOrders.length,
+                                                        icon: ShoppingBag, color: 'success'
+                                                    },
+                                                    {
+                                                        label: 'Total Artworks',
+                                                        value: (products.filter(p => p.creatorId === selId).length +
+                                                            galleryItems.filter(g => g.creatorId === selId).length),
+                                                        icon: ImageIcon, color: 'primary'
+                                                    },
+                                                ].map((stat, idx) => (
+                                                    <div key={idx} className="col-12 col-md-4">
+                                                        <div className="glass p-4 rounded-4 border-0 h-100 bg-opacity-5">
+                                                            <div className={`bg-${stat.color} bg-opacity-10 p-2 rounded-3 text-${stat.color} d-inline-block mb-3`}>
+                                                                <stat.icon size={20} />
+                                                            </div>
+                                                            <h3 className="h2 fw-bold mb-0 text-white">{stat.value}</h3>
+                                                            <p className="text-muted small mb-0 mt-1">{stat.label}</p>
+                                                        </div>
                                                     </div>
-                                                    <h3 className="h2 fw-bold mb-0 text-white">{stat.value}</h3>
-                                                    <p className="text-muted small mb-0 mt-1">{stat.label}</p>
+                                                ))}
+
+                                                {/* Earnings Breakdown Card */}
+                                                <div className="col-12">
+                                                    <div className="glass p-4 rounded-4 border-0 bg-opacity-5">
+                                                        <h6 className="fw-bold mb-3 d-flex align-items-center gap-2 text-white">
+                                                            <DollarSign size={18} className="text-success" /> Earnings Breakdown
+                                                            <span className="badge bg-primary bg-opacity-10 text-primary extra-small ms-auto">Commission: {selRate}%</span>
+                                                        </h6>
+                                                        <div className="row g-3">
+                                                            <div className="col-4">
+                                                                <div className="text-center p-3 rounded-4" style={{ background: 'rgba(99, 102, 241, 0.08)' }}>
+                                                                    <div className="h4 fw-bold text-primary mb-0">₹{selVolume}</div>
+                                                                    <div className="extra-small text-muted">Total Volume</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-4">
+                                                                <div className="text-center p-3 rounded-4" style={{ background: 'rgba(16, 185, 129, 0.08)' }}>
+                                                                    <div className="h4 fw-bold text-success mb-0">₹{selArtistEarning.toFixed(0)}</div>
+                                                                    <div className="extra-small text-muted">Artist Earnings</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-4">
+                                                                <div className="text-center p-3 rounded-4" style={{ background: 'rgba(239, 68, 68, 0.08)' }}>
+                                                                    <div className="h4 fw-bold text-danger mb-0">₹{selAdminShare.toFixed(0)}</div>
+                                                                    <div className="extra-small text-muted">Admin Commission</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        );
+                                    })()}
 
                                     {/* Artworks Section */}
                                     <div className="mb-5">
@@ -1615,6 +1712,68 @@ const Admin = () => {
                                             </table>
                                         </div>
                                     </div>
+                                </div>
+                            </Motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Unfreeze Commission Reset Modal */}
+                <AnimatePresence>
+                    {unfreezeTarget && (
+                        <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.9)', zIndex: 13500 }}>
+                            <Motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="glass p-4 p-md-5 rounded-5 border border-success border-opacity-20 w-100 shadow-2xl"
+                                style={{ maxWidth: '480px' }}
+                            >
+                                <div className="text-center mb-4">
+                                    <div className="bg-success bg-opacity-10 p-3 rounded-circle d-inline-flex mb-3">
+                                        <CheckCircle size={32} className="text-success" />
+                                    </div>
+                                    <h4 className="fw-bold text-white mb-1">Unfreeze Artist</h4>
+                                    <p className="small text-muted mb-0">
+                                        Unfreezing <span className="text-primary fw-bold">{unfreezeTarget.username}</span>
+                                    </p>
+                                </div>
+
+                                <div className="glass p-4 rounded-4 border-0 mb-4" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                    <p className="small text-white opacity-80 mb-3 text-center">
+                                        Current Commission Rate: <span className="text-primary fw-bold">{unfreezeTarget.customCommission !== undefined ? unfreezeTarget.customCommission : (appSettings.emblos_config?.commissionRate || 10)}%</span>
+                                    </p>
+                                    <p className="extra-small text-muted text-center mb-0">
+                                        Do you want to reset their commission to 0% or keep the current rate?
+                                    </p>
+                                </div>
+
+                                <div className="d-flex flex-column gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            await updateEmblosStatus(unfreezeTarget._id, { status: 'unfreeze' });
+                                            await updateUserCommission(unfreezeTarget._id, 0);
+                                            setUnfreezeTarget(null);
+                                        }}
+                                        className="btn btn-danger w-100 py-3 rounded-4 fw-bold border-0 shadow-lg d-flex align-items-center justify-content-center gap-2"
+                                    >
+                                        Unfreeze + Reset Commission to 0%
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            await updateEmblosStatus(unfreezeTarget._id, { status: 'unfreeze' });
+                                            setUnfreezeTarget(null);
+                                        }}
+                                        className="btn btn-success w-100 py-3 rounded-4 fw-bold border-0 shadow-lg d-flex align-items-center justify-content-center gap-2"
+                                    >
+                                        Unfreeze + Keep Current Rate ({unfreezeTarget.customCommission !== undefined ? unfreezeTarget.customCommission : (appSettings.emblos_config?.commissionRate || 10)}%)
+                                    </button>
+                                    <button
+                                        onClick={() => setUnfreezeTarget(null)}
+                                        className="btn glass text-white-50 w-100 py-2 rounded-4 border-0 small"
+                                    >
+                                        Cancel
+                                    </button>
                                 </div>
                             </Motion.div>
                         </div>
