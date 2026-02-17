@@ -21,6 +21,10 @@ const ItemPreview = ({ item, isOpen, onClose, onNext, onPrev, toggleLike, isLike
     // Auto-detect type if missing
     const mediaType = liveItem.type || ((liveItem.url || liveItem.image)?.includes('.mp4') ? 'video' : 'image');
 
+    // Determine if this item supports interactive features (like/comment)
+    // Orders and tasks are view-only — they don't have comments or likes
+    const isInteractive = item.type !== 'order' && item.type !== 'task';
+
     const handleShare = async () => {
         if (navigator.share) {
             try {

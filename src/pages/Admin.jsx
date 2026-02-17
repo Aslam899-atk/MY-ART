@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X,
-    CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
+    CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart, Eye,
     Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
     AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush, Send, Menu
 } from 'lucide-react';

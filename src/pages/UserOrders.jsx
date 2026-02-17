@@ -5,7 +5,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import ItemPreview from '../components/ItemPreview';
 
 const UserOrders = () => {
-    const { orders, user, users, deleteOrder, toggleLike, toggleGalleryLike, likedIds } = useContext(AppContext);
+    const { orders, user, users, deleteOrder } = useContext(AppContext);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -135,16 +135,13 @@ const UserOrders = () => {
                 item={selectedOrder ? {
                     ...selectedOrder,
                     title: selectedOrder.productName,
-                    url: selectedOrder.image
+                    url: selectedOrder.image,
+                    type: 'order'
                 } : null}
                 isOpen={!!selectedOrder}
                 onClose={() => setSelectedOrder(null)}
-                isLiked={selectedOrder && likedIds.includes(selectedOrder.productId || selectedOrder.id)}
-                toggleLike={() => {
-                    const id = selectedOrder.productId || selectedOrder.id;
-                    if (selectedOrder.type === 'product') toggleLike(id);
-                    else toggleGalleryLike(id);
-                }}
+                isLiked={false}
+                toggleLike={() => { }}
             />
         </div>
     );
