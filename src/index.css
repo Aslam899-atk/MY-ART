@@ -416,12 +416,16 @@ a {
   }
 
   .py-10 {
-    padding-top: 4rem !important;
+    padding-top: 6rem !important;
     padding-bottom: 4rem !important;
   }
 
   .mb-10 {
     margin-bottom: 3rem !important;
+  }
+
+  .pt-responsive {
+    padding-top: 7rem !important;
   }
 
   .glass {
@@ -726,14 +730,16 @@ video {
 /* Flexbox utilities for mobile */
 .flex-md-row {
   flex-direction: row !important;
-  margin-top: 75px;
 }
 
 @media (max-width: 768px) {
   .flex-md-row {
     flex-direction: column !important;
-    margin-top: 20px;
   }
+}
+
+.pt-responsive {
+  padding-top: 9rem;
 }
 
 .shadow-glow-blue {

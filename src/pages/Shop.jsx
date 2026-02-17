@@ -71,7 +71,7 @@ const Shop = () => {
     }
 
     return (
-        <div className="container" style={{ paddingTop: '10rem', paddingBottom: '6rem' }}>
+        <div className="container pt-responsive pb-5">
             <header className="mb-5 text-center">
                 <Motion.div
                     initial={{ opacity: 0, y: 10 }}

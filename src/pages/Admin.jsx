@@ -6,8 +6,7 @@ import {
     Package, MessageSquare, ShoppingBag, Plus, Trash2, Edit3, LogOut, X,
     CheckCircle, Upload, Mail, User, Phone, Settings, Lock, Heart,
     Image as ImageIcon, LayoutDashboard, Search, Users as UsersIcon,
-    ChevronRight, Filter, ExternalLink, MoreVertical, Eye,
-    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush, Send
+    AlertCircle, TrendingUp, DollarSign, Clock, BarChart3, Brush, Send, Menu
 } from 'lucide-react';
 import ItemPreview from '../components/ItemPreview';
 
@@ -23,6 +22,7 @@ const Admin = () => {
     } = useContext(AppContext);
 
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [uploadType, setUploadType] = useState('shop'); // 'shop' or 'gallery'
     const [editingProduct, setEditingProduct] = useState(null);
@@ -462,7 +462,7 @@ const Admin = () => {
             {/* Mobile Bottom Nav */}
             <nav className="d-lg-none fixed-bottom glass border-top border-secondary border-opacity-10 py-2 px-3 d-flex justify-content-between align-items-center h-navbar shadow-2xl" style={{ zIndex: 1000 }}>
                 {
-                    menuItems.slice(0, 5).map(item => {
+                    menuItems.slice(0, 4).map(item => {
                         const Icon = item.icon;
                         const isActive = activeTab === item.id;
                         return (
@@ -477,7 +477,63 @@ const Admin = () => {
                         );
                     })
                 }
-            </nav >
+                <button
+                    onClick={() => setShowMobileMenu(true)}
+                    className={`btn border-0 p-2 rounded-3 d-flex flex-column align-items-center gap-1 transition-all ${['messages', 'emblos', 'collectors', 'settings'].includes(activeTab) ? 'text-primary' : 'text-white-50'}`}
+                >
+                    <Menu size={20} />
+                    <span style={{ fontSize: '0.6rem' }} className="fw-bold text-uppercase">More</span>
+                </button>
+            </nav>
+
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {showMobileMenu && (
+                    <Motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="d-lg-none fixed-top w-100 h-100 bg-black bg-opacity-90 d-flex flex-column justify-content-end p-3"
+                        style={{ zIndex: 2000 }}
+                        onClick={() => setShowMobileMenu(false)}
+                    >
+                        <Motion.div
+                            initial={{ y: 100 }}
+                            animate={{ y: 0 }}
+                            exit={{ y: 100 }}
+                            className="glass p-4 rounded-4 border border-secondary border-opacity-20 mb-5"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h5 className="fw-bold mb-0 text-white">Menu</h5>
+                                <button onClick={() => setShowMobileMenu(false)} className="btn btn-sm glass rounded-circle p-2 text-white"><X size={16} /></button>
+                            </div>
+                            <div className="row g-3">
+                                {menuItems.slice(4).map(item => {
+                                    const Icon = item.icon;
+                                    const isActive = activeTab === item.id;
+                                    return (
+                                        <div key={item.id} className="col-4">
+                                            <button
+                                                onClick={() => { setActiveTab(item.id); setShowMobileMenu(false); }}
+                                                className={`btn w-100 py-3 rounded-4 border-0 d-flex flex-column align-items-center gap-2 ${isActive ? 'bg-primary text-white' : 'glass text-white-50'}`}
+                                            >
+                                                <Icon size={24} />
+                                                <span className="extra-small fw-bold text-uppercase">{item.label}</span>
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                                <div className="col-12 mt-2">
+                                    <button onClick={handleLogout} className="btn w-100 glass text-danger border-0 py-3 d-flex align-items-center gap-3 justify-content-center rounded-4">
+                                        <LogOut size={16} /> <span className="fw-bold small text-uppercase">Logout</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </Motion.div>
+                    </Motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Main Content Area */}
             <main className="flex-grow-1 p-3 p-lg-5" style={{ paddingTop: '12rem', paddingBottom: '100px' }}>
