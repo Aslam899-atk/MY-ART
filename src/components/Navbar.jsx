@@ -7,6 +7,14 @@ import { AppContext } from '../context/AppContext';
 const Navbar = () => {
     const { user, logoutUser } = useContext(AppContext);
 
+    const closeMenu = () => {
+        const menu = document.getElementById('navbarNav');
+        if (menu && menu.classList.contains('show')) {
+            const toggler = document.querySelector('.navbar-toggler');
+            if (toggler) toggler.click();
+        }
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top mx-auto mt-3 px-3"
             style={{
@@ -23,7 +31,7 @@ const Navbar = () => {
                 transform: 'translateX(-50%)'
             }}>
             <div className="container-fluid p-0">
-                <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }}>
+                <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }} onClick={closeMenu}>
                     <img src="/icon.png" alt="ART VOID" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
                     <div className="d-flex flex-column">
                         <span className="text-gradient" style={{ letterSpacing: '2px', lineHeight: '1', fontSize: '1.4rem' }}>
@@ -39,16 +47,16 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0">
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/">HOME</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/" onClick={closeMenu}>HOME</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/gallery">GALLERY</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/gallery" onClick={closeMenu}>GALLERY</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/shop">STORE</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/shop" onClick={closeMenu}>STORE</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/contact">CONTACT</Link>
+                            <Link className="nav-link px-0 text-white opacity-70 hover-opacity-100 transition-all small fw-bold" to="/contact" onClick={closeMenu}>CONTACT</Link>
                         </li>
 
                         <li className="nav-item d-none d-lg-block mx-1">
@@ -64,22 +72,22 @@ const Navbar = () => {
                                             <span className="small text-white fw-bold d-none d-sm-inline opacity-75">{user.username?.split(' ')[0]}</span>
                                         </button>
                                         <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end glass border-0 mt-2 p-2 shadow-2xl">
-                                            <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/orders"><ShoppingBag size={14} /> My Orders</Link></li>
+                                            <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/orders" onClick={closeMenu}><ShoppingBag size={14} /> My Orders</Link></li>
                                             {user.role === 'emblos' && (
-                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/dashboard"><LayoutDashboard size={14} /> Emblos Dashboard</Link></li>
+                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/dashboard" onClick={closeMenu}><LayoutDashboard size={14} /> Emblos Dashboard</Link></li>
                                             )}
                                             {user.role !== 'emblos' && user.emblosAccess?.status !== 'pending' && (
-                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/request-access"><LayoutDashboard size={14} /> Request Emblos</Link></li>
+                                                <li><Link className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2" to="/request-access" onClick={closeMenu}><LayoutDashboard size={14} /> Request Emblos</Link></li>
                                             )}
                                             {user.emblosAccess?.status === 'pending' && (
                                                 <li><div className="dropdown-item rounded-3 small fw-bold py-2 d-flex align-items-center gap-2 text-warning"><LayoutDashboard size={14} /> Access Pending</div></li>
                                             )}
-                                            <li><button onClick={logoutUser} className="dropdown-item rounded-3 small fw-bold py-2 text-danger d-flex align-items-center gap-2"><LogIn size={14} style={{ transform: 'rotate(180deg)' }} /> Logout</button></li>
+                                            <li><button onClick={() => { logoutUser(); closeMenu(); }} className="dropdown-item rounded-3 small fw-bold py-2 text-danger d-flex align-items-center gap-2"><LogIn size={14} style={{ transform: 'rotate(180deg)' }} /> Logout</button></li>
                                         </ul>
                                     </div>
                                 </div>
                             ) : (
-                                <Link to="/login" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale">
+                                <Link to="/login" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-glow border-0 transition-all hover-scale" onClick={closeMenu}>
                                     LOGIN
                                 </Link>
                             )}
