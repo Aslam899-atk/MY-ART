@@ -34,7 +34,7 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
             className={`${className} position-relative ${!isLoaded ? 'skeleton' : ''}`}
             style={{
                 ...style,
-                backgroundColor: isLoaded ? 'transparent' : 'rgba(255,255,255,0.05)',
+                backgroundColor: isLoaded ? 'transparent' : 'rgba(255,255,255,0.03)',
                 transition: 'background-color 0.4s ease-out',
                 overflow: 'hidden',
                 aspectRatio: props.aspectRatio || 'unset',
@@ -42,10 +42,28 @@ const LazyImage = ({ src, alt, className, style, onClick, ...props }) => {
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
-                WebkitTransform: 'translateZ(0)'
+                WebkitTransform: 'translateZ(0)',
+                position: 'relative'
             }}
             onClick={onClick}
         >
+            {!isLoaded && (
+                <div
+                    className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{
+                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 2s infinite linear',
+                        zIndex: 1
+                    }}
+                />
+            )}
+            <style>{`
+                @keyframes shimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
+                }
+            `}</style>
             {isInView && (
                 <img
                     src={src}
