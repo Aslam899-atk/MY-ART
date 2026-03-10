@@ -54,11 +54,30 @@ export const AppProvider = ({ children }) => {
                 fetch(`${API_URL}/users`)
             ]);
 
-            setProducts(await prodRes.json());
-            setGalleryItems(await galRes.json());
+            const fetchedUsers = await usersRes.json();
+            setUsers(fetchedUsers);
+
+            // Build a set of frozen artist IDs
+            const frozenIds = new Set(
+                fetchedUsers
+                    .filter(u => u.isFrozen || u.emblosAccess?.status === 'frozen')
+                    .map(u => u._id || u.id)
+            );
+
+            const allProducts = await prodRes.json();
+            const allGallery = await galRes.json();
+
+            // For public users: hide items from frozen artists
+            if (canSeeAll) {
+                setProducts(allProducts);
+                setGalleryItems(allGallery);
+            } else {
+                setProducts(allProducts.filter(p => !p.creatorId || !frozenIds.has(p.creatorId)));
+                setGalleryItems(allGallery.filter(g => !g.creatorId || !frozenIds.has(g.creatorId)));
+            }
+
             setMessages(await msgRes.json());
             setOrders(await ordRes.json());
-            setUsers(await usersRes.json());
 
             // Fetch Emblos Config
             const configRes = await fetch(`${API_URL}/settings/emblos_config`);

@@ -32,7 +32,7 @@ const Navbar = () => {
             }}>
             <div className="container-fluid p-0">
                 <Link className="navbar-brand d-flex align-items-center gap-3" to="/" style={{ fontWeight: '800' }} onClick={closeMenu}>
-                    <img src="/icon.png" alt="ART VOID" style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
+                    <img src="/icon.png" alt="ART VOID" style={{ width: '38px', height: '38px', borderRadius: '0', background: 'transparent' }} />
                     <div className="d-flex flex-column">
                         <span className="text-gradient" style={{ letterSpacing: '2px', lineHeight: '1', fontSize: '1.4rem' }}>
                             ART VOID
