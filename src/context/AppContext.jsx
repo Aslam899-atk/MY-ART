@@ -55,19 +55,34 @@ export const AppProvider = ({ children }) => {
             ]);
 
             const fetchedUsers = await usersRes.json();
-            setUsers(fetchedUsers);
+
+            // Normalize isFrozen from emblosAccess.status for all users
+            const normalizedUsers = fetchedUsers.map(u => ({
+                ...u,
+                isFrozen: u.isFrozen === true || u.emblosAccess?.status === 'frozen'
+            }));
+            setUsers(normalizedUsers);
+
+            // Sync logged-in user's freeze status from latest server data
+            setUser(prev => {
+                if (!prev) return prev;
+                const prevId = prev._id || prev.id;
+                const fresh = normalizedUsers.find(u => (u._id || u.id) === prevId);
+                if (!fresh) return prev;
+                const updated = { ...prev, isFrozen: fresh.isFrozen, role: fresh.role, emblosAccess: fresh.emblosAccess };
+                localStorage.setItem('art_user', JSON.stringify(updated));
+                return updated;
+            });
 
             // Build a set of frozen artist IDs
             const frozenIds = new Set(
-                fetchedUsers
-                    .filter(u => u.isFrozen || u.emblosAccess?.status === 'frozen')
-                    .map(u => u._id || u.id)
+                normalizedUsers.filter(u => u.isFrozen).map(u => u._id || u.id)
             );
 
             const allProducts = await prodRes.json();
             const allGallery = await galRes.json();
 
-            // For public users: hide items from frozen artists
+            // For public users: hide items from frozen artists; admins/emblos see all
             if (canSeeAll) {
                 setProducts(allProducts);
                 setGalleryItems(allGallery);

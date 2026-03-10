@@ -196,25 +196,40 @@ const Dashboard = () => {
     return (
         <div className="container mt-5 pt-5 min-vh-100">
             {/* ... banner ... */}
-            <div className={`glass p-4 rounded-4 mb-4 border border-white border-opacity-10 d-flex flex-wrap align-items-center justify-content-between gap-3 ${isFrozen ? 'border-danger' : 'border-success'}`}>
-                {/* banner content */}
+            <div className={`glass p-4 rounded-4 mb-4 border d-flex flex-wrap align-items-center justify-content-between gap-3 ${isFrozen ? 'border-danger border-opacity-50' : 'border-white border-opacity-10'}`}>
                 <div className="d-flex align-items-center gap-3">
-                    <img src={user?.avatar} className="rounded-circle border border-2 border-primary" style={{ width: '60px', height: '60px' }} alt="" />
+                    <div className="position-relative">
+                        <img src={user?.avatar} className={`rounded-circle border border-2 ${isFrozen ? 'border-danger' : 'border-primary'}`} style={{ width: '60px', height: '60px', filter: isFrozen ? 'grayscale(80%)' : 'none' }} alt="" />
+                        {isFrozen && <span className="position-absolute bottom-0 end-0 fs-5">❄️</span>}
+                    </div>
                     <div>
                         <h4 className="fw-bold mb-1 text-gradient">{user?.username}</h4>
                         <div className="d-flex align-items-center gap-2">
-                            <span className={`badge rounded-pill bg-success px-3 py-1`}>
-                                Active Artist
-                            </span>
+                            {isFrozen ? (
+                                <span className="badge rounded-pill bg-danger px-3 py-1">❄️ Account Frozen</span>
+                            ) : (
+                                <span className="badge rounded-pill bg-success px-3 py-1">✓ Active Artist</span>
+                            )}
                         </div>
                     </div>
                 </div>
                 <div className="d-flex gap-3 align-items-center">
-                    <button onClick={() => setIsUploadModalOpen(true)} className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-glow d-flex align-items-center gap-2">
+                    <button onClick={() => { if (isFrozen) return alert("Your account is frozen. You cannot upload until unfrozen by Admin."); setIsUploadModalOpen(true); }} className={`btn rounded-pill px-4 py-2 fw-bold d-flex align-items-center gap-2 ${isFrozen ? 'btn-secondary opacity-50' : 'btn-primary shadow-glow'}`}>
                         <Plus size={18} /> New Creation
                     </button>
                 </div>
             </div>
+
+            {/* Frozen Warning Banner */}
+            {isFrozen && (
+                <div className="alert border border-danger border-opacity-30 rounded-4 mb-4 d-flex align-items-center gap-3" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                    <span className="fs-4">❄️</span>
+                    <div>
+                        <div className="fw-bold text-danger">Account Frozen by Admin</div>
+                        <div className="small text-white opacity-60">Your gallery and shop items are hidden from public view. Contact admin to resolve.</div>
+                    </div>
+                </div>
+            )}
 
             {isUploadModalOpen && (
                 <div className="fixed-top min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'rgba(0,0,0,0.92)', zIndex: 11000 }}>
