@@ -43,7 +43,8 @@ export const AppProvider = ({ children }) => {
     const fetchData = useCallback(async (isSilent = false) => {
         try {
             if (!isSilent) setIsLoadingData(true);
-            const canSeeAll = isAdmin || (user && user.role === 'emblos');
+            // Admins see all; active artists see all; frozen artists/public see filtered
+            const canSeeAll = (isAdmin || (user && user.role === 'emblos')) && !user?.isFrozen;
             const query = canSeeAll ? '?all=true' : '';
 
             const [prodRes, galRes, msgRes, ordRes, usersRes] = await Promise.all([
@@ -76,19 +77,19 @@ export const AppProvider = ({ children }) => {
 
             // Build a set of frozen artist IDs
             const frozenIds = new Set(
-                normalizedUsers.filter(u => u.isFrozen).map(u => u._id || u.id)
+                normalizedUsers.filter(u => u.isFrozen).map(u => String(u._id || u.id))
             );
 
             const allProducts = await prodRes.json();
             const allGallery = await galRes.json();
 
             // For public users: hide items from frozen artists; admins/emblos see all
-            if (canSeeAll) {
+            if (isAdmin) {
                 setProducts(allProducts);
                 setGalleryItems(allGallery);
             } else {
-                setProducts(allProducts.filter(p => !p.creatorId || !frozenIds.has(p.creatorId)));
-                setGalleryItems(allGallery.filter(g => !g.creatorId || !frozenIds.has(g.creatorId)));
+                setProducts(allProducts.filter(p => !p.creatorId || !frozenIds.has(String(p.creatorId))));
+                setGalleryItems(allGallery.filter(g => !g.creatorId || !frozenIds.has(String(g.creatorId))));
             }
 
             setMessages(await msgRes.json());

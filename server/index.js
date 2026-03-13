@@ -133,6 +133,7 @@ const userSchema = new mongoose.Schema({
         message: String,
         phone: String
     },
+    customCommission: { type: Number },
     createdAt: { type: Date, default: Date.now }
 }, schemaOptions);
 const User = mongoose.model('User', userSchema);
@@ -408,11 +409,16 @@ app.post('/api/users/:id/request-emblos', asyncHandler(async (req, res) => {
 }));
 
 app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
-    const { status, password } = req.body;
+    const { status, password, customCommission } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
+    if (customCommission !== undefined) {
+        user.customCommission = customCommission;
+    }
+
     if (status === 'active' || status === 'unfreeze') {
+        user.emblosAccess = user.emblosAccess || {};
         user.emblosAccess.status = 'active';
         user.role = 'emblos';
         user.isFrozen = false;
@@ -422,10 +428,15 @@ app.put('/api/users/:id/emblos-status', asyncHandler(async (req, res) => {
         }
     } else if (status === 'frozen') {
         user.isFrozen = true;
+        user.emblosAccess = user.emblosAccess || {};
+        user.emblosAccess.status = 'frozen';
     } else if (status === 'none' || status === 'rejected') {
+        user.emblosAccess = user.emblosAccess || {};
         user.emblosAccess.status = 'none';
         user.role = 'user';
+        user.isFrozen = false;
     } else {
+        user.emblosAccess = user.emblosAccess || {};
         user.emblosAccess.status = status;
     }
 
@@ -449,9 +460,22 @@ app.put('/api/orders/:id/price', asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Estimated days must be between 1 and 30" });
     }
 
-    // Fetch commission rate from settings (default to 10%)
-    const config = await AppSetting.findOne({ key: 'emblos_config' });
-    const commissionRate = config?.value?.commissionRate || 10;
+    // Fetch commission rate: check user's custom rate first, then global setting
+    const orderObj = await Order.findById(req.params.id);
+    let commissionRate = 10;
+
+    if (orderObj && orderObj.creatorId) {
+        const artist = await User.findById(orderObj.creatorId);
+        if (artist && artist.customCommission !== undefined) {
+            commissionRate = artist.customCommission;
+        } else {
+            const config = await AppSetting.findOne({ key: 'emblos_config' });
+            commissionRate = config?.value?.commissionRate || 10;
+        }
+    } else {
+        const config = await AppSetting.findOne({ key: 'emblos_config' });
+        commissionRate = config?.value?.commissionRate || 10;
+    }
 
     const adminCommission = (price * commissionRate) / 100;
     const artistEarnings = price - adminCommission;
@@ -491,8 +515,19 @@ app.put('/api/orders/:id/claim', asyncHandler(async (req, res) => {
         updateData.status = 'Approved';
 
         // Fetch commission rate
-        const config = await AppSetting.findOne({ key: 'emblos_config' });
-        const commissionRate = config?.value?.commissionRate || 10;
+        let commissionRate = 10;
+        if (creatorId) {
+            const artist = await User.findById(creatorId);
+            if (artist && artist.customCommission !== undefined) {
+                commissionRate = artist.customCommission;
+            } else {
+                const config = await AppSetting.findOne({ key: 'emblos_config' });
+                commissionRate = config?.value?.commissionRate || 10;
+            }
+        } else {
+            const config = await AppSetting.findOne({ key: 'emblos_config' });
+            commissionRate = config?.value?.commissionRate || 10;
+        }
 
         updateData.adminCommission = (price * commissionRate) / 100;
         updateData.artistEarnings = price - updateData.adminCommission;
@@ -564,8 +599,19 @@ app.post('/api/orders', asyncHandler(async (req, res) => {
     }, 1000 * 60 * 60); // Run check roughly every hour (in a real app, use cron)
 
     if (price > 0) {
-        const config = await AppSetting.findOne({ key: 'emblos_config' });
-        const commissionRate = config?.value?.commissionRate || 10;
+        let commissionRate = 10;
+        if (creatorId) {
+            const artist = await User.findById(creatorId);
+            if (artist && artist.customCommission !== undefined) {
+                commissionRate = artist.customCommission;
+            } else {
+                const config = await AppSetting.findOne({ key: 'emblos_config' });
+                commissionRate = config?.value?.commissionRate || 10;
+            }
+        } else {
+            const config = await AppSetting.findOne({ key: 'emblos_config' });
+            commissionRate = config?.value?.commissionRate || 10;
+        }
         adminCommission = (price * commissionRate) / 100;
         artistEarnings = price - adminCommission;
     }

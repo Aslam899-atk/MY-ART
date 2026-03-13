@@ -1168,23 +1168,21 @@ const Admin = () => {
                                                                 <MessageSquare size={16} />
                                                             </button>
 
-                                                            <div className="d-flex gap-2 align-items-center bg-white bg-opacity-5 p-1 px-2 rounded-pill shadow-sm border border-white border-opacity-5">
+                                                            <div className="d-flex gap-2">
                                                                 {u.isFrozen ? (
                                                                     <button
                                                                         onClick={() => setUnfreezeTarget(u)}
-                                                                        className="btn btn-sm btn-success rounded-pill extra-small px-3 py-1 fw-bold shadow-glow"
+                                                                        className="btn btn-sm btn-success rounded-pill extra-small px-3 py-1 fw-bold"
                                                                     >
                                                                         Unfreeze
                                                                     </button>
                                                                 ) : (
-                                                                    <div className="d-flex gap-1">
-                                                                        <button
-                                                                            onClick={() => { if (window.confirm(`Freeze access for ${u.username}?`)) updateEmblosStatus(u._id, { status: 'frozen' }); }}
-                                                                            className="btn btn-sm btn-danger rounded-pill extra-small px-3 py-1 fw-bold"
-                                                                        >
-                                                                            Freeze
-                                                                        </button>
-                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => { if (window.confirm(`Freeze access for ${u.username}?`)) updateEmblosStatus(u._id || u.id, { status: 'frozen' }); }}
+                                                                        className="btn btn-sm btn-danger rounded-pill extra-small px-3 py-1 fw-bold"
+                                                                    >
+                                                                        Freeze
+                                                                    </button>
                                                                 )}
                                                             </div>
                                                         </>
@@ -1213,7 +1211,7 @@ const Admin = () => {
                                         </tr>
                                     ))}
                                     {(activeTab === 'emblos' ? filteredEmblos : filteredUsers).length === 0 && (
-                                        <tr><td colSpan="4" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
+                                        <tr><td colSpan="6" className="text-center py-5 opacity-30 small">No {activeTab} found</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -1768,8 +1766,9 @@ const Admin = () => {
                                 <div className="d-flex flex-column gap-2">
                                     <button
                                         onClick={async () => {
-                                            await updateEmblosStatus(unfreezeTarget._id, { status: 'unfreeze' });
-                                            await updateUserCommission(unfreezeTarget._id, 0);
+                                            const id = unfreezeTarget._id || unfreezeTarget.id;
+                                            await updateEmblosStatus(id, { status: 'unfreeze' });
+                                            await updateUserCommission(id, 0);
                                             setUnfreezeTarget(null);
                                         }}
                                         className="btn btn-danger w-100 py-3 rounded-4 fw-bold border-0 shadow-lg d-flex align-items-center justify-content-center gap-2"
@@ -1778,7 +1777,8 @@ const Admin = () => {
                                     </button>
                                     <button
                                         onClick={async () => {
-                                            await updateEmblosStatus(unfreezeTarget._id, { status: 'unfreeze' });
+                                            const id = unfreezeTarget._id || unfreezeTarget.id;
+                                            await updateEmblosStatus(id, { status: 'unfreeze' });
                                             setUnfreezeTarget(null);
                                         }}
                                         className="btn btn-success w-100 py-3 rounded-4 fw-bold border-0 shadow-lg d-flex align-items-center justify-content-center gap-2"
