@@ -51,7 +51,7 @@ const Dashboard = () => {
 
     // Protection & Init
     useEffect(() => {
-        if (!isLoadingAuth && (!user || user.role !== 'emblos')) {
+        if (!isLoadingAuth && (!user || (user.role !== 'emblos' && user.role !== 'admin'))) {
             navigate('/');
         }
     }, [user, isLoadingAuth, navigate]);
@@ -73,9 +73,9 @@ const Dashboard = () => {
 
     // Filter relevant data
     const userId = user?._id || user?.id;
-    const myProducts = products.filter(p => p.creatorId === userId);
-    const myGallery = galleryItems.filter(g => g.creatorId === userId);
-    const myOrders = orders.filter(o => o.creatorId === userId);
+    const myProducts = products.filter(p => (p.creatorId === userId) || (p.ownerId === userId));
+    const myGallery = galleryItems.filter(g => (g.creatorId === userId));
+    const myOrders = orders.filter(o => (o.creatorId === userId) || (o.customerId === userId));
     const publicTasks = orders.filter(o => !o.creatorId && o.status !== 'Completed' && o.deliveryStatus !== 'Completed');
     const myMessages = messages.filter(m => m.receiverId === userId || m.senderId === userId);
 
@@ -376,7 +376,7 @@ const Dashboard = () => {
                             <div className="col-md-4">
                                 <div className="glass p-4 rounded-4 text-center">
                                     <div className="h3 fw-bold text-accent">
-                                        ₹{myOrders.reduce((sum, o) => sum + (o.price || 0), 0)}
+                                        ₹{myOrders.reduce((sum, o) => sum + (Number(o.price) || 0), 0)}
                                     </div>
                                     <div className="small text-white opacity-50 uppercase tracking-widest">Total Earnings</div>
                                 </div>
